@@ -63,6 +63,11 @@ public class VertexGenerator {
  /**
  */
  public static void main(String args[]) {
-	 
- }
+	 VertexGenerator vg = VertexGenerator.getInstance();
+	 try {
+		System.out.println(vg.generate("1-2:10,3:15,4:12"));
+	} catch (InvalidVertexLineException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} }
 }
