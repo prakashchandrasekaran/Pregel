@@ -3,6 +3,8 @@ package utility;
 import java.util.LinkedList;
 import java.util.List;
 
+import exceptions.InvalidVertexLineException;
+
 import api.Edge;
 import api.Vertex;
 
@@ -19,10 +21,10 @@ public class VertexGenerator {
  private VertexGenerator() { }
 
  public static synchronized VertexGenerator getInstance() {
-  if (instance == null) {
-   instance = new VertexGenerator();
-  }
-  return instance;
+	  if (instance == null) {
+	   instance = new VertexGenerator();
+	  }
+	  return instance;
  }
  
  /**
@@ -31,30 +33,36 @@ public class VertexGenerator {
   * <br> Example : 1-2:10,3:15,4:12
   * @param vertexLine
   * @return
+  * @throws InvalidVertexLineException 
   */
- public Vertex generate(String vertexLine) {
-  // if(vertexLine != null) { throw some error }
-  Vertex vertex = new Vertex();
-  String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
-  String sourceVertex = vertexSplit[0];
-  vertex.setId(sourceVertex);
-  String[] edges = vertexSplit[1].split(edgesDelimiter);
-  List<Edge> outGoingEdges = new LinkedList<>();
-  String[] edgeData = null;
-  String destVertex = null;
-  Double edgeWeight = 0.0;
-  for(String edge : edges) {
-	  edgeData = edge.split(vertexWeightDelimiter);
-	  destVertex = edgeData[0];
-	  edgeWeight = Double.parseDouble(edgeData[1]);
-	  outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
-  }
-  vertex.setOutgoingEdges(outGoingEdges);
-  return vertex;
+ public Vertex generate(String vertexLine) throws InvalidVertexLineException {
+	  if(vertexLine == null || vertexLine.length() == 0) 
+		  throw new InvalidVertexLineException(vertexLine, "Vertex Line is Null");
+	  
+	  Vertex vertex = new Vertex();
+	  String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
+	  // Source Vertex
+	  String sourceVertex = vertexSplit[0];
+	  vertex.setId(sourceVertex);
+	  // List of Edges
+	  String[] edges = vertexSplit[1].split(edgesDelimiter);
+	  List<Edge> outGoingEdges = new LinkedList<>();
+	  String[] edgeData = null;
+	  String destVertex = null;
+	  Double edgeWeight = 0.0;
+	  for(String edge : edges) {
+		  edgeData = edge.split(vertexWeightDelimiter);
+		  destVertex = edgeData[0];
+		  edgeWeight = Double.parseDouble(edgeData[1]);
+		  outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
+	  }
+	  vertex.setOutgoingEdges(outGoingEdges);
+	  return vertex;
  }
 
  /**
  */
  public static void main(String args[]) {
+	 
  }
 }
