@@ -15,9 +15,9 @@ public class VertexGenerator {
  
  
 	 private static VertexGenerator instance = null; 
-	 private static String sourceVertexDelimiter = "-";
-	 private static String edgesDelimiter = ",";
-	 private static String vertexWeightDelimiter = ":";
+	 private static String sourceVertexDelimiter;
+	 private static String edgesDelimiter;
+	 private static String vertexWeightDelimiter;
 	 private static Props props;
 	 private VertexGenerator() { }
 	
