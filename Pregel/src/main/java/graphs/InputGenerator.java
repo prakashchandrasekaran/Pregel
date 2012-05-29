@@ -29,6 +29,9 @@ public class InputGenerator {
 	/** The output file path. */
 	private String outputFilePath;
 	
+	/** The writer object. */
+	private BufferedWriter writer;
+	
 	/**
 	 * Instantiates a new input generator.
 	 *
@@ -42,15 +45,39 @@ public class InputGenerator {
 		this.minEdgeWeight = minEdgeWeight;
 		this.maxEdgeWeight = maxEdgeWeight;
 		this.outputFilePath = outputFilePath;
+		setWriter();
 	}
 	
+	
+	/**
+	 * Sets the writer.
+	 */
+	private void setWriter(){
+		try {
+			writer = new BufferedWriter(new FileWriter(outputFilePath));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Close writer.
+	 */
+	private void closeWriter(){
+		try{
+			writer.close();
+		}
+		catch (IOException e){
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Generate the input to be processed by graph generator.
 	 * The resulting input file will be in the following format:
 	 * <Number of vertices> (line 1)
 	 * <Vertex1-Vertex2:Weight1,Vertex3:Weight2,...> (from line 2 onwards)
-	 * ...
+	 * Example : 1-2:10,3:15,4:12
 	 */
 	public void generateInput(){
 		Props properties = Props.getInstance();
@@ -59,46 +86,52 @@ public class InputGenerator {
 		Random random = new Random();
 		StringBuilder adjacencyList = new StringBuilder();
 		
-		adjacencyList.append(numVertices);
-		adjacencyList.append(properties.getStringProperty("LINE_SEPARATOR"));
+		// Getting the separators and buffer size from the properties file
+		String vertexListSeparator = properties.getStringProperty("VERTEX_LIST_SEPARATOR");
+		String listVertexSeparator = properties.getStringProperty("LIST_VERTEX_SEPARATOR");
+		String listVertexWeightSeparator = properties.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
+		String lineSeparator = properties.getStringProperty("LINE_SEPARATOR"); 
+		int inputBufferSize = properties.getIntProperty("INPUTGEN_BUFFER_SIZE");
 		
-		boolean appendFile = false;
+		adjacencyList.append(numVertices);
+		adjacencyList.append(lineSeparator);
+		
 		
 		for (int vertexId = 1; vertexId <= numVertices; vertexId++){
 			int rightVertexId = (vertexId % squareRoot != 0) ? (vertexId + 1) : 0;
 			int topVertexId = ((vertexId + squareRoot) <= numVertices) ? (vertexId + squareRoot) : 0;
-			adjacencyList.append(vertexId).append(properties.getStringProperty("VERTEX_LIST_SEPARATOR"));
+			adjacencyList.append(vertexId).append(vertexListSeparator);
 		
 			// if the right vertex exists, add it to the adjacency list	
 			if(rightVertexId != 0){
 				double weight = minEdgeWeight + (maxEdgeWeight - minEdgeWeight) * random.nextDouble();
-				adjacencyList.append(rightVertexId).append(properties.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR")).append(weight);
+				adjacencyList.append(rightVertexId).append(listVertexWeightSeparator).append(weight);
 			}
 			
 			// if the top vertex exists, add it to the adjacency list
 			if(topVertexId != 0){
 				if(rightVertexId != 0){
-					adjacencyList.append(properties.getStringProperty("LIST_VERTEX_SEPARATOR"));
+					adjacencyList.append(listVertexSeparator);
 				}
 				double weight = minEdgeWeight + (maxEdgeWeight - minEdgeWeight) * random.nextDouble();
-				adjacencyList.append(topVertexId).append(properties.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR")).append(weight);
+				adjacencyList.append(topVertexId).append(listVertexWeightSeparator).append(weight);
 			}
-			adjacencyList.append(properties.getStringProperty("LINE_SEPARATOR"));
+			adjacencyList.append(lineSeparator);
 			
 			// append the content to the file in batches.
-			if(vertexId % properties.getIntProperty("INPUTGEN_BUFFER_SIZE") == 0){
+			if(vertexId % inputBufferSize == 0){
 				System.out.println("Flushing to file");
-				writeToFile(adjacencyList.toString(), appendFile);
-				appendFile = true;
+				//Write the graph input to the output file path
+				writeToFile(adjacencyList.toString());
 				adjacencyList = new StringBuilder();
 			}
 		}
 		if(adjacencyList.length() > 0){
 			System.out.println("Writing the remaining content to file");
 			//Write the graph input to the output file path
-			writeToFile(adjacencyList.toString(), appendFile);
+			writeToFile(adjacencyList.toString());
 		}
-		
+		closeWriter();
 	}
 		
 	/**
@@ -106,22 +139,13 @@ public class InputGenerator {
 	 *
 	 * @param output the output
 	 */
-	private void writeToFile(String output, boolean append){	
-		BufferedWriter writefile = null;
+	private void writeToFile(String output){	
 		try {
-			// appends the content to the file
-			writefile = new BufferedWriter(new FileWriter(outputFilePath, append));
-			writefile.write(output);			
+			writer.write(output);			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		finally{
-			try {
-				writefile.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		
 	}
 	
 	/**
@@ -131,10 +155,10 @@ public class InputGenerator {
 	 * @throws Exception the exception
 	 */
 	public static void main(String[] args) throws Exception {
-		int numVertices = 36;//Integer.parseInt(args[0]);
+		int numVertices = 16;//Integer.parseInt(args[0]);
 		double minEdgeWeight = 1;//Double.parseDouble(args[1]);
 		double maxEdgeWeight = 1;//Double.parseDouble(args[2]);
-		String outputFilePath = "output/output.txt";
+		String outputFilePath = "/storage/shelf2/ucsb/cs290b/output.txt";
 
 		InputGenerator inputGenerator = new InputGenerator(numVertices, minEdgeWeight, maxEdgeWeight, outputFilePath);		
 		inputGenerator.generateInput(); 
