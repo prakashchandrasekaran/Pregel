@@ -42,8 +42,8 @@ public class VertexGenerator {
 		  if(vertexLine == null || vertexLine.length() == 0) 
 			  throw new InvalidVertexLineException(vertexLine, "Vertex Line is Null");
 		  
-		  
 		  String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
+		  
 		  // Source Vertex
 		  String sourceVertex = vertexSplit[0];
 		 
