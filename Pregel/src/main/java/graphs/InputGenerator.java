@@ -126,7 +126,7 @@ public class InputGenerator {
 		int numVertices = 16;//Integer.parseInt(args[0]);
 		double minEdgeWeight = 1;//Double.parseDouble(args[1]);
 		double maxEdgeWeight = 100;//Double.parseDouble(args[2]);
-		String outputFilePath = "/storage/shelf2/ucsb/cs290b/output.txt";
+		String outputFilePath = "output/output.txt";
 		InputGenerator inputGenerator = new InputGenerator(numVertices, minEdgeWeight, maxEdgeWeight, outputFilePath);		
 		inputGenerator.generateInput();
 		

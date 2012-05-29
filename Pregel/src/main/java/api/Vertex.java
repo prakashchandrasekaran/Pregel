@@ -4,14 +4,18 @@ import java.util.List;
 
 public class Vertex {
 
-	public void setId(String sourceVertex) {
-		// TODO Auto-generated method stub
-		
+	public String vertexId;
+	public List<Edge> outGoingEdges;
+	public void setId(String vertexId) {
+		this.vertexId = vertexId;
 	}
 
 	public void setOutgoingEdges(List<Edge> outGoingEdges) {
-		// TODO Auto-generated method stub
-		
+		this.outGoingEdges = outGoingEdges;
+	}
+	
+	public String toString() {
+		return vertexId + "<->" + outGoingEdges;
 	}
 	
 }
