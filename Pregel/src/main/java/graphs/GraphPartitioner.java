@@ -1,11 +1,11 @@
 package graphs;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
+
+import utility.Props;
 import utility.VertexGenerator;
 import api.Partition;
 import api.Vertex;
@@ -22,15 +22,14 @@ public class GraphPartitioner implements Iterable<Partition> {
 	/**
 	 * Constructs the graph partitions
 	 */
-	double numVertices;
-	double numWorkerManager;
-	double numWorker;
-	double numPartitions;
+	private long numVertices;
+	private long numWorkerManager;
+	private long numWorker;
+	private long numPartitions;
 	String fileName;
-	FileInputStream fstream;
 	BufferedReader br;
-	DataInputStream in;
-	public static final double MAX_VERTICES_PER_PARTITION = 1000;
+	public static final long MAX_VERTICES_PER_PARTITION = Props.getInstance().getLongProperty("MAX_VERTICES_PER_PARTITION");
+	
 	/**
 	 * 
 	 * @param fileName Represents the input graph generated file
@@ -39,19 +38,21 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-	public GraphPartitioner(String fileName, double numWorkerManager,
-			double numWorker) throws NumberFormatException, IOException {
+	public GraphPartitioner(String fileName, long numWorkerManager,
+			long numWorker) throws NumberFormatException, IOException {
 		this.fileName = fileName;
 		this.numWorkerManager = numWorkerManager;
 		this.numWorker = numWorker;
-		fstream = new FileInputStream(fileName);
-		in = new DataInputStream(fstream);
-		br = new BufferedReader(new InputStreamReader(in));
-		numVertices = Double.parseDouble(br.readLine());
+		br = new BufferedReader(new FileReader(fileName));
+		numVertices = Long.parseLong(br.readLine());
 		if (numVertices < MAX_VERTICES_PER_PARTITION)
 			numPartitions = 1;
 		else
+		{
 			numPartitions = numVertices / MAX_VERTICES_PER_PARTITION;
+			if(numPartitions % MAX_VERTICES_PER_PARTITION != 0)
+				numPartitions +=1;
+		}
 	}
 
 	/**
@@ -62,11 +63,11 @@ public class GraphPartitioner implements Iterable<Partition> {
 		List<Vertex> vertexList = new ArrayList<>();
 		try {
 			String strLine;
-			double vertexCounter = 0;
-			while (((strLine = br.readLine()) != null)
-					&& (vertexCounter < MAX_VERTICES_PER_PARTITION)) {
+			long vertexCounter = 0;
+			while ( (vertexCounter < MAX_VERTICES_PER_PARTITION) && ((strLine = br.readLine()) != null)
+					) {
 				vertexCounter += 1;
-				vertexList.add(VertexGenerator.getInstance().generate(strLine));
+				vertexList.add(VertexGenerator.generate(strLine));
 			}
 		} catch (Exception e) {
 			System.err.println("File Read Error: " + e.getMessage());
@@ -89,7 +90,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 					return true;
 				else {
 					try {
-						in.close();
+						br.close();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -99,13 +100,9 @@ public class GraphPartitioner implements Iterable<Partition> {
 
 			@Override
 			public Partition next() {
-				Partition nextPartition = getNextPartition();
+				Partition nextPartition = new Partition(getNextVertices());
 				partitionCounter += 1;
 				return nextPartition;
-			}
-
-			private Partition getNextPartition() {
-				return new Partition(getNextVertices());
 			}
 
 			@Override
