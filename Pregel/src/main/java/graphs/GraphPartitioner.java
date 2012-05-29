@@ -54,6 +54,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 			double vertexCounter = 0;
 			while (((strLine = br.readLine()) != null)
 					&& (vertexCounter < MAX_VERTICES_PER_PARTITION)) {
+				vertexCounter += 1;
 				vertexList.add(VertexGenerator.getInstance().generate(strLine));
 			}
 		} catch (Exception e) {
