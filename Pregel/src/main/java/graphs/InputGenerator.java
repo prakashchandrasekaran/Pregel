@@ -27,6 +27,10 @@ public class InputGenerator {
 	/** Represents the line separator. */
 	private final static String LINE_SEPARATOR = "\n";
 	
+	
+	private final static int INPUT_BUFFER_SIZE = 10;
+	
+	
 	/** The number of vertices. */
 	private int numVertices;
 	
@@ -57,7 +61,8 @@ public class InputGenerator {
 	
 	/**
 	 * Generate the input to be processed by graph generator.
-	 *
+	 * The resulting input file will be in the following format:
+	 * V1-
 	 * @return string
 	 */
 	public void generateInput(){
@@ -68,6 +73,7 @@ public class InputGenerator {
 		
 		adjacencyList.append(numVertices);
 		adjacencyList.append(LINE_SEPARATOR);
+		boolean appendFile = false;
 		
 		for (int vertexId = 1; vertexId <= numVertices; vertexId++){
 			int rightVertexId = (vertexId % squareRoot != 0) ? (vertexId + 1) : 0;
@@ -89,9 +95,21 @@ public class InputGenerator {
 				adjacencyList.append(topVertexId).append(LIST_VERTEX_WEIGHT_SEPARATOR).append(weight);
 			}
 			adjacencyList.append(LINE_SEPARATOR);
+			
+			// append the content to the file in batches.
+			if(vertexId % INPUT_BUFFER_SIZE == 0){
+				System.out.println("Flushing to file");
+				writeToFile(adjacencyList.toString(), appendFile);
+				appendFile = true;
+				adjacencyList = new StringBuilder();
+			}
 		}
-		//Write the graph input to the output file path
-		writeToFile(adjacencyList.toString());
+		if(adjacencyList.length() > 0){
+			System.out.println("Writing the remaining content to file");
+			//Write the graph input to the output file path
+			writeToFile(adjacencyList.toString(), appendFile);
+		}
+		
 	}
 		
 	/**
@@ -99,10 +117,11 @@ public class InputGenerator {
 	 *
 	 * @param output the output
 	 */
-	private void writeToFile(String output){	
+	private void writeToFile(String output, boolean append){	
 		BufferedWriter writefile = null;
 		try {
-			writefile = new BufferedWriter(new FileWriter(outputFilePath));
+			// appends the content to the file
+			writefile = new BufferedWriter(new FileWriter(outputFilePath, append));
 			writefile.write(output);			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -123,10 +142,10 @@ public class InputGenerator {
 	 * @throws Exception the exception
 	 */
 	public static void main(String[] args) throws Exception {
-		int numVertices = 16;//Integer.parseInt(args[0]);
+		int numVertices = 36;//Integer.parseInt(args[0]);
 		double minEdgeWeight = 1;//Double.parseDouble(args[1]);
 		double maxEdgeWeight = 100;//Double.parseDouble(args[2]);
-		String outputFilePath = "output/output.txt";
+		String outputFilePath = "/storage/shelf2/ucsb/cs290b/output.txt";
 		InputGenerator inputGenerator = new InputGenerator(numVertices, minEdgeWeight, maxEdgeWeight, outputFilePath);		
 		inputGenerator.generateInput();
 		
