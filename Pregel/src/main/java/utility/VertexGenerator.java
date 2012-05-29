@@ -18,13 +18,17 @@ public class VertexGenerator {
 	 private static String sourceVertexDelimiter = "-";
 	 private static String edgesDelimiter = ",";
 	 private static String vertexWeightDelimiter = ":";
-	
+	 private static Props props;
 	 private VertexGenerator() { }
 	
 	 public static synchronized VertexGenerator getInstance() {
 		  if (instance == null) {
-		   instance = new VertexGenerator();
+			  instance = new VertexGenerator();
 		  }
+		  props = Props.getInstance();
+		  sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
+		  edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
+		  vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
 		  return instance;
 	 }
 	 
