@@ -67,6 +67,7 @@ public class InputGenerator {
 		StringBuilder adjacencyList = new StringBuilder();
 		
 		adjacencyList.append(numVertices);
+		adjacencyList.append(LINE_SEPARATOR);
 		
 		for (int vertexId = 1; vertexId <= numVertices; vertexId++){
 			int rightVertexId = (vertexId % squareRoot != 0) ? (vertexId + 1) : 0;
