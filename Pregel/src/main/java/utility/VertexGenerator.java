@@ -38,12 +38,12 @@ public class VertexGenerator {
 	  * @return
 	  * @throws InvalidVertexLineException 
 	  */
-	 public Vertex generate(String vertexLine) throws InvalidVertexLineException {
+	 public static Vertex generate(String vertexLine) throws InvalidVertexLineException {
 		  if(vertexLine == null || vertexLine.length() == 0) 
 			  throw new InvalidVertexLineException(vertexLine, "Vertex Line is Null");
 		  
-		  
 		  String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
+		  
 		  // Source Vertex
 		  String sourceVertex = vertexSplit[0];
 		 
