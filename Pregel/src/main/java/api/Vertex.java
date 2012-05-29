@@ -5,11 +5,11 @@ import java.util.List;
 public class Vertex {
 
 	private String vertexId;
-	private List<Edge> outGoingEdges;
+	private List<Edge> outgoingEdges;
 	
-	public Vertex(String vertexId, List<Edge> outGoingEdges) {
+	public Vertex(String vertexId, List<Edge> outgoingEdges) {
 		this.vertexId = vertexId;
-		this.outGoingEdges = outGoingEdges;
+		this.outgoingEdges = outgoingEdges;
 	}
 	
 	public String getId() {
@@ -17,11 +17,11 @@ public class Vertex {
 	}
 
 	public List<Edge> getOutgoingEdges() {
-		return outGoingEdges;
+		return outgoingEdges;
 	}
 	
 	public String toString() {
-		return "(" + vertexId + "-" + outGoingEdges + ")";
+		return "(" + vertexId + "-" + outgoingEdges + ")";
 	}
 	
 }

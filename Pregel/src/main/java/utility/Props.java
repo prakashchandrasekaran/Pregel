@@ -75,6 +75,11 @@ public class Props {
 		return Double.parseDouble(properties.getProperty(key));
 	}
 	
+	public Long getLongProperty(String key) {
+		checkProperties();
+		return Long.parseLong(properties.getProperty(key));
+	}
+	
 	/**
 	 * @param args
 	 */
