@@ -10,26 +10,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
+import utility.Props;
+
 /**
  * Generates an adjacency list representing a graph based on the number of vertices and the range of weights to be assigned to the edges.
  */
 public class InputGenerator {
-	
-	/** Represents the separator between the vertex and its adjacency list. */
-	private final static String VERTEX_LIST_SEPARATOR = "-";
-	
-	/** Represents the separator between a vertex and its weight in the adjacency list. */
-	private final static String LIST_VERTEX_WEIGHT_SEPARATOR = ":";
-	
-	/** Represents the separator between two elements in the adjacency list. */
-	private final static String LIST_VERTEX_SEPARATOR = ",";
-		
-	/** Represents the line separator. */
-	private final static String LINE_SEPARATOR = "\n";
-	
-	
-	private final static int INPUT_BUFFER_SIZE = 10;
-	
 	
 	/** The number of vertices. */
 	private int numVertices;
@@ -62,42 +48,45 @@ public class InputGenerator {
 	/**
 	 * Generate the input to be processed by graph generator.
 	 * The resulting input file will be in the following format:
-	 * V1-
-	 * @return string
+	 * <Number of vertices> (line 1)
+	 * <Vertex1-Vertex2:Weight1,Vertex3:Weight2,...> (from line 2 onwards)
+	 * ...
 	 */
 	public void generateInput(){
+		Props properties = Props.getInstance();
 		// Assuming that the numVertices is a perfect square.
 		int squareRoot = (int)Math.sqrt(numVertices);
 		Random random = new Random();
 		StringBuilder adjacencyList = new StringBuilder();
 		
 		adjacencyList.append(numVertices);
-		adjacencyList.append(LINE_SEPARATOR);
+		adjacencyList.append(properties.getStringProperty("LINE_SEPARATOR"));
+		
 		boolean appendFile = false;
 		
 		for (int vertexId = 1; vertexId <= numVertices; vertexId++){
 			int rightVertexId = (vertexId % squareRoot != 0) ? (vertexId + 1) : 0;
 			int topVertexId = ((vertexId + squareRoot) <= numVertices) ? (vertexId + squareRoot) : 0;
-			adjacencyList.append(vertexId).append(VERTEX_LIST_SEPARATOR);
+			adjacencyList.append(vertexId).append(properties.getStringProperty("VERTEX_LIST_SEPARATOR"));
 		
 			// if the right vertex exists, add it to the adjacency list	
 			if(rightVertexId != 0){
 				double weight = minEdgeWeight + (maxEdgeWeight - minEdgeWeight) * random.nextDouble();
-				adjacencyList.append(rightVertexId).append(LIST_VERTEX_WEIGHT_SEPARATOR).append(weight);
+				adjacencyList.append(rightVertexId).append(properties.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR")).append(weight);
 			}
 			
 			// if the top vertex exists, add it to the adjacency list
 			if(topVertexId != 0){
 				if(rightVertexId != 0){
-					adjacencyList.append(LIST_VERTEX_SEPARATOR);
+					adjacencyList.append(properties.getStringProperty("LIST_VERTEX_SEPARATOR"));
 				}
 				double weight = minEdgeWeight + (maxEdgeWeight - minEdgeWeight) * random.nextDouble();
-				adjacencyList.append(topVertexId).append(LIST_VERTEX_WEIGHT_SEPARATOR).append(weight);
+				adjacencyList.append(topVertexId).append(properties.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR")).append(weight);
 			}
-			adjacencyList.append(LINE_SEPARATOR);
+			adjacencyList.append(properties.getStringProperty("LINE_SEPARATOR"));
 			
 			// append the content to the file in batches.
-			if(vertexId % INPUT_BUFFER_SIZE == 0){
+			if(vertexId % properties.getIntProperty("INPUTGEN_BUFFER_SIZE") == 0){
 				System.out.println("Flushing to file");
 				writeToFile(adjacencyList.toString(), appendFile);
 				appendFile = true;
@@ -148,7 +137,7 @@ public class InputGenerator {
 		String outputFilePath = "output/output.txt";
 
 		InputGenerator inputGenerator = new InputGenerator(numVertices, minEdgeWeight, maxEdgeWeight, outputFilePath);		
-		inputGenerator.generateInput();
+		inputGenerator.generateInput(); 
 		
 		System.out.println("File generated successfully!");
 	}
