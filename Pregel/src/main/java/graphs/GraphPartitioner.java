@@ -31,7 +31,14 @@ public class GraphPartitioner implements Iterable<Partition> {
 	BufferedReader br;
 	DataInputStream in;
 	public static final double MAX_VERTICES_PER_PARTITION = 1000;
-
+	/**
+	 * 
+	 * @param fileName Represents the input graph generated file
+	 * @param numWorkerManager Represents the number of worker nodes registered for computations
+	 * @param numWorker Represents the number of total number of worker threads available for computations  
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
 	public GraphPartitioner(String fileName, double numWorkerManager,
 			double numWorker) throws NumberFormatException, IOException {
 		this.fileName = fileName;
@@ -47,8 +54,12 @@ public class GraphPartitioner implements Iterable<Partition> {
 			numPartitions = numVertices / MAX_VERTICES_PER_PARTITION;
 	}
 
-	public ArrayList<Vertex> getNextVertices() {
-		ArrayList<Vertex> vertexList = new ArrayList<>();
+	/**
+	 * 
+	 * @return Returns list of vertices comprising a partition
+	 */
+	public List<Vertex> getNextVertices() {
+		List<Vertex> vertexList = new ArrayList<>();
 		try {
 			String strLine;
 			double vertexCounter = 0;
@@ -63,6 +74,9 @@ public class GraphPartitioner implements Iterable<Partition> {
 		return vertexList;
 	}
 
+	/**
+	 * Iterator to iterate through the partitions of a graph
+	 */
 	@Override
 	public Iterator<Partition> iterator() {
 		Iterator<Partition> iter = new Iterator<Partition>() {

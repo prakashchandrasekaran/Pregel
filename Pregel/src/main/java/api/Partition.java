@@ -13,18 +13,19 @@ import java.util.*;
  */
 
 public class Partition implements Iterable<Vertex> {
-	ArrayList<Vertex> vertexList;
-	int length;
+	private List<Vertex> vertexList;
 
 	/**
 	 * @param vertexList
 	 *            Represents the list of vertices in a partition
 	 */
-	public Partition(ArrayList<Vertex> vertexList) {
+	public Partition(List<Vertex> vertexList) {
 		this.vertexList = vertexList;
-		length = vertexList.size();
 	}
 
+	/**
+	 * Iterator to iterate through the vertices
+	 */
 	@Override
 	public Iterator<Vertex> iterator() {
 		Iterator<Vertex> iter = vertexList.iterator();
