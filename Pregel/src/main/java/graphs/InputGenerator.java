@@ -144,8 +144,9 @@ public class InputGenerator {
 	public static void main(String[] args) throws Exception {
 		int numVertices = 36;//Integer.parseInt(args[0]);
 		double minEdgeWeight = 1;//Double.parseDouble(args[1]);
-		double maxEdgeWeight = 100;//Double.parseDouble(args[2]);
-		String outputFilePath = "/storage/shelf2/ucsb/cs290b/output.txt";
+		double maxEdgeWeight = 1;//Double.parseDouble(args[2]);
+		String outputFilePath = "output/output.txt";
+
 		InputGenerator inputGenerator = new InputGenerator(numVertices, minEdgeWeight, maxEdgeWeight, outputFilePath);		
 		inputGenerator.generateInput();
 		
