@@ -2,9 +2,7 @@ package utility;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import exceptions.InvalidVertexLineException;
-
 import api.Edge;
 import api.Vertex;
 
@@ -44,11 +42,11 @@ public class VertexGenerator {
 		  if(vertexLine == null || vertexLine.length() == 0) 
 			  throw new InvalidVertexLineException(vertexLine, "Vertex Line is Null");
 		  
-		  Vertex vertex = new Vertex();
+		  
 		  String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
 		  // Source Vertex
 		  String sourceVertex = vertexSplit[0];
-		  vertex.setId(sourceVertex);
+		 
 		  // List of Edges
 		  String[] edges = vertexSplit[1].split(edgesDelimiter);
 		  List<Edge> outGoingEdges = new LinkedList<>();
@@ -61,8 +59,8 @@ public class VertexGenerator {
 			  edgeWeight = Double.parseDouble(edgeData[1]);
 			  outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
 		  }
-		  vertex.setOutgoingEdges(outGoingEdges);
-		  return vertex;
+		  
+		  return new Vertex(sourceVertex, outGoingEdges);
  }
 
  /**
