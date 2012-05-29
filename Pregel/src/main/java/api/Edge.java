@@ -13,15 +13,15 @@ public class Edge {
 	}
 	
 	public String toString() {
-		return "(" + sourceId + "," + destId + "," + weight + ")";
+		return "(" + sourceId + "," + destId + "-" + weight + ")";
 	}
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
+		Edge edge = new Edge("source", "dest", 123.456);
+		System.out.println(edge);
 	}
 
 }
