@@ -17,9 +17,9 @@ public class VertexID implements Serializable {
 	 * A Pair Object containing partitionID and vertex identifier
 	 * 
 	 * @param partitionID
-	 *            Task which combines the results returned by the sub tasks
+	 *            Represents the partition to which this vertex belongs to
 	 * @param vertexIdentifier
-	 *            Represents the generated list of sub tasks
+	 *            Represents the unique vertex Identifier
 	 */
 	public VertexID(int partitionID,
 			String vertexIdentifier) {
