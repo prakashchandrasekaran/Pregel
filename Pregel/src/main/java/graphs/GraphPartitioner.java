@@ -23,7 +23,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * Constructs the graph partitions
 	 */
 	private long numVertices;
-	private long numPartitions;
+	private int numPartitions;
 	String fileName;
 	BufferedReader br;
 	public static final long MAX_VERTICES_PER_PARTITION = Props.getInstance()
@@ -50,7 +50,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 		if (numVertices < MAX_VERTICES_PER_PARTITION)
 			numPartitions = 1;
 		else {
-			numPartitions = numVertices / MAX_VERTICES_PER_PARTITION;
+			numPartitions = (int) (numVertices / MAX_VERTICES_PER_PARTITION);
 			if (numPartitions % MAX_VERTICES_PER_PARTITION != 0)
 				numPartitions += 1;
 		}
@@ -113,4 +113,14 @@ public class GraphPartitioner implements Iterable<Partition> {
 		};
 		return iter;
 	}
+
+	public int getNumPartitions() {
+		return numPartitions;
+	}
+
+	public void setNumPartitions(int numPartitions) {
+		this.numPartitions = numPartitions;
+	}
+	
+	
 }

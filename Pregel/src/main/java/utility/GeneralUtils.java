@@ -11,7 +11,6 @@ import api.Edge;
 import api.Vertex;
 
 /**
-<<<<<<< Updated upstream
  * General Utility class
  */
 public class GeneralUtils {
