@@ -61,13 +61,14 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 */
 	public List<Vertex> getNextVertices() {
 		List<Vertex> vertexList = new ArrayList<>();
+		VertexGenerator vertexGenerator = VertexGenerator.getInstance();
 		try {
 			String strLine;
 			long vertexCounter = 0;
 			while ( (vertexCounter < MAX_VERTICES_PER_PARTITION) && ((strLine = br.readLine()) != null)
 					) {
 				vertexCounter += 1;
-				vertexList.add(VertexGenerator.generate(strLine));
+				vertexList.add(vertexGenerator.generate(strLine));
 			}
 		} catch (Exception e) {
 			System.err.println("File Read Error: " + e.getMessage());
