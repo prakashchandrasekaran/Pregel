@@ -14,12 +14,13 @@ import java.util.*;
 
 public class Partition implements Iterable<Vertex> {
 	private List<Vertex> vertexList;
-
+    int partitionID;
 	/**
 	 * @param vertexList
 	 *            Represents the list of vertices in a partition
 	 */
-	public Partition(List<Vertex> vertexList) {
+	public Partition(int partitionID, List<Vertex> vertexList) {
+		this.partitionID = partitionID;
 		this.vertexList = vertexList;
 	}
 

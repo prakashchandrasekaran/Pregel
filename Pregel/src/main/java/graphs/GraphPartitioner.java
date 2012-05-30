@@ -95,7 +95,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 
 			@Override
 			public Partition next() {
-				Partition nextPartition = new Partition(getNextVertices());
+				Partition nextPartition = new Partition(partitionCounter, getNextVertices());
 				partitionCounter += 1;
 				return nextPartition;
 			}
