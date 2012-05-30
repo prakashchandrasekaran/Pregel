@@ -1,12 +1,10 @@
-/*
- * @author gautham
- */
 package utility;
 
 import graphs.VertexID;
 import java.util.LinkedList;
 import java.util.List;
 import exceptions.InvalidVertexLineException;
+import exceptions.PropertyNotFoundException;
 import api.Edge;
 import api.Vertex;
 
@@ -16,15 +14,22 @@ import api.Vertex;
 public class GeneralUtils {
 
 	private static Props props = Props.getInstance();
-	private static String sourceVertexDelimiter = props
-			.getStringProperty("VERTEX_LIST_SEPARATOR");
-	private static String edgesDelimiter = props
-			.getStringProperty("LIST_VERTEX_SEPARATOR");
-	private static String vertexWeightDelimiter = props
-			.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
-	private static long maxVerticesPerPartition = props
-			.getLongProperty("MAX_VERTICES_PER_PARTITION");
-
+	private static String sourceVertexDelimiter;
+	private static String edgesDelimiter; 
+	private static String vertexWeightDelimiter; 
+	private static long maxVerticesPerPartition; 
+	
+	static {
+		try {
+			sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
+			edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
+			vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
+			maxVerticesPerPartition = props.getLongProperty("MAX_VERTICES_PER_PARTITION");
+		} catch (PropertyNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * generate vertex object from vertexLine <br>
 	 * vertexLine is of the form sourceVertex-Vertex1:Weight1,Vertex2:Weight2 <br>
@@ -58,7 +63,7 @@ public class GeneralUtils {
 			edgeData = edge.split(vertexWeightDelimiter);
 			vertexIdentifier = Long.parseLong(edgeData[0]);
 			destVertex = new VertexID(
-					getPartitionId(vertexIdentifier),
+					(int) (vertexIdentifier / maxVerticesPerPartition),
 					vertexIdentifier);
 			edgeWeight = Double.parseDouble(edgeData[1]);
 			outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
@@ -66,9 +71,24 @@ public class GeneralUtils {
 
 		return new Vertex(sourceVertex, outGoingEdges);
 	}
-
+	
+	/**
+	 * for a given vertexId, partitionId is computed and returned, partitionId starts from 0
+	 * @param vertexId, input vertedId for which PatitionId is computed
+	 * @return respective partition Id
+	 */
 	public static int getPartitionId(long vertexId) {
-		int partitionId = (int) (vertexId / maxVerticesPerPartition) + 1;
+		int partitionId = (int) (vertexId / maxVerticesPerPartition);
 		return partitionId;
+	}
+
+	public static void main(String args[]) {
+		try {
+			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12"));
+			System.out.println(GeneralUtils.getPartitionId(123456));
+		} catch (InvalidVertexLineException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
