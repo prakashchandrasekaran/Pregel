@@ -11,24 +11,12 @@ Utility class for generating Vertex Object from VertexInputLine
 */
 public class VertexGenerator {
  
- 
-	 private static VertexGenerator instance = null; 
-	 private static String sourceVertexDelimiter;
-	 private static String edgesDelimiter;
-	 private static String vertexWeightDelimiter;
-	 private static Props props;
-	 private VertexGenerator() { }
-	
-	 public static synchronized VertexGenerator getInstance() {
-		  if (instance == null) {
-			  instance = new VertexGenerator();
-		  }
-		  props = Props.getInstance();
-		  sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
-		  edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
-		  vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
-		  return instance;
-	 }
+	private static Props props = Props.getInstance(); 
+	private static String sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
+	private static String edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
+	private static String vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
+	 
+	private VertexGenerator() { }
 	 
 	 /**
 	  * generate vertex object from vertexLine
@@ -38,7 +26,7 @@ public class VertexGenerator {
 	  * @return
 	  * @throws InvalidVertexLineException 
 	  */
-	 public static Vertex generate(String vertexLine) throws InvalidVertexLineException {
+	public static Vertex generate(String vertexLine) throws InvalidVertexLineException {
 		  if(vertexLine == null || vertexLine.length() == 0) 
 			  throw new InvalidVertexLineException(vertexLine, "Vertex Line is Null");
 		  
@@ -61,16 +49,14 @@ public class VertexGenerator {
 		  }
 		  
 		  return new Vertex(sourceVertex, outGoingEdges);
- }
+	}
 
- /**
- */
- public static void main(String args[]) {
-	 VertexGenerator vg = VertexGenerator.getInstance();
-	 try {
-		System.out.println(vg.generate("1-2:10,3:15,4:12"));
-	} catch (InvalidVertexLineException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} }
+	public static void main(String args[]) {
+		try {
+			System.out.println(VertexGenerator.generate("1-2:10,3:15,4:12"));
+		} catch (InvalidVertexLineException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
 }
