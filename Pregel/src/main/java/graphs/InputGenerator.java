@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
+import exceptions.PropertyNotFoundException;
+
 import utility.Props;
 
 /**
@@ -81,8 +83,9 @@ public class InputGenerator {
 	 * input file will be in the following format: <Number of vertices> (line 1)
 	 * <Vertex1-Vertex2:Weight1,Vertex3:Weight2,...> (from line 2 onwards)
 	 * Example : 1-2:10,3:15,4:12
+	 * @throws PropertyNotFoundException 
 	 */
-	public void generateInput() {
+	public void generateInput() throws PropertyNotFoundException {
 		Props properties = Props.getInstance();
 		// Assuming that the numVertices is a perfect square.
 		int squareRoot = (int) Math.sqrt(numVertices);
