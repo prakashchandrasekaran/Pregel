@@ -102,7 +102,7 @@ public class InputGenerator {
 		adjacencyList.append(numVertices);
 		adjacencyList.append(lineSeparator);
 
-		for (int vertexId = 1; vertexId <= numVertices; vertexId++) {
+		for (int vertexId = 0; vertexId < numVertices; vertexId++) {
 			int rightVertexId = (vertexId % squareRoot != 0) ? (vertexId + 1)
 					: 0;
 			int topVertexId = ((vertexId + squareRoot) <= numVertices) ? (vertexId + squareRoot)
