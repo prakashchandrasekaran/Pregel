@@ -23,8 +23,6 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * Constructs the graph partitions
 	 */
 	private long numVertices;
-	private long numWorkerManager;
-	private long numWorker;
 	private long numPartitions;
 	String fileName;
 	BufferedReader br;
@@ -38,11 +36,8 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-	public GraphPartitioner(String fileName, long numWorkerManager,
-			long numWorker) throws NumberFormatException, IOException {
+	public GraphPartitioner(String fileName) throws NumberFormatException, IOException {
 		this.fileName = fileName;
-		this.numWorkerManager = numWorkerManager;
-		this.numWorker = numWorker;
 		br = new BufferedReader(new FileReader(fileName));
 		numVertices = Long.parseLong(br.readLine());
 		if (numVertices < MAX_VERTICES_PER_PARTITION)
@@ -61,14 +56,13 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 */
 	public List<Vertex> getNextVertices() {
 		List<Vertex> vertexList = new ArrayList<>();
-		VertexGenerator vertexGenerator = VertexGenerator.getInstance();
 		try {
 			String strLine;
 			long vertexCounter = 0;
 			while ( (vertexCounter < MAX_VERTICES_PER_PARTITION) && ((strLine = br.readLine()) != null)
 					) {
 				vertexCounter += 1;
-				vertexList.add(vertexGenerator.generate(strLine));
+				vertexList.add(VertexGenerator.generate(strLine));
 			}
 		} catch (Exception e) {
 			System.err.println("File Read Error: " + e.getMessage());
