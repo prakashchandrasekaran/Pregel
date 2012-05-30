@@ -14,7 +14,8 @@ import java.util.*;
 
 public class Partition implements Iterable<Vertex> {
 	private List<Vertex> vertexList;
-    int partitionID;
+	int partitionID;
+
 	/**
 	 * @param vertexList
 	 *            Represents the list of vertices in a partition

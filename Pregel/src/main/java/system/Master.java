@@ -1,14 +1,11 @@
 package system;
 
 public class Master {
-	public Master()
-	{
-		
+	public Master() {
+
 	}
-	
-	public void assignPartitions()
-	{
-		
-		
+
+	public void assignPartitions() {
+
 	}
 }

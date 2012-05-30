@@ -10,48 +10,46 @@ import java.util.Properties;
 public class Props {
 
 	private static Props props;
-	
+
 	private static Properties properties;
-	
+
 	private static File propertiesFile;
-	
+
 	private static long lastModified;
-	
+
 	private Props(String propertiesFilePath) {
-			properties = new Properties();			
-			propertiesFile = new File(propertiesFilePath);
-			loadProperties();
+		properties = new Properties();
+		propertiesFile = new File(propertiesFilePath);
+		loadProperties();
 	}
-	
+
 	public static synchronized Props getInstance() {
-		if(props == null) {
-			props = new Props("../../config/system.properties");		
+		if (props == null) {
+			props = new Props("../../config/system.properties");
 		}
 		return props;
 	}
-	
+
 	/**
 	 * Checks if the properties file has been modified after it was loaded.
 	 */
-	private static void checkProperties(){
-		if(propertiesFile.lastModified() > lastModified){
+	private static void checkProperties() {
+		if (propertiesFile.lastModified() > lastModified) {
 			loadProperties();
 		}
 	}
-	
-	private static void loadProperties(){
+
+	private static void loadProperties() {
 		lastModified = System.currentTimeMillis();
 		InputStream in = null;
-		try{
+		try {
 			in = new FileInputStream(propertiesFile);
 			properties.load(in);
-		}
-		catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally{
+		} finally {
 			try {
 				in.close();
 			} catch (IOException e) {
@@ -59,27 +57,27 @@ public class Props {
 			}
 		}
 	}
-	
+
 	public String getStringProperty(String key) {
 		checkProperties();
 		return properties.getProperty(key);
 	}
-	
+
 	public Integer getIntProperty(String key) {
 		checkProperties();
 		return Integer.parseInt(properties.getProperty(key));
 	}
-	
+
 	public Double getDoubleProperty(String key) {
 		checkProperties();
 		return Double.parseDouble(properties.getProperty(key));
 	}
-	
+
 	public Long getLongProperty(String key) {
 		checkProperties();
 		return Long.parseLong(properties.getProperty(key));
 	}
-	
+
 	/**
 	 * @param args
 	 */

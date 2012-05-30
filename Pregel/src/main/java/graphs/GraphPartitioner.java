@@ -26,27 +26,33 @@ public class GraphPartitioner implements Iterable<Partition> {
 	private long numPartitions;
 	String fileName;
 	BufferedReader br;
-	public static final long MAX_VERTICES_PER_PARTITION = Props.getInstance().getLongProperty("MAX_VERTICES_PER_PARTITION");
-	
+	public static final long MAX_VERTICES_PER_PARTITION = Props.getInstance()
+			.getLongProperty("MAX_VERTICES_PER_PARTITION");
+
 	/**
 	 * 
-	 * @param fileName Represents the input graph generated file
-	 * @param numWorkerManager Represents the number of worker nodes registered for computations
-	 * @param numWorker Represents the number of total number of worker threads available for computations  
+	 * @param fileName
+	 *            Represents the input graph generated file
+	 * @param numWorkerManager
+	 *            Represents the number of worker nodes registered for
+	 *            computations
+	 * @param numWorker
+	 *            Represents the number of total number of worker threads
+	 *            available for computations
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-	public GraphPartitioner(String fileName) throws NumberFormatException, IOException {
+	public GraphPartitioner(String fileName) throws NumberFormatException,
+			IOException {
 		this.fileName = fileName;
 		br = new BufferedReader(new FileReader(fileName));
 		numVertices = Long.parseLong(br.readLine());
 		if (numVertices < MAX_VERTICES_PER_PARTITION)
 			numPartitions = 1;
-		else
-		{
+		else {
 			numPartitions = numVertices / MAX_VERTICES_PER_PARTITION;
-			if(numPartitions % MAX_VERTICES_PER_PARTITION != 0)
-				numPartitions +=1;
+			if (numPartitions % MAX_VERTICES_PER_PARTITION != 0)
+				numPartitions += 1;
 		}
 	}
 
@@ -59,8 +65,8 @@ public class GraphPartitioner implements Iterable<Partition> {
 		try {
 			String strLine;
 			long vertexCounter = 0;
-			while ( (vertexCounter < MAX_VERTICES_PER_PARTITION) && ((strLine = br.readLine()) != null)
-					) {
+			while ((vertexCounter < MAX_VERTICES_PER_PARTITION)
+					&& ((strLine = br.readLine()) != null)) {
 				vertexCounter += 1;
 				vertexList.add(GeneralUtils.generateVertex(strLine));
 			}
@@ -95,7 +101,8 @@ public class GraphPartitioner implements Iterable<Partition> {
 
 			@Override
 			public Partition next() {
-				Partition nextPartition = new Partition(partitionCounter, getNextVertices());
+				Partition nextPartition = new Partition(partitionCounter,
+						getNextVertices());
 				partitionCounter += 1;
 				return nextPartition;
 			}
