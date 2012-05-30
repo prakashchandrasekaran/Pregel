@@ -7,16 +7,14 @@ import api.Edge;
 import api.Vertex;
 
 /**
-Utility class for generating Vertex Object from VertexInputLine
+General Utility class
 */
-public class VertexGenerator {
+public class GeneralUtils {
  
 	private static Props props = Props.getInstance(); 
 	private static String sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
 	private static String edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
 	private static String vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
-	 
-	private VertexGenerator() { }
 	 
 	 /**
 	  * generate vertex object from vertexLine
@@ -26,34 +24,40 @@ public class VertexGenerator {
 	  * @return
 	  * @throws InvalidVertexLineException 
 	  */
-	public static Vertex generate(String vertexLine) throws InvalidVertexLineException {
+	public static Vertex generateVertex(String vertexLine) throws InvalidVertexLineException {
 		  if(vertexLine == null || vertexLine.length() == 0) 
 			  throw new InvalidVertexLineException(vertexLine, "Vertex Line is Null");
 		  
 		  String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
 		  
 		  // Source Vertex
-		  String sourceVertex = vertexSplit[0];
+		  long sourceVertex = Long.parseLong(vertexSplit[0]);
 		 
 		  // List of Edges
 		  String[] edges = vertexSplit[1].split(edgesDelimiter);
-		  List<Edge> outGoingEdges = new LinkedList<>();
+		  List<Edge> outGoingEdges = new LinkedList<Edge>();
 		  String[] edgeData = null;
-		  String destVertex = null;
+		  long destVertex = 0;
 		  Double edgeWeight = 0.0;
 		  for(String edge : edges) {
 			  edgeData = edge.split(vertexWeightDelimiter);
-			  destVertex = edgeData[0];
+			  destVertex = Long.parseLong(edgeData[0]);
 			  edgeWeight = Double.parseDouble(edgeData[1]);
 			  outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
 		  }
 		  
-		  return new Vertex(Long.parseLong(sourceVertex), outGoingEdges);
+		  return new Vertex(sourceVertex, outGoingEdges);
 	}
 
+	public static int getPartitionId(long vertexId){
+		long numVerticesPerPartition = props.getLongProperty("MAX_VERTICES_PER_PARTITION");
+		int partitionId = (int)(vertexId / numVerticesPerPartition) + 1;
+		return partitionId;
+	}
+	
 	public static void main(String args[]) {
 		try {
-			System.out.println(VertexGenerator.generate("1-2:10,3:15,4:12"));
+			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12"));
 		} catch (InvalidVertexLineException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -4,15 +4,15 @@ import java.util.List;
 
 public class Vertex {
 
-	private Long vertexId;
+	private long vertexId;
 	private List<Edge> outgoingEdges;
 	
-	public Vertex(Long vertexId, List<Edge> outgoingEdges) {
+	public Vertex(long vertexId, List<Edge> outgoingEdges) {
 		this.vertexId = vertexId;
 		this.outgoingEdges = outgoingEdges;
 	}
 	
-	public Long getId() {
+	public long getId() {
 		return vertexId;
 	}
 
