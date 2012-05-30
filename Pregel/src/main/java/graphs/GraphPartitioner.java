@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 import utility.Props;
-import utility.VertexGenerator;
+import utility.GeneralUtils;
 import api.Partition;
 import api.Vertex;
 
@@ -62,7 +62,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 			while ( (vertexCounter < MAX_VERTICES_PER_PARTITION) && ((strLine = br.readLine()) != null)
 					) {
 				vertexCounter += 1;
-				vertexList.add(VertexGenerator.generate(strLine));
+				vertexList.add(GeneralUtils.generateVertex(strLine));
 			}
 		} catch (Exception e) {
 			System.err.println("File Read Error: " + e.getMessage());
