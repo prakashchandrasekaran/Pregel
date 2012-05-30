@@ -1,28 +1,52 @@
 package api;
+import utility.VertexID;
+
+/**
+ * Represents the edge containing source and destination vertex along with their edge weight
+ * 
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
+ * 
+ */
 
 public class Edge {
 
-	private long sourceId;
-	private long destId;
+	private VertexID sourceID;
+	private VertexID destID;
 	private double weight;
 	
-	
-	public Edge(long src, long dst, double w) {
-		sourceId = src;
-		destId = dst;
-		weight = w;
+	/**
+	 * @param sourceID Represents the source vertex
+	 * @param destID Represents the destination vertex
+	 * @param weight Represents the edge weight 
+	 */
+	public Edge(VertexID sourceID, VertexID destID, double weight) {
+		this.sourceID = sourceID;
+		this.destID = destID;
+		this.weight = weight;
 	}
 	
+	@Override
 	public String toString() {
-		return "(" + sourceId + "," + destId + "-" + weight + ")";
+		return "(" + sourceID + "," + destID + "-" + weight + ")";
 	}
 	
 	/**
-	 * @param args
+	 * Gets the source vertex identifier
+	 * @return Returns the source vertex identifier
 	 */
-	public static void main(String[] args) {
-		Edge edge = new Edge(1, 2, 123.456);
-		System.out.println(edge);
+	public VertexID getSourceID()
+	{
+		return sourceID;
 	}
-
+	
+	/**
+	 * Gets the destination vertex identifier
+	 * @return Returns the destination vertex identifier
+	 */
+	public VertexID getDestID()
+	{
+		return destID;
+	}
 }

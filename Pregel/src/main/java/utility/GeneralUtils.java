@@ -15,7 +15,8 @@ public class GeneralUtils {
 	private static String sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
 	private static String edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
 	private static String vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
-	 
+	private static long maxVerticesPerPartition = props.getLongProperty("MAX_VERTICES_PER_PARTITION");
+ 
 	 /**
 	  * generate vertex object from vertexLine
 	  * <br> vertexLine is of the form sourceVertex-Vertex1:Weight1,Vertex2:Weight2
@@ -31,17 +32,19 @@ public class GeneralUtils {
 		  String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
 		  
 		  // Source Vertex
-		  long sourceVertex = Long.parseLong(vertexSplit[0]);
+		  long vertexIdentifier = Long.parseLong(vertexSplit[0]);
+		  VertexID sourceVertex = new VertexID((int)(vertexIdentifier/maxVerticesPerPartition), vertexIdentifier);
 		 
 		  // List of Edges
 		  String[] edges = vertexSplit[1].split(edgesDelimiter);
 		  List<Edge> outGoingEdges = new LinkedList<Edge>();
 		  String[] edgeData = null;
-		  long destVertex = 0;
+		  VertexID destVertex = null;
 		  Double edgeWeight = 0.0;
 		  for(String edge : edges) {
 			  edgeData = edge.split(vertexWeightDelimiter);
-			  destVertex = Long.parseLong(edgeData[0]);
+			  vertexIdentifier = Long.parseLong(edgeData[0]);
+			  destVertex = new VertexID((int)(vertexIdentifier/maxVerticesPerPartition), vertexIdentifier);
 			  edgeWeight = Double.parseDouble(edgeData[1]);
 			  outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
 		  }
