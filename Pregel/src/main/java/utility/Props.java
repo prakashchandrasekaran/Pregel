@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import exceptions.PropertyNotFoundException;
+
 public class Props {
 
 	private static Props props;
@@ -58,24 +60,36 @@ public class Props {
 		}
 	}
 
-	public String getStringProperty(String key) {
+	public String getStringProperty(String key) throws PropertyNotFoundException {
 		checkProperties();
-		return properties.getProperty(key);
+		String value = properties.getProperty(key);
+		if(value == null)
+			throw new PropertyNotFoundException(key);
+		return value;
 	}
 
-	public Integer getIntProperty(String key) {
+	public Integer getIntProperty(String key) throws PropertyNotFoundException {
 		checkProperties();
-		return Integer.parseInt(properties.getProperty(key));
+		String value = properties.getProperty(key);
+		if(value == null)
+			throw new PropertyNotFoundException(key);
+		return Integer.parseInt(value);
 	}
 
-	public Double getDoubleProperty(String key) {
+	public Double getDoubleProperty(String key) throws PropertyNotFoundException {
 		checkProperties();
-		return Double.parseDouble(properties.getProperty(key));
+		String value = properties.getProperty(key);
+		if(value == null)
+			throw new PropertyNotFoundException(key);
+		return Double.parseDouble(value);
 	}
 
-	public Long getLongProperty(String key) {
+	public Long getLongProperty(String key) throws PropertyNotFoundException {
 		checkProperties();
-		return Long.parseLong(properties.getProperty(key));
+		String value = properties.getProperty(key);
+		if(value == null)
+			throw new PropertyNotFoundException(key);
+		return Long.parseLong(value);
 	}
 
 	/**
@@ -83,7 +97,13 @@ public class Props {
 	 */
 	public static void main(String[] args) {
 		Props props = Props.getInstance();
-		System.out.println(props.getStringProperty("FILE_NAME"));
+		try {
+			System.out.println(props.getStringProperty("FILE_NAME"));
+			System.out.println(props.getStringProperty("NOT_FOUND_PROPERTY"));
+		} catch (PropertyNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

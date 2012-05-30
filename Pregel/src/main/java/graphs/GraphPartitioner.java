@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+import exceptions.PropertyNotFoundException;
+
 import utility.Props;
 import utility.GeneralUtils;
 import api.Partition;
@@ -26,9 +28,16 @@ public class GraphPartitioner implements Iterable<Partition> {
 	private long numPartitions;
 	String fileName;
 	BufferedReader br;
-	public static final long MAX_VERTICES_PER_PARTITION = Props.getInstance()
-			.getLongProperty("MAX_VERTICES_PER_PARTITION");
-
+	public static long MAX_VERTICES_PER_PARTITION;
+	
+	static {
+		try {
+			MAX_VERTICES_PER_PARTITION = Props.getInstance().getLongProperty("MAX_VERTICES_PER_PARTITION");
+		} catch (PropertyNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+			
 	/**
 	 * 
 	 * @param fileName

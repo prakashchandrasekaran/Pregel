@@ -4,6 +4,7 @@ import graphs.VertexID;
 import java.util.LinkedList;
 import java.util.List;
 import exceptions.InvalidVertexLineException;
+import exceptions.PropertyNotFoundException;
 import api.Edge;
 import api.Vertex;
 
@@ -13,14 +14,21 @@ import api.Vertex;
 public class GeneralUtils {
 
 	private static Props props = Props.getInstance();
-	private static String sourceVertexDelimiter = 
-			props.getStringProperty("VERTEX_LIST_SEPARATOR");
-	private static String edgesDelimiter = 
-			props.getStringProperty("LIST_VERTEX_SEPARATOR");
-	private static String vertexWeightDelimiter = 
-			props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
-	private static long maxVerticesPerPartition = 
-			props.getLongProperty("MAX_VERTICES_PER_PARTITION");
+	private static String sourceVertexDelimiter;
+	private static String edgesDelimiter; 
+	private static String vertexWeightDelimiter; 
+	private static long maxVerticesPerPartition; 
+	
+	static {
+		try {
+			sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
+			edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
+			vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
+			maxVerticesPerPartition = props.getLongProperty("MAX_VERTICES_PER_PARTITION");
+		} catch (PropertyNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * generate vertex object from vertexLine <br>
