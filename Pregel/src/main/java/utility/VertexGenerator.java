@@ -51,6 +51,12 @@ public class VertexGenerator {
 		  return new Vertex(Long.parseLong(sourceVertex), outGoingEdges);
 	}
 
+	public static int getPartitionId(long vertexId){
+		long numVerticesPerPartition = props.getLongProperty("MAX_VERTICES_PER_PARTITION");
+		int partitionId = (int)(vertexId / numVerticesPerPartition) + 1;
+		return partitionId;
+	}
+	
 	public static void main(String args[]) {
 		try {
 			System.out.println(VertexGenerator.generate("1-2:10,3:15,4:12"));

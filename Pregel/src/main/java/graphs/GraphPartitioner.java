@@ -55,7 +55,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * @return Returns list of vertices comprising a partition
 	 */
 	public List<Vertex> getNextVertices() {
-		List<Vertex> vertexList = new ArrayList<>();
+		List<Vertex> vertexList = new ArrayList<Vertex>();
 		try {
 			String strLine;
 			long vertexCounter = 0;
