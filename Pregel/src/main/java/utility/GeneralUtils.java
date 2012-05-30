@@ -1,3 +1,6 @@
+/*
+ * @author gautham
+ */
 package utility;
 
 import java.util.LinkedList;
@@ -7,6 +10,7 @@ import api.Edge;
 import api.Vertex;
 
 /**
+<<<<<<< Updated upstream
  * General Utility class
  */
 public class GeneralUtils {
@@ -54,7 +58,7 @@ public class GeneralUtils {
 			edgeData = edge.split(vertexWeightDelimiter);
 			vertexIdentifier = Long.parseLong(edgeData[0]);
 			destVertex = new VertexID(
-					(int) (vertexIdentifier / maxVerticesPerPartition),
+					getPartitionId(vertexIdentifier),
 					vertexIdentifier);
 			edgeWeight = Double.parseDouble(edgeData[1]);
 			outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
@@ -64,18 +68,7 @@ public class GeneralUtils {
 	}
 
 	public static int getPartitionId(long vertexId) {
-		long numVerticesPerPartition = props
-				.getLongProperty("MAX_VERTICES_PER_PARTITION");
-		int partitionId = (int) (vertexId / numVerticesPerPartition) + 1;
+		int partitionId = (int) (vertexId / maxVerticesPerPartition) + 1;
 		return partitionId;
-	}
-
-	public static void main(String args[]) {
-		try {
-			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12"));
-		} catch (InvalidVertexLineException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }
