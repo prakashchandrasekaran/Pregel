@@ -48,7 +48,7 @@ public class VertexGenerator {
 			  outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
 		  }
 		  
-		  return new Vertex(sourceVertex, outGoingEdges);
+		  return new Vertex(Long.parseLong(sourceVertex), outGoingEdges);
 	}
 
 	public static void main(String args[]) {
