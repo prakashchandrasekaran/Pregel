@@ -1,7 +1,7 @@
 package api;
 
 import java.util.List;
-import utility.VertexID;
+import graphs.VertexID;
 
 /**
  * Represents the pair object containing partitionID and vertexIdentifier

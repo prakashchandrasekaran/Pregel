@@ -1,4 +1,4 @@
-package utility;
+package graphs;
 
 import java.io.Serializable;
 

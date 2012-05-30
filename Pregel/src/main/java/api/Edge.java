@@ -1,6 +1,6 @@
 package api;
 
-import utility.VertexID;
+import graphs.VertexID;
 
 /**
  * Represents the edge containing source and destination vertex along with their
