@@ -1,5 +1,6 @@
 package utility;
 
+import graphs.VertexID;
 import java.util.LinkedList;
 import java.util.List;
 import exceptions.InvalidVertexLineException;
