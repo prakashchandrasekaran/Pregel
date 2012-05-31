@@ -13,27 +13,27 @@ import java.io.Serializable;
 public class VertexID implements Serializable {
 	private static final long serialVersionUID = -8636812964597333133L;
 	private int partitionID;
-	private long vertexIdentifier;
+	private long vertexID;
 
 	/**
 	 * A Pair Object containing partitionID and vertex identifier
 	 * 
 	 * @param partitionID
 	 *            Represents the partition to which this vertex belongs to
-	 * @param vertexIdentifier
+	 * @param vertexID
 	 *            Represents the unique vertex Identifier
 	 */
-	public VertexID(int partitionID, long vertexIdentifier) {
+	public VertexID(int partitionID, long vertexID) {
 		super();
 		this.partitionID = partitionID;
-		this.vertexIdentifier = vertexIdentifier;
+		this.vertexID = vertexID;
 	}
 
 	/**
 	 * Represents the hashCode of this java object
 	 */
 	public int hashCode() {
-		int vertexHash = new Long(vertexIdentifier).hashCode();
+		int vertexHash = new Long(vertexID).hashCode();
 		return (partitionID + vertexHash) * vertexHash + partitionID;
 	}
 
@@ -44,7 +44,7 @@ public class VertexID implements Serializable {
 	public boolean equals(Object other) {
 		if (other instanceof VertexID) {
 			VertexID otherPair = (VertexID) other;
-			return ((this.partitionID == otherPair.partitionID) && (this.vertexIdentifier == otherPair.vertexIdentifier));
+			return ((this.partitionID == otherPair.partitionID) && (this.vertexID == otherPair.vertexID));
 		}
 		return false;
 	}
@@ -54,7 +54,7 @@ public class VertexID implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "(" + partitionID + ", " + vertexIdentifier + ")";
+		return "(" + partitionID + ", " + vertexID + ")";
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class VertexID implements Serializable {
 	 * 
 	 * @return Returns the unique vertexIdentifier
 	 */
-	public long getVertexIdentifier() {
-		return vertexIdentifier;
+	public long getVertexID() {
+		return vertexID;
 	}
 }
