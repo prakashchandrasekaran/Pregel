@@ -1,60 +1,108 @@
-/*
- * @author gautham
- */
 package system;
 
 import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import api.Partition;
 
-public class Worker {
-	
+/**
+ * Represents the computation node
+ * 
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
+ **/
+
+public class Worker extends UnicastRemoteObject {
+
+	private static final long serialVersionUID = -8137628519082382850L;
 	private int numThreads;
 	private BlockingQueue<Partition> partitionQueue;
-	
-	/**
-	 * Adds the partition to be assigned to the worker.
-	 *
-	 * @param partition the partition to be assigned
-	 */
-	public void addPartition(Partition partition) {
-		this.partitionQueue.add(partition);
-	}
+	/* Hostname of the node */
+	private String workerID;
+	private Worker2Master masterProxy;
 
-	public Worker(){
+	public Worker() throws RemoteException {
+		workerID = "hostname + ";
 		this.partitionQueue = new LinkedBlockingDeque<Partition>();
 		this.numThreads = Runtime.getRuntime().availableProcessors();
-		for(int i = 0; i < numThreads; i++){
+		for (int i = 0; i < numThreads; i++) {
 			WorkerThread workerThread = new WorkerThread();
 			workerThread.start();
 		}
 	}
-	
+
+	/**
+	 * Adds the partition to be assigned to the worker.
+	 * 
+	 * @param partition
+	 *            the partition to be assigned
+	 */
+	public void addPartition(Partition partition) throws RemoteException {
+		this.partitionQueue.add(partition);
+	}
+
+	public void addPartitionList(List<Partition> workerPartitions)
+			throws RemoteException {
+		this.partitionQueue.addAll(workerPartitions);
+	}
+
 	public int getNumThreads() {
 		return numThreads;
 	}
-	
-	private class WorkerThread extends Thread{		
+
+	public String getWorkerID() {
+		return workerID;
+	}
+
+	private class WorkerThread extends Thread {
 		@Override
 		public void run() {
-			while(true){
+			while (true) {
 				try {
 					Partition partition = partitionQueue.take();
 					// do some work on the partition.
-					
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		
+
 	}
-	
-	public static void main(String[] args) throws Exception{
-		Master master = (Master) Naming.lookup("//localhost/Master");
-		Worker worker = new Worker();
-		master.register(worker);
+
+	public static void main(String[] args) throws Exception {
+		// Master master = (Master) Naming.lookup("//localhost/Master");
+		// Worker worker = new Worker();
+		// master.register(worker);
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}
+		try {
+			String masterMachineName = args[0];
+			Registry registry = LocateRegistry.getRegistry(masterMachineName);
+			Worker2Master worker2Master = (Worker2Master) registry
+					.lookup("Master");
+			Worker worker = new Worker();
+			String masterProxyServiceName = worker2Master.register(worker,
+					worker.getWorkerID(), worker.getNumThreads());
+			Worker2Master masterProxy = (Worker2Master) registry
+					.lookup(masterProxyServiceName);
+			worker.setMasterProxy(masterProxy);
+			System.out.println("Worker is bound and ready for computations ");
+		} catch (Exception e) {
+			System.err.println("ComputeEngine exception:");
+			e.printStackTrace();
+		}
+	}
+
+	private void setMasterProxy(Worker2Master masterProxy2) {
+		this.masterProxy = masterProxy;
 	}
 }

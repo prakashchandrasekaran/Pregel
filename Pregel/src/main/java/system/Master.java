@@ -1,116 +1,146 @@
-/*
- * @author gautham
- */
 package system;
 
 import exceptions.PropertyNotFoundException;
 import graphs.GraphPartitioner;
 
+import java.rmi.AccessException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import utility.Props;
 import api.Partition;
 
 /**
  * The Class Master.
+ * 
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
  */
-public class Master extends UnicastRemoteObject implements Runnable {
-	
+public class Master extends UnicastRemoteObject implements Worker2Master,
+		Runnable {
+
 	/** The master thread. */
-	private Thread masterThread;
-	
+	// private Thread masterThread;
+
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -4329526430075226361L;
-	
+
 	/** The Constant SERVICE_NAME. */
 	private static final String SERVICE_NAME = "Master";
-	
+
 	/** The worker id. */
-	private static int workerID = 0;
-	
+	// private static int workerID = 0;
+
 	/** The total number of worker threads. */
-	private static int totalWorkerThreads = 0;
-	
+	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
+
 	/** The Constant totalWorkers. */
 	private static int totalWorkers;
-	
+
 	/** The graph. */
 	private GraphPartitioner graph;
-	
+
 	/** The worker map. */
-	Map<Integer, Worker> workerMap = new HashMap<Integer, Worker>();
-		
-	
+	Map<String, WorkerProxy> workerMap = new HashMap<String, WorkerProxy>();
+
+	/** List of registered worker nodes */
+	List<WorkerProxy> registeredWorkers = new ArrayList<>();
+
 	/**
 	 * Instantiates a new master.
-	 *
-	 * @throws RemoteException the remote exception
+	 * 
+	 * @throws RemoteException
+	 *             the remote exception
 	 */
 	public Master() throws RemoteException, PropertyNotFoundException {
 		super();
-		totalWorkers = Props.getInstance().getIntProperty("TOTAL_WORKERS");		
-//		masterThread = new Thread(this);
-//		masterThread.start();
-	}
-	
-	/**
-	 * Register.
-	 *
-	 * @param worker the worker
-	 */
-	public void register(Worker worker) {
-		workerID += 1;
-		totalWorkerThreads += worker.getNumThreads();
-		workerMap.put(workerID, worker);
+		totalWorkers = Props.getInstance().getIntProperty("TOTAL_WORKERS");
+		// masterThread = new Thread(this);
+		// masterThread.start();
 	}
 
 	/**
-	 * The application programmer calls this method to give the input graph to the master.
-	 *
-	 * @param graph the graph
+	 * Registers the worker computation nodes with the master
+	 * 
+	 * @param worker
+	 *            Represents the {@link system.Worker Worker}
+	 * @param numWorkerThreads
+	 *            Represents the number of worker threads available in the
+	 *            worker computation node
+	 * @throws RemoteException
+	 * @throws AccessException
 	 */
-	public void putGraph(GraphPartitioner graph){
+	public String register(Worker worker, String workerID, int numWorkerThreads)
+			throws AccessException, RemoteException {
+		totalWorkerThreads.getAndAdd(numWorkerThreads);
+		WorkerProxy wp = new WorkerProxy(worker, workerID, numWorkerThreads,
+				this);
+		workerMap.put(workerID, wp);
+		return workerID;
+	}
+
+	@Override
+	public String getServiceName() throws RemoteException {
+		return SERVICE_NAME;
+	}
+
+	/**
+	 * The application programmer calls this method to give the input graph to
+	 * the master.
+	 * 
+	 * @param graph
+	 *            the graph
+	 */
+	public void putGraph(GraphPartitioner graph) {
 		this.graph = graph;
 		assignPartitions();
 	}
-	
-	
+
 	/**
-	 * Assign partitions to workers based on the number of processors (threads) that each worker has.
+	 * Assign partitions to workers based on the number of processors (threads)
+	 * that each worker has.
 	 */
 	public void assignPartitions() {
 		int totalPartitions = graph.getNumPartitions();
 		Iterator<Partition> iter = graph.iterator();
-		
-		// Assign partitions to workers in the ratio of the number of worker threads that each worker has. 
-		for(Map.Entry<Integer, Worker> entry : workerMap.entrySet()){
-			Worker worker = entry.getValue();
-			int numThreads = worker.getNumThreads();
-			int numPartitionsToAssign = numThreads / totalWorkerThreads * totalPartitions;
-			for(int i = 0; i < numPartitionsToAssign; i++){
-				worker.addPartition(iter.next());
+
+		// Assign partitions to workers in the ratio of the number of worker
+		// threads that each worker has.
+		for (Map.Entry<String, WorkerProxy> entry : workerMap.entrySet()) {
+			WorkerProxy workerProxy = entry.getValue();
+			int numThreads = workerProxy.getNumThreads();
+			int numPartitionsToAssign = numThreads / totalWorkerThreads.get()
+					* totalPartitions;
+			List<Partition> workerPartitions = new ArrayList<>();
+			for (int i = 0; i < numPartitionsToAssign; i++) {
+				workerPartitions.add(iter.next());
 			}
+			workerProxy.addPartitionList(workerPartitions);
 		}
-		
+
 		// Add the remaining partitions (if any) in a round-robin fashion.
 		int index = 0;
-		while(iter.hasNext()){
-			int workerID = (index % totalWorkers) + 1;			
+		while (iter.hasNext()) {
+			int workerID = (index % totalWorkers) + 1;
 			workerMap.get(workerID).addPartition(iter.next());
 		}
-				
+
 	}
 
 	/**
 	 * The main method.
-	 *
-	 * @param args the arguments
+	 * 
+	 * @param args
+	 *            the arguments
 	 */
 	public static void main(String[] args) throws Exception {
 		if (System.getSecurityManager() == null) {
@@ -127,12 +157,18 @@ public class Master extends UnicastRemoteObject implements Runnable {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
 	public void run() {
-		
+
+	}
+
+	public void removeWorker(String serviceName) throws RemoteException {
+		workerMap.remove(serviceName);
 	}
 
 }

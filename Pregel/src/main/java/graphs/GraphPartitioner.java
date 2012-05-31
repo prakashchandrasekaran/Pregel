@@ -29,15 +29,16 @@ public class GraphPartitioner implements Iterable<Partition> {
 	String fileName;
 	BufferedReader br;
 	public static long MAX_VERTICES_PER_PARTITION;
-	
+
 	static {
 		try {
-			MAX_VERTICES_PER_PARTITION = Props.getInstance().getLongProperty("MAX_VERTICES_PER_PARTITION");
+			MAX_VERTICES_PER_PARTITION = Props.getInstance().getLongProperty(
+					"MAX_VERTICES_PER_PARTITION");
 		} catch (PropertyNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-			
+
 	/**
 	 * 
 	 * @param fileName
@@ -130,6 +131,5 @@ public class GraphPartitioner implements Iterable<Partition> {
 	public void setNumPartitions(int numPartitions) {
 		this.numPartitions = numPartitions;
 	}
-	
-	
+
 }

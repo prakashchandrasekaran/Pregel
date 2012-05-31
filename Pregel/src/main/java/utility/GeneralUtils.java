@@ -15,21 +15,24 @@ public class GeneralUtils {
 
 	private static Props props = Props.getInstance();
 	private static String sourceVertexDelimiter;
-	private static String edgesDelimiter; 
-	private static String vertexWeightDelimiter; 
-	private static long maxVerticesPerPartition; 
-	
+	private static String edgesDelimiter;
+	private static String vertexWeightDelimiter;
+	private static long maxVerticesPerPartition;
+
 	static {
 		try {
-			sourceVertexDelimiter = props.getStringProperty("VERTEX_LIST_SEPARATOR");
+			sourceVertexDelimiter = props
+					.getStringProperty("VERTEX_LIST_SEPARATOR");
 			edgesDelimiter = props.getStringProperty("LIST_VERTEX_SEPARATOR");
-			vertexWeightDelimiter = props.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
-			maxVerticesPerPartition = props.getLongProperty("MAX_VERTICES_PER_PARTITION");
+			vertexWeightDelimiter = props
+					.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
+			maxVerticesPerPartition = props
+					.getLongProperty("MAX_VERTICES_PER_PARTITION");
 		} catch (PropertyNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * generate vertex object from vertexLine <br>
 	 * vertexLine is of the form sourceVertex-Vertex1:Weight1,Vertex2:Weight2 <br>
@@ -71,10 +74,13 @@ public class GeneralUtils {
 
 		return new Vertex(sourceVertex, outGoingEdges);
 	}
-	
+
 	/**
-	 * for a given vertexId, partitionId is computed and returned, partitionId starts from 0
-	 * @param vertexId, input vertedId for which PatitionId is computed
+	 * for a given vertexId, partitionId is computed and returned, partitionId
+	 * starts from 0
+	 * 
+	 * @param vertexId
+	 *            , input vertedId for which PatitionId is computed
 	 * @return respective partition Id
 	 */
 	public static int getPartitionId(long vertexId) {

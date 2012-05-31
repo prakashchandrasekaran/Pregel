@@ -83,7 +83,8 @@ public class InputGenerator {
 	 * input file will be in the following format: <Number of vertices> (line 1)
 	 * <Vertex1-Vertex2:Weight1,Vertex3:Weight2,...> (from line 2 onwards)
 	 * Example : 1-2:10,3:15,4:12
-	 * @throws PropertyNotFoundException 
+	 * 
+	 * @throws PropertyNotFoundException
 	 */
 	public void generateInput() throws PropertyNotFoundException {
 		Props properties = Props.getInstance();

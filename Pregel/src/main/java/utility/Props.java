@@ -60,10 +60,11 @@ public class Props {
 		}
 	}
 
-	public String getStringProperty(String key) throws PropertyNotFoundException {
+	public String getStringProperty(String key)
+			throws PropertyNotFoundException {
 		checkProperties();
 		String value = properties.getProperty(key);
-		if(value == null)
+		if (value == null)
 			throw new PropertyNotFoundException(key);
 		return value;
 	}
@@ -71,15 +72,16 @@ public class Props {
 	public Integer getIntProperty(String key) throws PropertyNotFoundException {
 		checkProperties();
 		String value = properties.getProperty(key);
-		if(value == null)
+		if (value == null)
 			throw new PropertyNotFoundException(key);
 		return Integer.parseInt(value);
 	}
 
-	public Double getDoubleProperty(String key) throws PropertyNotFoundException {
+	public Double getDoubleProperty(String key)
+			throws PropertyNotFoundException {
 		checkProperties();
 		String value = properties.getProperty(key);
-		if(value == null)
+		if (value == null)
 			throw new PropertyNotFoundException(key);
 		return Double.parseDouble(value);
 	}
@@ -87,7 +89,7 @@ public class Props {
 	public Long getLongProperty(String key) throws PropertyNotFoundException {
 		checkProperties();
 		String value = properties.getProperty(key);
-		if(value == null)
+		if (value == null)
 			throw new PropertyNotFoundException(key);
 		return Long.parseLong(value);
 	}
@@ -103,7 +105,7 @@ public class Props {
 		} catch (PropertyNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }
