@@ -3,6 +3,7 @@
  */
 package system;
 
+import exceptions.PropertyNotFoundException;
 import graphs.GraphPartitioner;
 
 import java.rmi.RemoteException;
@@ -37,7 +38,7 @@ public class Master extends UnicastRemoteObject implements Runnable {
 	private static int totalWorkerThreads = 0;
 	
 	/** The Constant totalWorkers. */
-	private static final int totalWorkers = Props.getInstance().getIntProperty("TOTAL_WORKERS"); 
+	private static int totalWorkers;
 	
 	/** The graph. */
 	private GraphPartitioner graph;
@@ -51,8 +52,9 @@ public class Master extends UnicastRemoteObject implements Runnable {
 	 *
 	 * @throws RemoteException the remote exception
 	 */
-	public Master() throws RemoteException {
+	public Master() throws RemoteException, PropertyNotFoundException {
 		super();
+		totalWorkers = Props.getInstance().getIntProperty("TOTAL_WORKERS");		
 //		masterThread = new Thread(this);
 //		masterThread.start();
 	}
@@ -110,7 +112,7 @@ public class Master extends UnicastRemoteObject implements Runnable {
 	 *
 	 * @param args the arguments
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
