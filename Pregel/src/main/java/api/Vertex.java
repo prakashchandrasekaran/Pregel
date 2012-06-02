@@ -1,6 +1,8 @@
 package api;
 
 import java.util.List;
+
+import system.Message;
 import graphs.VertexID;
 
 /**
@@ -49,6 +51,11 @@ public class Vertex {
 
 	public String toString() {
 		return "(" + vertexID + "-" + outgoingEdges + ")";
+	}
+
+	public void compute(List<Message> list) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

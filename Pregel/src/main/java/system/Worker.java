@@ -11,9 +11,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import api.Vertex;
@@ -31,7 +33,13 @@ public class Worker extends UnicastRemoteObject {
 
 	private static final long serialVersionUID = -8137628519082382850L;
 	private int numThreads;
+	
+	
+	/** */
 	private BlockingQueue<Partition> partitionQueue;
+	
+	/** */
+	private Queue<Partition> completedPartitions;
 	
 	/** Hostname of the node with timestamp information*/
 	private String workerID;
@@ -71,7 +79,8 @@ public class Worker extends UnicastRemoteObject {
 		} 
 
 		this.workerID = hostName + "_" + timestamp;
-		this.partitionQueue = new LinkedBlockingDeque<Partition>();
+		this.partitionQueue = new LinkedBlockingDeque<>();
+		this.completedPartitions = new LinkedList<>();
 		this.numThreads = Runtime.getRuntime().availableProcessors();
 		for (int i = 0; i < numThreads; i++) {
 			WorkerThread workerThread = new WorkerThread();
@@ -111,7 +120,9 @@ public class Worker extends UnicastRemoteObject {
 					Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages.get(partition.getPartitionID());
 					for(Entry<VertexID, List<Message>> entry : messageForThisPartition.entrySet()) {
 						Vertex vertex = partition.getVertex(entry.getKey());
+						vertex.compute(entry.getValue());
 					}
+					completedPartitions.add(partition);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
