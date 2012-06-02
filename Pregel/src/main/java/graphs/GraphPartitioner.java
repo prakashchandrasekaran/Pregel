@@ -68,20 +68,22 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * 
 	 * @return Returns list of vertices comprising a partition
 	 */
-	public List<Vertex> getNextVertices() {
-		List<Vertex> vertexList = new ArrayList<Vertex>();
+	public Map<VertexID, Vertex> getNextVertices() {
+		Map<VertexID, Vertex> vertexMap = new HashMap<>();
 		try {
 			String strLine;
 			long vertexCounter = 0;
+			Vertex vertex = null;
 			while ((vertexCounter < MAX_VERTICES_PER_PARTITION)
 					&& ((strLine = br.readLine()) != null)) {
 				vertexCounter += 1;
-				vertexList.add(GeneralUtils.generateVertex(strLine));
+				vertex = GeneralUtils.generateVertex(strLine);
+				vertexMap.put(vertex.getID(), vertex);
 			}
 		} catch (Exception e) {
 			System.err.println("File Read Error: " + e.getMessage());
 		}
-		return vertexList;
+		return vertexMap;
 	}
 
 	/**

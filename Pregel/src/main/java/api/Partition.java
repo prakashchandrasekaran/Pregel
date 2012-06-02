@@ -22,9 +22,9 @@ public class Partition {
 	 * @param vertexList
 	 *            Represents the list of vertices in a partition
 	 */
-	public Partition(int partitionID, List<Vertex> vertexList) {
+	public Partition(int partitionID, Map<VertexID, Vertex> vertexMap) {
 		this.partitionID = partitionID;
-		// this.vertexList = vertexList;
+		this.vertexMap = vertexMap;
 	}
 
 	public int getPartitionID() {
