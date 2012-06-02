@@ -121,7 +121,4 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 			throws RemoteException {
 		return null;
 	}
-	
-	
-
 }
