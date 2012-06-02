@@ -32,14 +32,26 @@ public class Worker extends UnicastRemoteObject {
 	private static final long serialVersionUID = -8137628519082382850L;
 	private int numThreads;
 	private BlockingQueue<Partition> partitionQueue;
-	/* Hostname of the node */
+	
+	/** Hostname of the node with timestamp information*/
 	private String workerID;
+	
+	/** Master Proxy object to interact with Master*/
 	private Worker2Master masterProxy;
+	
+	/** PartitionID to WorkerID Map*/
 	private Map<Integer, String> mapPartitionIdToWorkerId;
+	
+	/** Worker2WorkerProxy Object*/
 	private Worker2WorkerProxy worker2WorkerProxy;
-	private Map<String, Worker2WorkerProxy> mapWorkerIdToW2WProxy = new HashMap<>();
+	
+	/** Worker to Outgoing Messages Map*/
 	private Map<Worker, Map<VertexID, List<Message>>> outgoingMessages;
+	
+	/** partitionId to Previous Incoming messages - Used in current Super Step*/
 	private Map<Integer, Map<VertexID, List<Message>>> previousIncomingMessages;
+	
+	/** partitionId to Current Incoming messages - used in next Super Step*/
 	private Map<Integer, Map<VertexID, List<Message>>> currentIncomingMessages;
 
 	/** boolean variable indicating whether the partitions can be worked upon by the workers in each superstep. **/
@@ -47,7 +59,7 @@ public class Worker extends UnicastRemoteObject {
 	public Worker() throws RemoteException {
 		InetAddress address = null;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYMMMdd.HHmmss.SSS");
-		String timeStamp = simpleDateFormat.format(new Date());
+		String timestamp = simpleDateFormat.format(new Date());
 
 		String hostName = new String();
 		try {
@@ -58,7 +70,7 @@ public class Worker extends UnicastRemoteObject {
 			e.printStackTrace();
 		} 
 
-		this.workerID = hostName + "_" + timeStamp;
+		this.workerID = hostName + "_" + timestamp;
 		this.partitionQueue = new LinkedBlockingDeque<Partition>();
 		this.numThreads = Runtime.getRuntime().availableProcessors();
 		for (int i = 0; i < numThreads; i++) {
@@ -107,18 +119,6 @@ public class Worker extends UnicastRemoteObject {
 			Map<String, Worker> mapWorkerIdToWorker) {
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
 		this.worker2WorkerProxy = new Worker2WorkerProxy(mapWorkerIdToWorker);
-		
-		/*
-		for(Entry<String, Worker> entry : mapWorkerIdToWorker.entrySet()) {
-			String currWorkerID = entry.getKey();
-			if ( ! this.workerID.equals(currWorkerID)) {
-				Worker worker = entry.getValue();
-				Worker2WorkerProxy w2wProxy = new Worker2WorkerProxy(worker);
-				mapWorkerIdToW2WProxy.put(currWorkerID, w2wProxy);
-			}
-		}
-<<<<<<< HEAD
-		*/
 		startSuperStep = true;
 	}
 
