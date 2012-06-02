@@ -54,12 +54,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 	Map<String, Worker> workerMap = new HashMap<>();
 	
 	/** The partitionID to workerID map. **/
-	Map<Integer, String> partitionWorkerMap = new HashMap<>();
-	
-	/** List of registered worker nodes */
-	List<WorkerProxy> registeredWorkers = new ArrayList<>();
+	Map<Integer, String> partitionWorkerMap;
 
-	
 	/**
 	 * Instantiates a new master.
 	 * 
@@ -121,6 +117,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 		int totalPartitions = this.graphPartitioner.getNumPartitions();
 		Iterator<Partition> iter = this.graphPartitioner.iterator();
 		Partition partition = null;
+		partitionWorkerMap = new HashMap<>();
 		// Assign partitions to workers in the ratio of the number of worker
 		// threads that each worker has.
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {

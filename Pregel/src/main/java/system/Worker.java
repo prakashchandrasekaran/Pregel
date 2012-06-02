@@ -34,8 +34,16 @@ public class Worker extends UnicastRemoteObject {
 	private String workerID;
 	private Worker2Master masterProxy;
 	private Map<Integer, String> mapPartitionIdToWorkerId;
+<<<<<<< HEAD
 	private Worker2WorkerProxy worker2WorkerProxy;
 
+=======
+	private Map<String, Worker2WorkerProxy> mapWorkerIdToW2WProxy = new HashMap<>();
+	/** boolean variable indicating whether the partitions can be worked upon by the workers in each superstep. **/
+	boolean startSuperStep = false;
+	
+	
+>>>>>>> 33f54d359217053727b135017a6c9812b43c8196
 	public Worker() throws RemoteException {
 		InetAddress address = null;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYMMMdd.HHmmss.SSS");
@@ -85,7 +93,7 @@ public class Worker extends UnicastRemoteObject {
 	private class WorkerThread extends Thread {
 		@Override
 		public void run() {
-			while (true) {
+			while (startSuperStep) {
 				try {
 					Partition partition = partitionQueue.take();
 		} catch (InterruptedException e) {
@@ -109,7 +117,12 @@ public class Worker extends UnicastRemoteObject {
 				mapWorkerIdToW2WProxy.put(currWorkerID, w2wProxy);
 			}
 		}
+<<<<<<< HEAD
 		*/
+=======
+		startSuperStep = true;
+		
+>>>>>>> 33f54d359217053727b135017a6c9812b43c8196
 	}
 
 	public static void main(String[] args) throws Exception {
