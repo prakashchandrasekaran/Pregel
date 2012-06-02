@@ -27,7 +27,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	private Thread t;
 	private int numWorkerThreads;
 	String serviceName;
-	LinkedBlockingQueue<Partition> partitionList;
+	BlockingQueue<Partition> partitionList;
 
 	/**
 	 * 

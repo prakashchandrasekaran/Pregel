@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import utility.Props;
 import api.Partition;
 
 /**
@@ -62,10 +62,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 	 *             the remote exception
 	 */
 	public Master() throws RemoteException, PropertyNotFoundException {
-		super();
-		totalWorkers = Props.getInstance().getIntProperty("TOTAL_WORKERS");
-		// masterThread = new Thread(this);
-		// masterThread.start();
+		super();		
 	}
 
 	/**
@@ -118,8 +115,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 		for (Map.Entry<String, WorkerProxy> entry : workerMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			int numThreads = workerProxy.getNumThreads();
-			int numPartitionsToAssign = numThreads / totalWorkerThreads.get()
-					* totalPartitions;
+			double ratio = numThreads / totalWorkerThreads.get();
+			int numPartitionsToAssign = (int) ratio * totalPartitions;
 			List<Partition> workerPartitions = new ArrayList<>();
 			for (int i = 0; i < numPartitionsToAssign; i++) {
 				workerPartitions.add(iter.next());
@@ -129,9 +126,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 
 		// Add the remaining partitions (if any) in a round-robin fashion.
 		int index = 0;
+		Iterator<Map.Entry<String, WorkerProxy>> workerMapIter = workerMap.entrySet().iterator();
 		while (iter.hasNext()) {
-			int workerID = (index % totalWorkers) + 1;
-			workerMap.get(workerID).addPartition(iter.next());
+			// If the remaining partitions is greater than the number of the workers, start iterating from the beginning again. 
+			if(!workerMapIter.hasNext()){
+				workerMapIter = workerMap.entrySet().iterator();
+			}
+			WorkerProxy workerProxy = workerMapIter.next().getValue();
+			workerProxy.addPartition(iter.next());
 		}
 
 	}
