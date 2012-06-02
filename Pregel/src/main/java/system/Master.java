@@ -130,7 +130,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 		}
 
 	}
-
+	
 	/**
 	 * The main method.
 	 * 
