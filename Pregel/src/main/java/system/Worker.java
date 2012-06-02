@@ -1,9 +1,13 @@
 package system;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +34,24 @@ public class Worker extends UnicastRemoteObject {
 	private String workerID;
 	private Worker2Master masterProxy;
 	private Map<String, String> mapPartitionIdToWorkerId;
-	private Map<String, Worker2WorkerProxy> mapWorkerIdW2WProxy = new HashMap<>();
+	private Map<String, Worker2WorkerProxy> mapWorkerIdToW2WProxy = new HashMap<>();
 
 	public Worker() throws RemoteException {
-		workerID = "hostname + ";
-		this.partitionQueue = new LinkedBlockingDeque<Partition>();
+		InetAddress Address = null;
+		SimpleDateFormat format = new SimpleDateFormat("YYYMMMdd.HHmmss.SSS");
+        String timeStamp = format.format(new Date());
+        
+		String hostName = new String();
+		try {
+			Address = InetAddress.getLocalHost();
+			hostName = Address.getHostName();
+		} catch (UnknownHostException e) {
+			hostName = "UnKnownHost";
+			e.printStackTrace();
+		} 
+	
+        this.workerID = hostName + "_" + timeStamp;
+        this.partitionQueue = new LinkedBlockingDeque<Partition>();
 		this.numThreads = Runtime.getRuntime().availableProcessors();
 		for (int i = 0; i < numThreads; i++) {
 			WorkerThread workerThread = new WorkerThread();
@@ -76,18 +93,17 @@ public class Worker extends UnicastRemoteObject {
 				}
 			}
 		}
-
 	}
 	
 	public void setWorkerPartitionInfo(Map<String, String> mapPartitionIdToWorkerId,
 			Map<String,Worker> mapWorkerIdToWorker) {
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
+		mapWorkerIdToW2WProxy = new HashMap<>();
 		for(Entry<String, Worker> entry : mapWorkerIdToWorker.entrySet()) {
 			Worker worker = entry.getValue();
 			Worker2WorkerProxy w2wProxy = new Worker2WorkerProxy(worker);
-			mapWorkerIdW2WProxy .put(entry.getKey(), w2wProxy);
+			mapWorkerIdToW2WProxy .put(entry.getKey(), w2wProxy);
 		}
-		
 	}
 
 	public static void main(String[] args) throws Exception {
