@@ -49,10 +49,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 	private GraphPartitioner graphPartitioner;
 
 	/** The worker map. */
-	Map<String, MasterWorkerProxy> workerMap = new HashMap<String, MasterWorkerProxy>();
+	Map<String, WorkerProxy> workerMap = new HashMap<String, WorkerProxy>();
 
 	/** List of registered worker nodes */
-	List<MasterWorkerProxy> registeredWorkers = new ArrayList<>();
+	List<WorkerProxy> registeredWorkers = new ArrayList<>();
 
 	/**
 	 * Instantiates a new master.
@@ -78,7 +78,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 	public Worker2Master register(Worker worker, String workerID, int numWorkerThreads)
 			throws AccessException, RemoteException {
 		totalWorkerThreads.getAndAdd(numWorkerThreads);
-		MasterWorkerProxy workerProxy = new MasterWorkerProxy(worker, workerID, numWorkerThreads,
+		WorkerProxy workerProxy = new WorkerProxy(worker, workerID, numWorkerThreads,
 				this);
 		workerMap.put(workerID, workerProxy);
 		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
@@ -106,8 +106,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 
 		// Assign partitions to workers in the ratio of the number of worker
 		// threads that each worker has.
-		for (Map.Entry<String, MasterWorkerProxy> entry : workerMap.entrySet()) {
-			MasterWorkerProxy workerProxy = entry.getValue();
+		for (Map.Entry<String, WorkerProxy> entry : workerMap.entrySet()) {
+			WorkerProxy workerProxy = entry.getValue();
 			int numThreads = workerProxy.getNumThreads();
 			double ratio = (double) numThreads / totalWorkerThreads.get();
 			int numPartitionsToAssign = (int) ratio * totalPartitions;
@@ -119,13 +119,13 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 		}
 
 		// Add the remaining partitions (if any) in a round-robin fashion.
-		Iterator<Map.Entry<String, MasterWorkerProxy>> workerMapIter = workerMap.entrySet().iterator();
+		Iterator<Map.Entry<String, WorkerProxy>> workerMapIter = workerMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			// If the remaining partitions is greater than the number of the workers, start iterating from the beginning again. 
 			if(!workerMapIter.hasNext()){
 				workerMapIter = workerMap.entrySet().iterator();
 			}
-			MasterWorkerProxy workerProxy = workerMapIter.next().getValue();
+			WorkerProxy workerProxy = workerMapIter.next().getValue();
 			workerProxy.addPartition(iter.next());
 		}
 
