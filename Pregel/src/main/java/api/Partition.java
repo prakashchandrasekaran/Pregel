@@ -33,4 +33,13 @@ public class Partition implements Iterable<Vertex> {
 		Iterator<Vertex> iter = vertexList.iterator();
 		return iter;
 	}
+
+	public int getPartitionID() {
+		return partitionID;
+	}
+
+	public void setPartitionID(int partitionID) {
+		this.partitionID = partitionID;
+	}	
+	
 }
