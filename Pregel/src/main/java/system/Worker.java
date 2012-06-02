@@ -37,14 +37,14 @@ public class Worker extends UnicastRemoteObject {
 	private Map<String, Worker2WorkerProxy> mapWorkerIdToW2WProxy = new HashMap<>();
 
 	public Worker() throws RemoteException {
-		InetAddress Address = null;
-		SimpleDateFormat format = new SimpleDateFormat("YYYMMMdd.HHmmss.SSS");
-        String timeStamp = format.format(new Date());
+		InetAddress address = null;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYMMMdd.HHmmss.SSS");
+        String timeStamp = simpleDateFormat.format(new Date());
         
 		String hostName = new String();
 		try {
-			Address = InetAddress.getLocalHost();
-			hostName = Address.getHostName();
+			address = InetAddress.getLocalHost();
+			hostName = address.getHostName();
 		} catch (UnknownHostException e) {
 			hostName = "UnKnownHost";
 			e.printStackTrace();
