@@ -4,7 +4,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -26,6 +29,8 @@ public class Worker extends UnicastRemoteObject {
 	/* Hostname of the node */
 	private String workerID;
 	private Worker2Master masterProxy;
+	private Map<String, String> mapPartitionIdToWorkerId;
+	private Map<String, Worker2WorkerProxy> mapWorkerIdW2WProxy = new HashMap<>();
 
 	public Worker() throws RemoteException {
 		workerID = "hostname + ";
@@ -72,6 +77,17 @@ public class Worker extends UnicastRemoteObject {
 			}
 		}
 
+	}
+	
+	public void setWorkerPartitionInfo(Map<String, String> mapPartitionIdToWorkerId,
+			Map<String,Worker> mapWorkerIdToWorker) {
+		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
+		for(Entry<String, Worker> entry : mapWorkerIdToWorker.entrySet()) {
+			Worker worker = entry.getValue();
+			Worker2WorkerProxy w2wProxy = new Worker2WorkerProxy(worker);
+			mapWorkerIdW2WProxy .put(entry.getKey(), w2wProxy);
+		}
+		
 	}
 
 	public static void main(String[] args) throws Exception {
