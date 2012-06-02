@@ -1,6 +1,5 @@
 package system;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -76,9 +75,6 @@ public class Worker extends UnicastRemoteObject {
 	}
 
 	public static void main(String[] args) throws Exception {
-		// Master master = (Master) Naming.lookup("//localhost/Master");
-		// Worker worker = new Worker();
-		// master.register(worker);
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
@@ -86,12 +82,10 @@ public class Worker extends UnicastRemoteObject {
 			String masterMachineName = args[0];
 			Registry registry = LocateRegistry.getRegistry(masterMachineName);
 			Worker2Master worker2Master = (Worker2Master) registry
-					.lookup("Master");
+					.lookup(Worker2Master.SERVICE_NAME);
 			Worker worker = new Worker();
-			String masterProxyServiceName = worker2Master.register(worker,
-					worker.getWorkerID(), worker.getNumThreads());
-			Worker2Master masterProxy = (Worker2Master) registry
-					.lookup(masterProxyServiceName);
+			Worker2Master masterProxy = worker2Master.register(worker,
+					worker.getWorkerID(), worker.getNumThreads());			
 			worker.setMasterProxy(masterProxy);
 			System.out.println("Worker is bound and ready for computations ");
 		} catch (Exception e) {
@@ -100,7 +94,7 @@ public class Worker extends UnicastRemoteObject {
 		}
 	}
 
-	private void setMasterProxy(Worker2Master masterProxy2) {
+	private void setMasterProxy(Worker2Master masterProxy) {
 		this.masterProxy = masterProxy;
 	}
 }

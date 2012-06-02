@@ -11,7 +11,8 @@ package system;
 
 public interface Worker2Master extends java.rmi.Remote {
 
-	public String getServiceName() throws java.rmi.RemoteException;
+	/** The Constant SERVICE_NAME. */
+	public static final String SERVICE_NAME = "Master";
 
 	/**
 	 * Registers remote workers with the master
@@ -25,6 +26,6 @@ public interface Worker2Master extends java.rmi.Remote {
 	 *             Master}
 	 */
 
-	public String register(Worker worker, String workerID, int numWorkerThreads)
+	public Worker2Master register(Worker worker, String workerID, int numWorkerThreads)
 			throws java.rmi.RemoteException;
 }
