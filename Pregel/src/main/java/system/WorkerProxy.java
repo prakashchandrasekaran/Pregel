@@ -4,6 +4,7 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -25,25 +26,25 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	private Master master;
 	private Thread t;
 	private int numWorkerThreads;
-	String serviceName; 
+	String workerID; 
 	BlockingQueue<Partition> partitionList;
-
+	
 	/**
 	 * 
 	 * @param worker
 	 *            Represents the remote {@link system.Worker Worker}
 	 * @param master
 	 *            Represents the {@link system.Master Master}
-	 * @param serviceName
+	 * @param workerID
 	 *            Represents the unique serviceName to identify the worker
 	 * @throws RemoteException
 	 * @throws AccessException
 	 */
 
-	public WorkerProxy(Worker worker, String serviceName, int numWorkerThreads,
+	public WorkerProxy(Worker worker, String workerID, int numWorkerThreads,
 			Master master) throws AccessException, RemoteException {
 		this.worker = worker;
-		this.serviceName = serviceName;
+		this.workerID = workerID;
 		this.numWorkerThreads = numWorkerThreads;
 		this.master = master;
 		partitionList = new LinkedBlockingQueue<>();
@@ -70,7 +71,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 				System.out.println("Remote Exception received from the Worker");
 				System.out.println("Giving back the partition to the Master ");
 				try {
-					master.removeWorker(serviceName);
+					master.removeWorker(workerID);
 					// give the partition back to Master
 					return;
 				} catch (RemoteException e1) {
@@ -97,7 +98,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 			System.out.println("Remote Exception received from the Worker");
 			System.out.println("Giving back the partition to the Master ");
 			try {
-				master.removeWorker(serviceName);
+				master.removeWorker(workerID);
 				// give the partition back to Master
 				return;
 			} catch (RemoteException e1) {
@@ -106,9 +107,21 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		}
 	}
 
+	public void setWorkerPartitionInfo(Map<Integer, String> mapPartitionIdToWorkerId,
+			Map<String, Worker> mapWorkerIdToWorker){
+		worker.setWorkerPartitionInfo(mapPartitionIdToWorkerId, mapWorkerIdToWorker);
+	}
+	
+	public String getWorkerID(){
+		return workerID;
+	}
+	
 	@Override
 	public Worker2Master register(Worker worker, String workerID, int numWorkerThreads)
 			throws RemoteException {
 		return null;
 	}
+	
+	
+
 }

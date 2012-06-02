@@ -33,7 +33,7 @@ public class Worker extends UnicastRemoteObject {
 	/* Hostname of the node */
 	private String workerID;
 	private Worker2Master masterProxy;
-	private Map<String, String> mapPartitionIdToWorkerId;
+	private Map<Integer, String> mapPartitionIdToWorkerId;
 	private Map<String, Worker2WorkerProxy> mapWorkerIdToW2WProxy = new HashMap<>();
 
 	public Worker() throws RemoteException {
@@ -95,8 +95,8 @@ public class Worker extends UnicastRemoteObject {
 		}
 	}
 	
-	public void setWorkerPartitionInfo(Map<String, String> mapPartitionIdToWorkerId,
-			Map<String,Worker> mapWorkerIdToWorker) {
+	public void setWorkerPartitionInfo(Map<Integer, String> mapPartitionIdToWorkerId,
+			Map<String, Worker> mapWorkerIdToWorker) {
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
 		mapWorkerIdToW2WProxy = new HashMap<>();
 		for(Entry<String, Worker> entry : mapWorkerIdToWorker.entrySet()) {

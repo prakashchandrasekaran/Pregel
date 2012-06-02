@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import api.Partition;
@@ -48,12 +47,19 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 	/** The graph. */
 	private GraphPartitioner graphPartitioner;
 
-	/** The worker map. */
-	Map<String, WorkerProxy> workerMap = new HashMap<String, WorkerProxy>();
+	/** The workerID to WorkerProxy map. */
+	Map<String, WorkerProxy> workerProxyMap = new HashMap<>();
 
+	/** The workerID to Worker map. **/
+	Map<String, Worker> workerMap = new HashMap<>();
+	
+	/** The partitionID to workerID map. **/
+	Map<Integer, String> partitionWorkerMap = new HashMap<>();
+	
 	/** List of registered worker nodes */
 	List<WorkerProxy> registeredWorkers = new ArrayList<>();
 
+	
 	/**
 	 * Instantiates a new master.
 	 * 
@@ -80,7 +86,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 		totalWorkerThreads.getAndAdd(numWorkerThreads);
 		WorkerProxy workerProxy = new WorkerProxy(worker, workerID, numWorkerThreads,
 				this);
-		workerMap.put(workerID, workerProxy);
+		workerProxyMap.put(workerID, workerProxy);
+		workerMap.put(workerID, worker);
 		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
 	}
 
@@ -94,39 +101,54 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 	public void putTask(GraphPartitioner graphPartitioner) {
 		this.graphPartitioner = graphPartitioner;
 		assignPartitions();
+		sendWorkerPartitionInfo();
 	}
 
+	/**
+	 * 
+	 */
+	private void sendWorkerPartitionInfo(){
+		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
+			WorkerProxy workerProxy = entry.getValue();
+			workerProxy.setWorkerPartitionInfo(partitionWorkerMap, workerMap);
+		}
+	}
 	/**
 	 * Assign partitions to workers based on the number of processors (threads)
 	 * that each worker has.
 	 */
-	public void assignPartitions() {
+	private void assignPartitions() {
 		int totalPartitions = this.graphPartitioner.getNumPartitions();
 		Iterator<Partition> iter = this.graphPartitioner.iterator();
-
+		Partition partition = null;
 		// Assign partitions to workers in the ratio of the number of worker
 		// threads that each worker has.
-		for (Map.Entry<String, WorkerProxy> entry : workerMap.entrySet()) {
+		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			int numThreads = workerProxy.getNumThreads();
+			
 			double ratio = (double) numThreads / totalWorkerThreads.get();
 			int numPartitionsToAssign = (int) ratio * totalPartitions;
 			List<Partition> workerPartitions = new ArrayList<>();
 			for (int i = 0; i < numPartitionsToAssign; i++) {
-				workerPartitions.add(iter.next());
+				partition = iter.next();
+				workerPartitions.add(partition);
+				partitionWorkerMap.put(partition.getPartitionID(), workerProxy.getWorkerID());
 			}
 			workerProxy.addPartitionList(workerPartitions);
 		}
 
 		// Add the remaining partitions (if any) in a round-robin fashion.
-		Iterator<Map.Entry<String, WorkerProxy>> workerMapIter = workerMap.entrySet().iterator();
+		Iterator<Map.Entry<String, WorkerProxy>> workerMapIter = workerProxyMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			// If the remaining partitions is greater than the number of the workers, start iterating from the beginning again. 
 			if(!workerMapIter.hasNext()){
-				workerMapIter = workerMap.entrySet().iterator();
+				workerMapIter = workerProxyMap.entrySet().iterator();
 			}
+			partition = iter.next();
 			WorkerProxy workerProxy = workerMapIter.next().getValue();
-			workerProxy.addPartition(iter.next());
+			workerProxy.addPartition(partition);
+			partitionWorkerMap.put(partition.getPartitionID(), workerProxy.getWorkerID());
 		}
 
 	}
@@ -160,7 +182,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 
 
 	public void removeWorker(String serviceName) throws RemoteException {
-		workerMap.remove(serviceName);
+		workerProxyMap.remove(serviceName);
 	}
 
 }
