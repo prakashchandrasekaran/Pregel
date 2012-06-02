@@ -100,9 +100,12 @@ public class Worker extends UnicastRemoteObject {
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
 		mapWorkerIdToW2WProxy = new HashMap<>();
 		for(Entry<String, Worker> entry : mapWorkerIdToWorker.entrySet()) {
-			Worker worker = entry.getValue();
-			Worker2WorkerProxy w2wProxy = new Worker2WorkerProxy(worker);
-			mapWorkerIdToW2WProxy .put(entry.getKey(), w2wProxy);
+			String currWorkerID = entry.getKey();
+			if ( ! this.workerID.equals(currWorkerID)) {
+				Worker worker = entry.getValue();
+				Worker2WorkerProxy w2wProxy = new Worker2WorkerProxy(worker);
+				mapWorkerIdToW2WProxy.put(currWorkerID, w2wProxy);
+			}
 		}
 	}
 
