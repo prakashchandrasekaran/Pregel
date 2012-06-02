@@ -26,7 +26,7 @@ import api.Partition;
  * @author Vijayaraghavan Subbaiah
  */
 public class Master extends UnicastRemoteObject implements Worker2Master,
-		Runnable {
+Runnable {
 
 	/** The master thread. */
 	// private Thread masterThread;

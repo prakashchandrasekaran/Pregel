@@ -6,6 +6,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import api.Partition;
@@ -26,7 +27,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	private Master master;
 	private Thread t;
 	private int numWorkerThreads;
-	String serviceName;
+	String serviceName; 
 	BlockingQueue<Partition> partitionList;
 
 	/**
