@@ -36,6 +36,7 @@ public class Worker extends UnicastRemoteObject {
 	private String workerID;
 	private Worker2Master masterProxy;
 	private Map<Integer, String> mapPartitionIdToWorkerId;
+	private Worker2WorkerProxy worker2WorkerProxy;
 	private Map<String, Worker2WorkerProxy> mapWorkerIdToW2WProxy = new HashMap<>();
 	private Map<Worker, Map<VertexID, List<Message>>> outgoingMessages;
 	private Map<Integer, Map<VertexID, List<Message>>> previousIncomingMessages;
@@ -43,8 +44,6 @@ public class Worker extends UnicastRemoteObject {
 
 	/** boolean variable indicating whether the partitions can be worked upon by the workers in each superstep. **/
 	boolean startSuperStep = false;
-
-
 	public Worker() throws RemoteException {
 		InetAddress address = null;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYMMMdd.HHmmss.SSS");
@@ -107,7 +106,9 @@ public class Worker extends UnicastRemoteObject {
 	public void setWorkerPartitionInfo(Map<Integer, String> mapPartitionIdToWorkerId,
 			Map<String, Worker> mapWorkerIdToWorker) {
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
-		mapWorkerIdToW2WProxy = new HashMap<>();
+		this.worker2WorkerProxy = new Worker2WorkerProxy(mapWorkerIdToWorker);
+		
+		/*
 		for(Entry<String, Worker> entry : mapWorkerIdToWorker.entrySet()) {
 			String currWorkerID = entry.getKey();
 			if ( ! this.workerID.equals(currWorkerID)) {
@@ -116,8 +117,9 @@ public class Worker extends UnicastRemoteObject {
 				mapWorkerIdToW2WProxy.put(currWorkerID, w2wProxy);
 			}
 		}
+<<<<<<< HEAD
+		*/
 		startSuperStep = true;
-
 	}
 
 	public static void main(String[] args) throws Exception {

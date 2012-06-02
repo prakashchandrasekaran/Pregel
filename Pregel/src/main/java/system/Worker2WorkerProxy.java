@@ -1,18 +1,16 @@
 package system;
-import graphs.VertexID;
-
 import java.rmi.RemoteException;
 import java.util.*;
+import graphs.VertexID;
+import java.util.Map;
 public class Worker2WorkerProxy implements Worker2Worker {
-	private Worker receiverWorker; 
+	private Map<String, Worker> mapWorkerIdToWorker;
 	
-	public Worker2WorkerProxy(Worker receiverWorker) {
-		this.receiverWorker = receiverWorker;
+	public Worker2WorkerProxy(Map<String, Worker> mapWorkerIdToWorker) {
+		this.mapWorkerIdToWorker = mapWorkerIdToWorker;
 	}
 	
-	public void sendMessage(Map<VertexID, List<Message>> outgoingMessages) throws RemoteException {
-		receiverWorker.receiveMessage(outgoingMessages);
+	public void sendMessage(String receiverWorkerID, Map<VertexID, List<Message>> outgoingMessages) throws RemoteException {
+		mapWorkerIdToWorker.get(receiverWorkerID).receiveMessage(outgoingMessages);
 	}
-
-	
 }
