@@ -1,6 +1,8 @@
 package api;
 
+import graphs.VertexID;
 import java.util.*;
+
 
 /**
  * Represents the partition of a graph consisting of set of vertices and their
@@ -12,8 +14,8 @@ import java.util.*;
  * 
  */
 
-public class Partition implements Iterable<Vertex> {
-	private List<Vertex> vertexList;
+public class Partition {
+	private Map<VertexID, Vertex> vertexMap;
 	int partitionID;
 
 	/**
@@ -22,16 +24,7 @@ public class Partition implements Iterable<Vertex> {
 	 */
 	public Partition(int partitionID, List<Vertex> vertexList) {
 		this.partitionID = partitionID;
-		this.vertexList = vertexList;
-	}
-
-	/**
-	 * Iterator to iterate through the vertices
-	 */
-	@Override
-	public Iterator<Vertex> iterator() {
-		Iterator<Vertex> iter = vertexList.iterator();
-		return iter;
+		// this.vertexList = vertexList;
 	}
 
 	public int getPartitionID() {
@@ -40,6 +33,10 @@ public class Partition implements Iterable<Vertex> {
 
 	public void setPartitionID(int partitionID) {
 		this.partitionID = partitionID;
+	}
+
+	public Vertex getVertex(VertexID vertexID) {
+		return vertexMap.get(vertexID);
 	}	
 	
 }

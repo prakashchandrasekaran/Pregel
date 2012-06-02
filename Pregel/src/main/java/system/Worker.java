@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-
+import api.Vertex;
 import api.Partition;
 
 /**
@@ -108,6 +108,10 @@ public class Worker extends UnicastRemoteObject {
 			while (startSuperStep) {
 				try {
 					Partition partition = partitionQueue.take();
+					Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages.get(partition.getPartitionID());
+					for(Entry<VertexID, List<Message>> entry : messageForThisPartition.entrySet()) {
+						Vertex vertex = partition.getVertex(entry.getKey());
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
