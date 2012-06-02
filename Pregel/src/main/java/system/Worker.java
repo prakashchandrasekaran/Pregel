@@ -1,6 +1,5 @@
 package system;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -88,10 +87,8 @@ public class Worker extends UnicastRemoteObject {
 			Worker2Master worker2Master = (Worker2Master) registry
 					.lookup("Master");
 			Worker worker = new Worker();
-			String masterProxyServiceName = worker2Master.register(worker,
-					worker.getWorkerID(), worker.getNumThreads());
-			Worker2Master masterProxy = (Worker2Master) registry
-					.lookup(masterProxyServiceName);
+			Worker2Master masterProxy = worker2Master.register(worker,
+					worker.getWorkerID(), worker.getNumThreads());			
 			worker.setMasterProxy(masterProxy);
 			System.out.println("Worker is bound and ready for computations ");
 		} catch (Exception e) {

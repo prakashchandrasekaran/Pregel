@@ -2,10 +2,9 @@ package system;
 
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import api.Partition;
@@ -49,9 +48,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		this.master = master;
 		partitionList = new LinkedBlockingQueue<>();
 		t = new Thread(this);
-		t.start();
-		Registry reg = LocateRegistry.getRegistry();
-		reg.rebind(serviceName, this);
+		t.start();		
 	}
 
 	/**

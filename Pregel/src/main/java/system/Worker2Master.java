@@ -25,6 +25,6 @@ public interface Worker2Master extends java.rmi.Remote {
 	 *             Master}
 	 */
 
-	public String register(Worker worker, String workerID, int numWorkerThreads)
+	public Worker2Master register(Worker worker, String workerID, int numWorkerThreads)
 			throws java.rmi.RemoteException;
 }

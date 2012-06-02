@@ -25,8 +25,7 @@ import api.Partition;
  * @author Gautham Narayanasamy
  * @author Vijayaraghavan Subbaiah
  */
-public class Master extends UnicastRemoteObject implements Worker2Master,
-		Runnable {
+public class Master extends UnicastRemoteObject implements Worker2Master{
 
 	/** The master thread. */
 	// private Thread masterThread;
@@ -47,7 +46,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 	private static int totalWorkers;
 
 	/** The graph. */
-	private GraphPartitioner graph;
+	private GraphPartitioner graphPartitioner;
 
 	/** The worker map. */
 	Map<String, WorkerProxy> workerMap = new HashMap<String, WorkerProxy>();
@@ -76,13 +75,13 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 	 * @throws RemoteException
 	 * @throws AccessException
 	 */
-	public String register(Worker worker, String workerID, int numWorkerThreads)
+	public Worker2Master register(Worker worker, String workerID, int numWorkerThreads)
 			throws AccessException, RemoteException {
 		totalWorkerThreads.getAndAdd(numWorkerThreads);
-		WorkerProxy wp = new WorkerProxy(worker, workerID, numWorkerThreads,
+		WorkerProxy workerProxy = new WorkerProxy(worker, workerID, numWorkerThreads,
 				this);
-		workerMap.put(workerID, wp);
-		return workerID;
+		workerMap.put(workerID, workerProxy);
+		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
 	}
 
 	@Override
@@ -91,14 +90,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 	}
 
 	/**
-	 * The application programmer calls this method to give the input graph to
+	 * The application programmer calls this method to give submit the task (in the form of a GraphPartitioner object) to
 	 * the master.
 	 * 
-	 * @param graph
+	 * @param graphPartitioner
 	 *            the graph
 	 */
-	public void putGraph(GraphPartitioner graph) {
-		this.graph = graph;
+	public void putTask(GraphPartitioner graphPartitioner) {
+		this.graphPartitioner = graphPartitioner;
 		assignPartitions();
 	}
 
@@ -107,15 +106,15 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 	 * that each worker has.
 	 */
 	public void assignPartitions() {
-		int totalPartitions = graph.getNumPartitions();
-		Iterator<Partition> iter = graph.iterator();
+		int totalPartitions = this.graphPartitioner.getNumPartitions();
+		Iterator<Partition> iter = this.graphPartitioner.iterator();
 
 		// Assign partitions to workers in the ratio of the number of worker
 		// threads that each worker has.
 		for (Map.Entry<String, WorkerProxy> entry : workerMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			int numThreads = workerProxy.getNumThreads();
-			double ratio = numThreads / totalWorkerThreads.get();
+			double ratio = (double) numThreads / totalWorkerThreads.get();
 			int numPartitionsToAssign = (int) ratio * totalPartitions;
 			List<Partition> workerPartitions = new ArrayList<>();
 			for (int i = 0; i < numPartitionsToAssign; i++) {
@@ -125,7 +124,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 		}
 
 		// Add the remaining partitions (if any) in a round-robin fashion.
-		int index = 0;
 		Iterator<Map.Entry<String, WorkerProxy>> workerMapIter = workerMap.entrySet().iterator();
 		while (iter.hasNext()) {
 			// If the remaining partitions is greater than the number of the workers, start iterating from the beginning again. 
@@ -164,10 +162,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master,
 	 * 
 	 * @see java.lang.Runnable#run()
 	 */
-	@Override
-	public void run() {
 
-	}
 
 	public void removeWorker(String serviceName) throws RemoteException {
 		workerMap.remove(serviceName);
