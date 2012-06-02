@@ -126,7 +126,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			int numThreads = workerProxy.getNumThreads();
-			
 			double ratio = (double) numThreads / totalWorkerThreads.get();
 			int numPartitionsToAssign = (int) ratio * totalPartitions;
 			List<Partition> workerPartitions = new ArrayList<>();
