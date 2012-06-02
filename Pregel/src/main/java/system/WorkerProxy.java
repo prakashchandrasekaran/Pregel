@@ -109,7 +109,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 
 	public void setWorkerPartitionInfo(Map<Integer, String> mapPartitionIdToWorkerId,
 			Map<String, Worker> mapWorkerIdToWorker){
-		worker.setWorkerPartitionInfo(mapPartitionIdToWorkerId, mapWorkerIdToWorker);
+		worker.setWorkerPartitionInfo(mapPartitionIdToWorkerId, mapWorkerIdToWorker);		
 	}
 	
 	public String getWorkerID(){
