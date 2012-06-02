@@ -67,9 +67,7 @@ public class Worker extends UnicastRemoteObject {
 			while (true) {
 				try {
 					Partition partition = partitionQueue.take();
-					// do some work on the partition.
-
-				} catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
