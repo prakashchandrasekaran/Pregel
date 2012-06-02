@@ -1,5 +1,7 @@
 package system;
 
+import java.rmi.RemoteException;
+
 /**
  * Defines an interface to register remote ({@link system.Worker Worker}) with
  * the {@link system.Master Master}.
@@ -27,5 +29,5 @@ public interface Worker2Master extends java.rmi.Remote {
 	 */
 
 	public Worker2Master register(Worker worker, String workerID, int numWorkerThreads)
-			throws java.rmi.RemoteException;
+			throws RemoteException;
 }
