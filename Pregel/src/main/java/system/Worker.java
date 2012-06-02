@@ -120,7 +120,7 @@ public class Worker extends UnicastRemoteObject {
 					Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages.get(partition.getPartitionID());
 					for(Entry<VertexID, List<Message>> entry : messageForThisPartition.entrySet()) {
 						Vertex vertex = partition.getVertex(entry.getKey());
-						vertex.compute(entry.getValue());
+						vertex.compute(entry.getValue().iterator());
 					}
 					completedPartitions.add(partition);
 				} catch (InterruptedException e) {

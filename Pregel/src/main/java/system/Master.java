@@ -41,9 +41,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 	/** The total number of worker threads. */
 	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
 
-	/** The Constant totalWorkers. */
-	private static int totalWorkers;
-
 	/** The graph. */
 	private GraphPartitioner graphPartitioner;
 
@@ -146,7 +143,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master{
 			workerProxy.addPartition(partition);
 			partitionWorkerMap.put(partition.getPartitionID(), workerProxy.getWorkerID());
 		}
-
 	}
 	
 	/**
