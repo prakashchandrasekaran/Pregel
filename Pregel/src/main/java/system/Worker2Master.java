@@ -1,3 +1,6 @@
+/*
+ * @author sam
+ */
 package system;
 
 import java.rmi.RemoteException;
@@ -17,19 +20,23 @@ public interface Worker2Master extends java.rmi.Remote {
 	public static final String SERVICE_NAME = "Master";
 
 	/**
-	 * Registers remote workers with the master
-	 * 
-	 * @param Worker
-	 *            Represents the {@system.Worker Worker} that is available for
-	 *            registering itself with the {@link system.Master Master}.
-	 * @throws java.rmi.RemoteException
-	 *             Throws RemoteException if {@link system.Worker Worker} is
-	 *             unable to register itself with the {@link system.Master
-	 *             Master}
+	 * Registers remote workers with the master.
+	 *
+	 * @param worker the worker
+	 * @param workerID the worker id
+	 * @param numWorkerThreads the num worker threads
+	 * @return worker2 master
+	 * @throws RemoteException the remote exception
 	 */
 
 	public Worker2Master register(Worker worker, String workerID,
 			int numWorkerThreads) throws RemoteException;
 
-	public void superStepCompleted(String workerID);
+	
+	/**
+	 * Send a message to the Master saying that the current superstep has been completed.
+	 *
+	 * @param workerID the worker id
+	 */
+	public void superStepCompleted(String workerID, boolean isWorkerActive);
 }

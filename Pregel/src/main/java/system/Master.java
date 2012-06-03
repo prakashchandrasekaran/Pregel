@@ -188,17 +188,25 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	}
 
 	@Override
-	public void superStepCompleted(String workerID) {
+	public void superStepCompleted(String workerID, boolean isWorkerActive) {
 		workerAcknowledgementSet.remove(workerID);
-		if(workerAcknowledgementSet.size() == 0) {
-			workerAcknowledgementSet.addAll(this.workerMap.keySet());
+		this.workerProxyMap.get(workerID).setWorkerActive(isWorkerActive);
+		// If the acknowledgment has been received from all the workers, start the next superstep
+		if(workerAcknowledgementSet.size() == 0) {			
 			startSuperStep();
 		}
 	}
 
 	private void startSuperStep() {
-		for(Entry<String,WorkerProxy> entry : this.workerProxyMap.entrySet()) {
-			entry.getValue().startSuperStep();
+		WorkerProxy workerProxy = null;
+		for(Entry<String, WorkerProxy> entry : this.workerProxyMap.entrySet()) {
+			workerProxy = entry.getValue();
+			if(workerProxy.isWorkerActive()){
+				workerProxy.startSuperStep();
+				// Wait for acknowledgment only if the worker will be active in the next superstep.
+				workerAcknowledgementSet.add(entry.getKey());
+			}
+			
 		}
 	}
 
