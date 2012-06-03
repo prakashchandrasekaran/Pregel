@@ -42,6 +42,9 @@ public class Worker extends UnicastRemoteObject {
 	/** */
 	private int totalPartitionsAssigned;
 	
+	/** flag is true when Worker is sending messages to other workers */
+	private boolean sendingMessage;
+	
 	/** */
 	private BlockingQueue<Partition> partitionQueue;
 
@@ -97,6 +100,7 @@ public class Worker extends UnicastRemoteObject {
 		this.previousIncomingMessages = new ConcurrentHashMap<>();
 		this.outgoingMessages = new ConcurrentHashMap<>();
 		this.numThreads = Runtime.getRuntime().availableProcessors();
+		this.sendingMessage = false;
 		for (int i = 0; i < numThreads; i++) {
 			WorkerThread workerThread = new WorkerThread();
 			workerThread.start();
@@ -129,27 +133,49 @@ public class Worker extends UnicastRemoteObject {
 	private class WorkerThread extends Thread {
 		@Override
 		public void run() {
-			while (startSuperStep) {
-				try {
-					Partition partition = partitionQueue.take();
-					Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages
-							.get(partition.getPartitionID());
-					Map<VertexID, Message> messagesFromCompute = null;
-					for (Entry<VertexID, List<Message>> entry : messageForThisPartition
-							.entrySet()) {
-						Vertex vertex = partition.getVertex(entry.getKey());
-						messagesFromCompute = vertex.compute(entry.getValue()
-								.iterator());
-						updateOutgoingMessages(messagesFromCompute);
+			while(true) {
+				while (startSuperStep) {
+					try {
+						Partition partition = partitionQueue.take();
+						Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages
+								.get(partition.getPartitionID());
+						Map<VertexID, Message> messagesFromCompute = null;
+						for (Entry<VertexID, List<Message>> entry : messageForThisPartition
+								.entrySet()) {
+							Vertex vertex = partition.getVertex(entry.getKey());
+							messagesFromCompute = vertex.compute(entry.getValue()
+									.iterator());
+							updateOutgoingMessages(messagesFromCompute);
+						}
+						completedPartitions.add(partition);
+						checkAndSendMessage();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
-					completedPartitions.add(partition);
-					
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			}
 		}
+
+		private synchronized void checkAndSendMessage() {
+			if( (! sendingMessage) && (completedPartitions.size() == totalPartitionsAssigned)) {
+				sendingMessage = true;
+				startSuperStep = false;
+				partitionQueue.addAll(completedPartitions);
+				completedPartitions.clear();
+				for(Entry<String, Map<VertexID, List<Message>>> entry : outgoingMessages.entrySet()) {
+					try {
+						worker2WorkerProxy.sendMessage(entry.getKey(), entry.getValue());
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			// superStepCompleted
+			
+		}
 	}
+	
+	
 
 	/**
 	 * Updates the outgoing messages for every superstep
@@ -220,6 +246,10 @@ public class Worker extends UnicastRemoteObject {
 			System.err.println("ComputeEngine exception:");
 			e.printStackTrace();
 		}
+	}
+	
+	private void superStepCompleted() {
+		this.masterProxy.superStepCompleted(this.workerID);
 	}
 
 	private void setMasterProxy(Worker2Master masterProxy) {

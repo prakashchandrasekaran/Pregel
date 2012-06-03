@@ -181,4 +181,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 		workerProxyMap.remove(serviceName);
 	}
 
+	@Override
+	public void superStepCompleted(String workerID) {
+		
+	}
+
 }

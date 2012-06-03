@@ -30,4 +30,6 @@ public interface Worker2Master extends java.rmi.Remote {
 
 	public Worker2Master register(Worker worker, String workerID,
 			int numWorkerThreads) throws RemoteException;
+
+	public void superStepCompleted(String workerID);
 }

@@ -125,4 +125,10 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 			int numWorkerThreads) throws RemoteException {
 		return null;
 	}
+
+	@Override
+	public void superStepCompleted(String workerID) {
+		// TODO Auto-generated method stub
+		
+	}
 }
