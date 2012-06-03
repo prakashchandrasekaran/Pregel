@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -28,8 +29,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	private int numWorkerThreads;
 	String workerID;
 	BlockingQueue<Partition> partitionList;
-	/** boolean variable denoting whether the worker will be active in the next superstep.*/
-	private boolean isWorkerActive;
+	
 	/**
 	 * 
 	 * @param worker
@@ -128,20 +128,12 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	}
 
 	@Override
-	public void superStepCompleted(String workerID, boolean isWorkerActive) {
+	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) {
 	}
 
 	public void startSuperStep() {
 		this.worker.setStartSuperStep(true);
 	}
 
-	public boolean isWorkerActive() {
-		return isWorkerActive;
-	}
-
-	public void setWorkerActive(boolean isWorkerActive) {
-		this.isWorkerActive = isWorkerActive;
-	}
-	
 	
 }

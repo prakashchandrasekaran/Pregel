@@ -4,6 +4,7 @@
 package system;
 
 import java.rmi.RemoteException;
+import java.util.Set;
 
 /**
  * Defines an interface to register remote ({@link system.Worker Worker}) with
@@ -38,5 +39,5 @@ public interface Worker2Master extends java.rmi.Remote {
 	 *
 	 * @param workerID the worker id
 	 */
-	public void superStepCompleted(String workerID, boolean isWorkerActive);
+	public void superStepCompleted(String workerID, Set<String> activeWorkerIDs);
 }

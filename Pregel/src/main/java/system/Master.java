@@ -55,9 +55,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	/** The partitionID to workerID map. **/
 	Map<Integer, String> partitionWorkerMap;
 
-	/** Set of Workers maintained for acknowledgment */
+	/** Set of Workers maintained for acknowledgment. */
 	Set<String> workerAcknowledgementSet = new HashSet<>();
 	
+	/** Set of workers who will be active in the next superstep. */
+	Set<String> activeWorkerSet = new HashSet<>();
 	/**
 	 * Instantiates a new master.
 	 * 
@@ -188,26 +190,22 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	}
 
 	@Override
-	public void superStepCompleted(String workerID, boolean isWorkerActive) {
-		workerAcknowledgementSet.remove(workerID);
-		this.workerProxyMap.get(workerID).setWorkerActive(isWorkerActive);
+	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) {
+		this.activeWorkerSet.addAll(activeWorkerSet);
+		this.workerAcknowledgementSet.remove(workerID);
 		// If the acknowledgment has been received from all the workers, start the next superstep
-		if(workerAcknowledgementSet.size() == 0) {			
+		if(this.workerAcknowledgementSet.size() == 0) {			
 			startSuperStep();
 		}
 	}
 
 	private void startSuperStep() {
-		WorkerProxy workerProxy = null;
-		for(Entry<String, WorkerProxy> entry : this.workerProxyMap.entrySet()) {
-			workerProxy = entry.getValue();
-			if(workerProxy.isWorkerActive()){
-				workerProxy.startSuperStep();
-				// Wait for acknowledgment only if the worker will be active in the next superstep.
-				workerAcknowledgementSet.add(entry.getKey());
-			}
-			
+		for(String workerID : this.activeWorkerSet){
+			this.workerProxyMap.get(workerID).startSuperStep();
 		}
+		
+		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
+		this.activeWorkerSet.clear();		
 	}
 
 }

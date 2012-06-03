@@ -17,11 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
-import api.Vertex;
+
 import api.Partition;
+import api.Vertex;
 
 /**
  * Represents the computation node
@@ -162,8 +164,7 @@ public class Worker extends UnicastRemoteObject {
 				startSuperStep = false;
 				partitionQueue.addAll(completedPartitions);
 				completedPartitions.clear();
-				// This worker will be active only if it has some messages queued up in the next superstep.
-				boolean isWorkerActive = ! (outgoingMessages.get(workerID).isEmpty()) || ! (currentIncomingMessages.get(workerID).isEmpty());
+				
 				for(Entry<String, Map<VertexID, List<Message>>> entry : outgoingMessages.entrySet()) {
 					try {
 						worker2WorkerProxy.sendMessage(entry.getKey(), entry.getValue());
@@ -171,8 +172,15 @@ public class Worker extends UnicastRemoteObject {
 						e.printStackTrace();
 					}
 				}
+				
+				// This worker will be active only if it has some messages queued up in the next superstep.
+				// activeWorkerSet will have all the workers who will be active in the next superstep.
+				Set<String> activeWorkerSet = outgoingMessages.keySet();
+				if(currentIncomingMessages.size() > 0){
+					activeWorkerSet.add(workerID);
+				}
 				// Send a message to the Master saying that this superstep has been completed.
-				masterProxy.superStepCompleted(workerID, isWorkerActive);
+				masterProxy.superStepCompleted(workerID, activeWorkerSet);
 			}
 			
 		}
