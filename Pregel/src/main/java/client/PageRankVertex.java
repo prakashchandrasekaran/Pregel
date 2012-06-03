@@ -29,6 +29,7 @@ public class PageRankVertex extends Vertex {
 	 */
 	public PageRankVertex(VertexID vertexID, List<Edge> outgoingEdges) {
 		super(vertexID, outgoingEdges);
+		this.setData(new PageRankData(new Double(0)));
 	}
 
 	@Override
