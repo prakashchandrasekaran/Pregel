@@ -54,4 +54,11 @@ public class Edge {
 	public VertexID getDestID() {
 		return destID;
 	}
+	
+	/**
+	 * 
+	 */
+	public double getEdgeWeight() {
+		return this.weight;
+	}
 }

@@ -36,24 +36,26 @@ public class ShortestPathVertex extends Vertex<Double>{
 	@Override
 	public Map<VertexID, Message<Double>> compute(Iterator<Message<Double>> messageIterator) {
 		Map<VertexID, Message<Double>> vertexMessageMap = new HashMap<>();
-		ShortestPathData resultData = null;
+		ShortestPathData minData = (ShortestPathData) this.getData();
 		
 		while (messageIterator.hasNext()) {
 			Message<Double> message = messageIterator.next();
-			resultData = (ShortestPathData) message.getData();
-			// do some operation on the data and get the aggregate value.
+			ShortestPathData currData = (ShortestPathData) message.getData();
+			if(minData.compareTo(currData) > 0) {
+				minData = currData;
+			}
 		}
+		this.setData(minData);
 
-		Message<Double> resultMsg = new Message<Double>(this.getID(), resultData);
-		resultMsg.setData(resultData);
+		// Message<Double> resultMsg = new Message<Double>(this.getID(), this.);
+		// resultMsg.setData(resultData);
 		// Iterate the outgoing edges and assign the resultant message to be
 		// sent to each of the destination vertices.
 		for (Edge edge : this.getOutgoingEdges()) {
-			vertexMessageMap.put(edge.getDestID(), resultMsg);
+			vertexMessageMap.put(edge.getDestID(), 
+					new Message<>(this.getID(), new ShortestPathData(this.getData().getValue() + edge.getEdgeWeight())));
 		}
 		return vertexMessageMap;
 	}
-	
-	
 	
 }
