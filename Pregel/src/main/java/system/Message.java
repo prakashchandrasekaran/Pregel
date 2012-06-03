@@ -7,13 +7,12 @@ import graphs.VertexID;
 
 public class Message<T> implements Serializable {
 
+	private static final long serialVersionUID = -2737750866653457002L;
 	private VertexID sourceID;
-	private VertexID destID;
 	private Data<T> data;
 	
-	public Message(VertexID sourceID, VertexID destID, Data<T> data) {
-		this.sourceID = sourceID;
-		this.destID = destID;
+	public Message(VertexID sourceID, Data<T> data) {
+		this.sourceID = sourceID;		
 		this.data = data;
 	}
 	
@@ -25,20 +24,12 @@ public class Message<T> implements Serializable {
 		return this.sourceID;
 	}
 	
-	/**
-	 * returns destination Vertex Identifier of the message
-	 * @return
-	 */
-	public VertexID getDestID() {
-		return this.destID;
-	}
-	
 	
 	/**
 	 * returns data associated with this message
 	 * @return
 	 */
-	public Data getData() {
+	public Data<T> getData() {
 		return data;
 	}
 
@@ -46,7 +37,7 @@ public class Message<T> implements Serializable {
 	 * sets data for this message
 	 * @param data
 	 */
-	public void setData(Data data) {
+	public void setData(Data<T> data) {
 		this.data = data;
 	}
 	
@@ -54,7 +45,7 @@ public class Message<T> implements Serializable {
 	 * String representation of Message
 	 */
 	public String toString() {
-		return "[" + sourceID + " --" + "{" + data + "}" +  "-> " + destID + "]"; 
+		return "[" + sourceID + " -- " + "{" + data + "}" + "]"; 
 	}
 	
 	
@@ -62,9 +53,8 @@ public class Message<T> implements Serializable {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		VertexID s = new VertexID(0, 1);
-		VertexID d = new VertexID(1, 2);
-		Message<Double> message = new Message<>(s,d, null);
+		VertexID s = new VertexID(0, 1);		
+		Message<Double> message = new Message<>(s, null);
 		System.out.println(message);
 	}
 

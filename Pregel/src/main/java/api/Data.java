@@ -3,7 +3,7 @@ package api;
 import java.io.Serializable;
 
 /**
- * Represents an interface which should be overrided by the users to provide
+ * Represents an interface which should be overridden by the users to provide
  * application specific data
  * 
  * @author Prakash Chandrasekaran

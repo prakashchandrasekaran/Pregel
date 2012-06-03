@@ -2,6 +2,7 @@ package api;
 
 import graphs.VertexID;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +17,15 @@ import system.Message;
  * @author Vijayaraghavan Subbaiah
  * 
  */
-public abstract class Vertex {
+public abstract class Vertex<T> implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2036651815090314092L;
 	private VertexID vertexID;
 	private List<Edge> outgoingEdges;
-	private Data data;
+	private Data<T> data;
 	
 	/**
 	 * 
@@ -57,13 +62,13 @@ public abstract class Vertex {
 		return "(" + vertexID + "-" + outgoingEdges + ")";
 	}
 
-	public abstract Map<VertexID, Message> compute(Iterator<Message> messageIterator);
+	public abstract Map<VertexID, Message<T>> compute(Iterator<Message<T>> messageIterator);
 
-	public Data getData(){
+	public Data<T> getData(){
 		return data;
 	}
 	
-	public void setData(Data data){
+	public void setData(Data<T> data){
 		this.data = data;
 	}
 }

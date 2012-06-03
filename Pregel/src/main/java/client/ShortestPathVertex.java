@@ -1,3 +1,4 @@
+
 package client;
 
 import graphs.VertexID;
@@ -8,28 +9,42 @@ import java.util.List;
 import java.util.Map;
 
 import system.Message;
-import api.Data;
 import api.Edge;
 import api.Vertex;
 
-public class ShortestPathVertex extends Vertex{
 
+/**
+ * Defines the Vertex implementation for the Shortest-Path graph problem.
+ */
+public class ShortestPathVertex extends Vertex<Double>{
+
+	private static final long serialVersionUID = -4522743163505176658L;
+
+	/**
+	 * Instantiates a new shortest path vertex.
+	 *
+	 * @param vertexID the vertex id
+	 * @param outgoingEdges the outgoing edges
+	 */
 	public ShortestPathVertex(VertexID vertexID, List<Edge> outgoingEdges) {
 		super(vertexID, outgoingEdges);		
 	}
 
+	/* (non-Javadoc)
+	 * @see api.Vertex#compute(java.util.Iterator)
+	 */
 	@Override
-	public Map<VertexID, Message> compute(Iterator<Message> messageIterator) {
-		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
-		Data resultData = null;
+	public Map<VertexID, Message<Double>> compute(Iterator<Message<Double>> messageIterator) {
+		Map<VertexID, Message<Double>> vertexMessageMap = new HashMap<>();
+		ShortestPathData resultData = null;
 		
 		while (messageIterator.hasNext()) {
-			Message message = messageIterator.next();
-			resultData = message.getData();
+			Message<Double> message = messageIterator.next();
+			resultData = (ShortestPathData) message.getData();
 			// do some operation on the data and get the aggregate value.
 		}
 
-		Message resultMsg = new Message();
+		Message<Double> resultMsg = new Message<Double>(this.getID(), resultData);
 		resultMsg.setData(resultData);
 		// Iterate the outgoing edges and assign the resultant message to be
 		// sent to each of the destination vertices.
