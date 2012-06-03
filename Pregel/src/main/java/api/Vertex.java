@@ -18,9 +18,10 @@ import system.Message;
  */
 public abstract class Vertex {
 
-	protected VertexID vertexID;
-	protected List<Edge> outgoingEdges;
-
+	private VertexID vertexID;
+	private List<Edge> outgoingEdges;
+	private Data data;
+	
 	/**
 	 * 
 	 * @param vertexID
@@ -58,5 +59,11 @@ public abstract class Vertex {
 
 	public abstract Map<VertexID, Message> compute(Iterator<Message> messageIterator);
 
-
+	public Data getData(){
+		return data;
+	}
+	
+	public void setData(Data data){
+		this.data = data;
+	}
 }
