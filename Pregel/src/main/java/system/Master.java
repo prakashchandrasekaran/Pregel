@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import api.Partition;
@@ -190,8 +191,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	public void superStepCompleted(String workerID) {
 		workerAcknowledgementSet.remove(workerID);
 		if(workerAcknowledgementSet.size() == 0) {
-			// superstep completed
 			workerAcknowledgementSet.addAll(this.workerMap.keySet());
+			startSuperStep();
+		}
+	}
+
+	private void startSuperStep() {
+		for(Entry<String,WorkerProxy> entry : this.workerProxyMap.entrySet()) {
+			entry.getValue().startSuperStep();
 		}
 	}
 

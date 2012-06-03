@@ -128,7 +128,9 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 
 	@Override
 	public void superStepCompleted(String workerID) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	public void startSuperStep() {
+		this.worker.startSuperStep = true;
 	}
 }
