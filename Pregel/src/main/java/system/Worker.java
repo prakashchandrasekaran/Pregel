@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import api.Vertex;
 import api.Partition;
@@ -54,13 +55,13 @@ public class Worker extends UnicastRemoteObject {
 	private Worker2WorkerProxy worker2WorkerProxy;
 
 	/** Worker to Outgoing Messages Map */
-	private Map<String, Map<VertexID, List<Message>>> outgoingMessages;
+	private ConcurrentHashMap<String, Map<VertexID, List<Message>>> outgoingMessages;
 
 	/** partitionId to Previous Incoming messages - Used in current Super Step */
-	private Map<Integer, Map<VertexID, List<Message>>> previousIncomingMessages;
+	private ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> previousIncomingMessages;
 
 	/** partitionId to Current Incoming messages - used in next Super Step */
-	private Map<Integer, Map<VertexID, List<Message>>> currentIncomingMessages;
+	private ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> currentIncomingMessages;
 
 	/**
 	 * boolean variable indicating whether the partitions can be worked upon by
@@ -86,6 +87,9 @@ public class Worker extends UnicastRemoteObject {
 		this.workerID = hostName + "_" + timestamp;
 		this.partitionQueue = new LinkedBlockingDeque<>();
 		this.completedPartitions = new LinkedList<>();
+		this.currentIncomingMessages = new ConcurrentHashMap<>();
+		this.previousIncomingMessages = new ConcurrentHashMap<>();
+		this.outgoingMessages = new ConcurrentHashMap<>();
 		this.numThreads = Runtime.getRuntime().availableProcessors();
 		for (int i = 0; i < numThreads; i++) {
 			WorkerThread workerThread = new WorkerThread();
@@ -159,7 +163,7 @@ public class Worker extends UnicastRemoteObject {
 			vertexID = entry.getKey();
 			message = entry.getValue();
 			workerID = mapPartitionIdToWorkerId.get(vertexID.getPartitionID());
-			if (workerID.equals(getWorkerID())) {
+			if (workerID.equals(this.workerID)) {
 				updateIncomingMessages(vertexID, message);
 			} else {
 				if (outgoingMessages.containsKey(workerID)) {
