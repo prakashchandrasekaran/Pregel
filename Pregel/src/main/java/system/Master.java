@@ -10,11 +10,12 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import api.Partition;
 
 /**
@@ -53,6 +54,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	/** The partitionID to workerID map. **/
 	Map<Integer, String> partitionWorkerMap;
 
+	/** Set of Workers maintained for acknowledgment */
+	Set<String> workerAcknowledgementSet = new HashSet<>();
+	
 	/**
 	 * Instantiates a new master.
 	 * 
@@ -81,6 +85,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 				numWorkerThreads, this);
 		workerProxyMap.put(workerID, workerProxy);
 		workerMap.put(workerID, worker);
+		workerAcknowledgementSet.add(workerID);
 		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
 	}
 
@@ -183,7 +188,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 
 	@Override
 	public void superStepCompleted(String workerID) {
-		
+		workerAcknowledgementSet.remove(workerID);
+		if(workerAcknowledgementSet.size() == 0) {
+			// superstep completed
+			workerAcknowledgementSet.addAll(this.workerMap.keySet());
+		}
 	}
 
 }
