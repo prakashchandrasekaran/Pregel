@@ -147,10 +147,8 @@ public class Worker extends UnicastRemoteObject {
 									.iterator());
 							updateOutgoingMessages(messagesFromCompute);
 						}
-						// This worker will be active only if it has some messages queued up in the next superstep.
-						boolean isWorkerActive = ! (outgoingMessages.get(workerID).isEmpty());
 						completedPartitions.add(partition);
-						checkAndSendMessage(isWorkerActive);
+						checkAndSendMessage();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -158,12 +156,14 @@ public class Worker extends UnicastRemoteObject {
 			}
 		}
 
-		private synchronized void checkAndSendMessage(boolean isWorkerActive) {
+		private synchronized void checkAndSendMessage() {
 			if( (! sendingMessage) && (completedPartitions.size() == totalPartitionsAssigned)) {
 				sendingMessage = true;
 				startSuperStep = false;
 				partitionQueue.addAll(completedPartitions);
 				completedPartitions.clear();
+				// This worker will be active only if it has some messages queued up in the next superstep.
+				boolean isWorkerActive = ! (outgoingMessages.get(workerID).isEmpty()) || ! (currentIncomingMessages.get(workerID).isEmpty());
 				for(Entry<String, Map<VertexID, List<Message>>> entry : outgoingMessages.entrySet()) {
 					try {
 						worker2WorkerProxy.sendMessage(entry.getKey(), entry.getValue());
@@ -171,9 +171,10 @@ public class Worker extends UnicastRemoteObject {
 						e.printStackTrace();
 					}
 				}
+				// Send a message to the Master saying that this superstep has been completed.
+				masterProxy.superStepCompleted(workerID, isWorkerActive);
 			}
-			// Send a message to the Master saying that this superstep has been completed.
-			masterProxy.superStepCompleted(workerID, isWorkerActive);
+			
 		}
 	}
 	
