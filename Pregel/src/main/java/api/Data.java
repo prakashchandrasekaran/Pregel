@@ -1,5 +1,7 @@
 package api;
 
+import java.io.Serializable;
+
 /**
  * Represents an interface which should be overrided by the users to provide
  * application specific data
@@ -9,7 +11,7 @@ package api;
  * @author Vijayaraghavan Subbaiah
  */
 
-public interface Data<T> extends Comparable<T> {
+public interface Data<T> extends Comparable<T>, Serializable{
 	/**
 	 * Override this method to do a comparison between the value contained as
 	 * data
