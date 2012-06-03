@@ -56,7 +56,7 @@ public class ShortestPathVertex extends Vertex{
 
 		for (Edge edge : this.getOutgoingEdges()) {
 			vertexMessageMap.put(edge.getDestID(), 
-					new Message(this.getID(), new ShortestPathData(((ShortestPathData)this.getData()).getValue() + edge.getEdgeWeight())));
+					new Message(this.getID(), new ShortestPathData(minData.getValue() + edge.getEdgeWeight())));
 		}
 		return vertexMessageMap;
 	}
