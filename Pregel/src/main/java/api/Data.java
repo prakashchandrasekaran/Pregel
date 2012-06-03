@@ -1,13 +1,37 @@
 package api;
 
-public class Data {
+/**
+ * Represents an interface which should be overrided by the users to provide
+ * application specific data
+ * 
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
+ */
+
+public interface Data<T> extends Comparable<T> {
+	/**
+	 * Override this method to do a comparison between the value contained as
+	 * data
+	 * 
+	 * @param other
+	 *            Represents the other data object to be compared
+	 */
+	@Override
+	public int compareTo(T other);
 
 	/**
-	 * @param args
+	 * Gets the value contained in Data
+	 * 
+	 * @return Returns the value contained in Data
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	public T getValue();
 
-	}
-
+	/**
+	 * Sets the value given to the data value
+	 * 
+	 * @param value
+	 *            Represents the value to be set to the data value
+	 */
+	public void setValue(T value);
 }
