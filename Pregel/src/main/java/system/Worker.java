@@ -76,7 +76,7 @@ public class Worker extends UnicastRemoteObject {
 	 * boolean variable indicating whether the partitions can be worked upon by
 	 * the workers in each superstep.
 	 **/
-	boolean startSuperStep = false;
+	private boolean startSuperStep = false;
 
 	public Worker() throws RemoteException {
 		InetAddress address = null;
@@ -296,4 +296,14 @@ public class Worker extends UnicastRemoteObject {
 			partitionMessages.put(destinationVertex, newMessageList);
 		}
 	}
+
+	public boolean isStartSuperStep() {
+		return startSuperStep;
+	}
+
+	public void setStartSuperStep(boolean startSuperStep) {
+		this.startSuperStep = startSuperStep;
+	}
+	
+	
 }
