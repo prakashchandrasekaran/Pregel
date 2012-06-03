@@ -28,6 +28,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	private int numWorkerThreads;
 	String workerID;
 	BlockingQueue<Partition> partitionList;
+	private int totalPartitions = 0;
 	
 	/**
 	 * 
@@ -84,6 +85,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	}
 
 	public void addPartition(Partition partition) {
+		totalPartitions += 1;
 		partitionList.add(partition);
 	}
 
@@ -93,6 +95,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 
 	public void addPartitionList(List<Partition> workerPartitions) {
 		try {
+			totalPartitions += workerPartitions.size();
 			worker.addPartitionList(workerPartitions);
 		} catch (RemoteException e) {
 			System.out.println("Remote Exception received from the Worker");
@@ -111,7 +114,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 			Map<Integer, String> mapPartitionIdToWorkerId,
 			Map<String, Worker> mapWorkerIdToWorker) {
 		worker.setWorkerPartitionInfo(
-				partitionList.size(), 
+				totalPartitions, 
 				mapPartitionIdToWorkerId, 
 				mapWorkerIdToWorker);
 	}
