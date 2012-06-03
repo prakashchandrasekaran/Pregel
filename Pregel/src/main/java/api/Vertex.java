@@ -26,7 +26,7 @@ public abstract class Vertex<T> implements Serializable {
 	private VertexID vertexID;
 	private List<Edge> outgoingEdges;
 	private Data<T> data;
-	
+	private long superstepCounter;
 	/**
 	 * 
 	 * @param vertexID
@@ -70,5 +70,13 @@ public abstract class Vertex<T> implements Serializable {
 	
 	public void setData(Data<T> data){
 		this.data = data;
+	}
+	
+	public long getSuperstepCounter(){
+		return superstepCounter;
+	}
+	
+	public void setSuperstepCounter(long superstepCounter){
+		this.superstepCounter = superstepCounter;
 	}
 }
