@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import api.Partition;
 
 /**
  * Represents a thread which is used by the master to talk to workers and

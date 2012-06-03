@@ -5,7 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
-import api.Edge;
+import system.Edge;
+
 import api.Vertex;
 import exceptions.InvalidVertexLineException;
 import exceptions.PropertyNotFoundException;

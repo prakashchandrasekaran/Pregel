@@ -1,21 +1,24 @@
-package client;
+/*
+ * @author sam
+ */
+package applications;
 
 import api.Data;
 
 /**
- * Defines the implementation of Data that is specific to the PageRank graph problem.
+ * Defines the implementation of Data that is specific to the Shortest-Path graph problem.
  * 
  * @author Prakash Chandrasekaran
  * @author Gautham Narayanasamy
  * @author Vijayaraghavan Subbaiah
  */
-public class PageRankData implements Data<Double>{
+public class ShortestPathData implements Data<Double>{
 	
 	Double value;
 	
 	private static final long serialVersionUID = -3455938165928334533L;
 	
-	public PageRankData(Double value){
+	public ShortestPathData(Double value){
 		this.value = value;
 	}
 	

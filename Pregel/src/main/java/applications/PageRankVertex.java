@@ -1,4 +1,4 @@
-package client;
+package applications;
 
 import graphs.VertexID;
 
@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import system.Edge;
 import system.Message;
-import api.Edge;
 import api.Vertex;
 
 /**

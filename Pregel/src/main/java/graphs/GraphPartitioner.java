@@ -7,9 +7,9 @@ import java.util.*;
 
 import exceptions.PropertyNotFoundException;
 
+import system.Partition;
 import utility.Props;
 import utility.GeneralUtils;
-import api.Partition;
 import api.Vertex;
 
 /**

@@ -22,7 +22,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import api.Partition;
 import api.Vertex;
 
 // TODO: Auto-generated Javadoc
@@ -344,7 +343,7 @@ public class Worker extends UnicastRemoteObject {
 	public void updateIncomingMessages(VertexID destinationVertex,
 			Message incomingMessage) {
 		Map<VertexID, List<Message>> partitionMessages = null;
-		ArrayList<Message> newMessageList = null;
+		List<Message> newMessageList = null;
 		int partitionID = destinationVertex.getPartitionID();
 		partitionMessages = currentIncomingMessages.get(partitionID);
 		if (partitionMessages.containsKey(destinationVertex)) {

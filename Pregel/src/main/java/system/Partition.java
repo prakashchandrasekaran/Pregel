@@ -1,7 +1,9 @@
-package api;
+package system;
 
 import graphs.VertexID;
 import java.util.*;
+
+import api.Vertex;
 
 /**
  * Represents the partition of a graph consisting of set of vertices and their
