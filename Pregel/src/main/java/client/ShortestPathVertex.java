@@ -27,7 +27,8 @@ public class ShortestPathVertex extends Vertex<Double>{
 	 * @param outgoingEdges the outgoing edges
 	 */
 	public ShortestPathVertex(VertexID vertexID, List<Edge> outgoingEdges) {
-		super(vertexID, outgoingEdges);		
+		super(vertexID, outgoingEdges);
+		this.setData(new ShortestPathData(Double.MAX_VALUE));
 	}
 
 	/* (non-Javadoc)
@@ -47,8 +48,6 @@ public class ShortestPathVertex extends Vertex<Double>{
 		}
 		this.setData(minData);
 
-		// Message<Double> resultMsg = new Message<Double>(this.getID(), this.);
-		// resultMsg.setData(resultData);
 		// Iterate the outgoing edges and assign the resultant message to be
 		// sent to each of the destination vertices.
 		for (Edge edge : this.getOutgoingEdges()) {
