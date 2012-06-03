@@ -67,13 +67,13 @@ public class Worker extends UnicastRemoteObject {
 	private Worker2WorkerProxy worker2WorkerProxy;
 
 	/** Worker to Outgoing Messages Map. */
-	private ConcurrentHashMap<String, Map<VertexID, List<Message<?>>>> outgoingMessages;
+	private ConcurrentHashMap<String, Map<VertexID, List<Message>>> outgoingMessages;
 
 	/** partitionId to Previous Incoming messages - Used in current Super Step. */
-	private ConcurrentHashMap<Integer, Map<VertexID, List<Message<?>>>> previousIncomingMessages;
+	private ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> previousIncomingMessages;
 
 	/** partitionId to Current Incoming messages - used in next Super Step. */
-	private ConcurrentHashMap<Integer, Map<VertexID, List<Message<?>>>> currentIncomingMessages;
+	private ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> currentIncomingMessages;
 
 	/**
 	 * boolean variable indicating whether the partitions can be worked upon by
@@ -168,12 +168,12 @@ public class Worker extends UnicastRemoteObject {
 				while (startSuperStep) {
 					try {
 						Partition partition = partitionQueue.take();
-						Map<VertexID, List<Message<?>>> messageForThisPartition = previousIncomingMessages
+						Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages
 								.get(partition.getPartitionID());
-						Map<VertexID, Message<?>> messagesFromCompute = null;
-						for (Entry<VertexID, List<Message<?>>> entry : messageForThisPartition
+						Map<VertexID, Message> messagesFromCompute = null;
+						for (Entry<VertexID, List<Message>> entry : messageForThisPartition
 								.entrySet()) {
-							Vertex<?> vertex = partition.getVertex(entry.getKey());
+							Vertex vertex = partition.getVertex(entry.getKey());
 							messagesFromCompute = vertex.compute(entry.getValue()
 									.iterator());
 							updateOutgoingMessages(messagesFromCompute);
@@ -198,7 +198,7 @@ public class Worker extends UnicastRemoteObject {
 				partitionQueue.addAll(completedPartitions);
 				completedPartitions.clear();
 				
-				for(Entry<String, Map<VertexID, List<Message<?>>>> entry : outgoingMessages.entrySet()) {
+				for(Entry<String, Map<VertexID, List<Message>>> entry : outgoingMessages.entrySet()) {
 					try {
 						worker2WorkerProxy.sendMessage(entry.getKey(), entry.getValue());
 					} catch (RemoteException e) {
@@ -226,13 +226,13 @@ public class Worker extends UnicastRemoteObject {
 	 * message to be send
 	 */
 	private void updateOutgoingMessages(
-			Map<VertexID, Message<?>> messagesFromCompute) {
+			Map<VertexID, Message> messagesFromCompute) {
 		String workerID = null;
 		VertexID vertexID = null;
-		Message<?> message = null;
-		Map<VertexID, List<Message<?>>> workerMessages = null;
-		List<Message<?>> messageList = null;
-		for (Entry<VertexID, Message<?>> entry : messagesFromCompute.entrySet()) {
+		Message message = null;
+		Map<VertexID, List<Message>> workerMessages = null;
+		List<Message> messageList = null;
+		for (Entry<VertexID, Message> entry : messagesFromCompute.entrySet()) {
 			vertexID = entry.getKey();
 			message = entry.getValue();
 			workerID = mapPartitionIdToWorkerId.get(vertexID.getPartitionID());
@@ -244,12 +244,12 @@ public class Worker extends UnicastRemoteObject {
 					if (workerMessages.containsKey(vertexID)) {
 						workerMessages.get(vertexID).add(message);
 					} else {
-						messageList = new ArrayList<Message<?>>();
+						messageList = new ArrayList<Message>();
 						messageList.add(message);
 						workerMessages.put(vertexID, messageList);
 					}
 				} else {
-					messageList = new ArrayList<Message<?>>();
+					messageList = new ArrayList<Message>();
 					messageList.add(message);
 					workerMessages = new HashMap<>();
 					workerMessages.put(vertexID, messageList);
@@ -317,11 +317,11 @@ public class Worker extends UnicastRemoteObject {
 	 *
 	 * @param incomingMessages the incoming messages
 	 */
-	public void receiveMessage(Map<VertexID, List<Message<?>>> incomingMessages) {
-		Map<VertexID, List<Message<?>>> partitionMessages = null;
+	public void receiveMessage(Map<VertexID, List<Message>> incomingMessages) {
+		Map<VertexID, List<Message>> partitionMessages = null;
 		int partitionID = 0;
 		VertexID vertexID = null;
-		for (Entry<VertexID, List<Message<?>>> entry : incomingMessages.entrySet()) {
+		for (Entry<VertexID, List<Message>> entry : incomingMessages.entrySet()) {
 			vertexID = entry.getKey();
 			partitionID = vertexID.getPartitionID();
 			partitionMessages = currentIncomingMessages.get(partitionID);
@@ -342,15 +342,15 @@ public class Worker extends UnicastRemoteObject {
 	 * @param incomingMessage Represents the incoming message for the destination vertex
 	 */
 	public void updateIncomingMessages(VertexID destinationVertex,
-			Message<?> incomingMessage) {
-		Map<VertexID, List<Message<?>>> partitionMessages = null;
-		ArrayList<Message<?>> newMessageList = null;
+			Message incomingMessage) {
+		Map<VertexID, List<Message>> partitionMessages = null;
+		ArrayList<Message> newMessageList = null;
 		int partitionID = destinationVertex.getPartitionID();
 		partitionMessages = currentIncomingMessages.get(partitionID);
 		if (partitionMessages.containsKey(destinationVertex)) {
 			partitionMessages.get(destinationVertex).add(incomingMessage);
 		} else {
-			newMessageList = new ArrayList<Message<?>>();
+			newMessageList = new ArrayList<Message>();
 			newMessageList.add(incomingMessage);
 			partitionMessages.put(destinationVertex, newMessageList);
 		}
@@ -364,7 +364,7 @@ public class Worker extends UnicastRemoteObject {
 	public void startSuperStep(long startSuperstep){
 		this.startSuperStep = true;
 		this.previousIncomingMessages.clear();
-		ConcurrentHashMap<Integer, Map<VertexID, List<Message<?>>>> temp = this.previousIncomingMessages;
+		ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> temp = this.previousIncomingMessages;
 		this.previousIncomingMessages = this.currentIncomingMessages;
 		this.currentIncomingMessages = temp;
 	}

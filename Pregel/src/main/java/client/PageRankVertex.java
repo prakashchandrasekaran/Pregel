@@ -15,7 +15,7 @@ import api.Vertex;
  * Defines the Vertex implementation for the PageRank graph problem.
  */
 
-public class PageRankVertex extends Vertex<Double>{
+public class PageRankVertex extends Vertex{
 
 	private static final long serialVersionUID = 3545610632519357452L;
 	
@@ -28,18 +28,18 @@ public class PageRankVertex extends Vertex<Double>{
 	public PageRankVertex(VertexID vertexID, List<Edge> outgoingEdges) {
 		super(vertexID, outgoingEdges);		
 	}
-/*
+
 	@Override
-	public Map<VertexID, Message<Double>> compute(
-			Iterator<Message<Double>> messageIterator) {
-		Map<VertexID, Message<Double>> vertexMessageMap = new HashMap<>();
+	public Map<VertexID, Message> compute(
+			Iterator<Message> messageIterator) {
+		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
 		int numOutgoingEdges = this.getOutgoingEdges().size();
 		if(this.getSuperstepCounter() >= 1)
 		{
 			double sum = 0;
 			double updatedRank = 0;
 			while (messageIterator.hasNext()) {
-				Message<Double> message = messageIterator.next();
+				Message message = messageIterator.next();
 				PageRankData data = (PageRankData) message.getData();
 				sum += data.getValue();
 				updatedRank = (0.15 / numOutgoingEdges + 0.85 * sum);
@@ -51,7 +51,7 @@ public class PageRankVertex extends Vertex<Double>{
 		{
 			for (Edge edge : this.getOutgoingEdges()) {
 				vertexMessageMap.put(edge.getDestID(), 
-						new Message<>(this.getID(), new PageRankData(this.getData().getValue() / numOutgoingEdges)));
+						new Message(this.getID(), new PageRankData(((PageRankData)this.getData()).getValue() / numOutgoingEdges)));
 			}
 		}
 		else
@@ -60,11 +60,4 @@ public class PageRankVertex extends Vertex<Double>{
 		}
 		return vertexMessageMap;
 	}
-*/
-	@Override
-	public Map<VertexID, Message<?>> compute(Iterator<Message<?>> iterator) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

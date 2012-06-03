@@ -5,13 +5,13 @@ import java.io.Serializable;
 import api.Data;
 import graphs.VertexID;
 
-public class Message<T> implements Serializable {
+public class Message implements Serializable {
 
 	private static final long serialVersionUID = -2737750866653457002L;
 	private VertexID sourceID;
-	private Data<T> data;
+	private Data<?> data;
 	
-	public Message(VertexID sourceID, Data<T> data) {
+	public Message(VertexID sourceID, Data<?> data) {
 		this.sourceID = sourceID;		
 		this.data = data;
 	}
@@ -29,7 +29,7 @@ public class Message<T> implements Serializable {
 	 * returns data associated with this message
 	 * @return
 	 */
-	public Data<T> getData() {
+	public Data<?> getData() {
 		return data;
 	}
 
@@ -37,7 +37,7 @@ public class Message<T> implements Serializable {
 	 * sets data for this message
 	 * @param data
 	 */
-	public void setData(Data<T> data) {
+	public void setData(Data<?> data) {
 		this.data = data;
 	}
 	
@@ -54,7 +54,7 @@ public class Message<T> implements Serializable {
 	 */
 	public static void main(String[] args) {
 		VertexID s = new VertexID(0, 1);		
-		Message<Double> message = new Message<>(s, null);
+		Message message = new Message(s, null);
 		System.out.println(message);
 	}
 

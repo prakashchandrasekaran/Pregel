@@ -1,12 +1,9 @@
-/*
- * @author sam
- */
 package client;
 
 import api.Data;
 
 /**
- * Defines the implementation of Data that is specific to the Shortest-Path graph problem.
+ * Defines the implementation of Data that is specific to the PageRank graph problem.
  * 
  * @author Prakash Chandrasekaran
  * @author Gautham Narayanasamy

@@ -45,13 +45,13 @@ public class GeneralUtils {
 	 * @return
 	 * @throws InvalidVertexLineException
 	 */
-	public static Vertex<?> generateVertex(String vertexLine, String vertexClassName)
+	public static Vertex generateVertex(String vertexLine, String vertexClassName)
 			throws InvalidVertexLineException {
 		if (vertexLine == null || vertexLine.length() == 0)
 			throw new InvalidVertexLineException(vertexLine,
 					"Vertex Line is Null");
 		
-		Vertex<?> vertex = null;
+		Vertex vertex = null;
 		String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
 
 		// Source Vertex
@@ -80,7 +80,7 @@ public class GeneralUtils {
 		try {
 			Class<?> c = Class.forName(vertexClassName);		
 			Constructor<?> constructor = c.getConstructor(sourceVertex.getClass(), outGoingEdges.getClass());
-			vertex = (Vertex<?>) constructor.newInstance(new Object[]{sourceVertex, outGoingEdges});
+			vertex = (Vertex) constructor.newInstance(new Object[]{sourceVertex, outGoingEdges});
 			
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {			
 			e.printStackTrace();			

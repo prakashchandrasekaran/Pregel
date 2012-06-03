@@ -17,7 +17,7 @@ import system.Message;
  * @author Vijayaraghavan Subbaiah
  * 
  */
-public abstract class Vertex<T> implements Serializable {
+public abstract class Vertex implements Serializable {
 
 	/**
 	 * 
@@ -25,7 +25,7 @@ public abstract class Vertex<T> implements Serializable {
 	private static final long serialVersionUID = 2036651815090314092L;
 	private VertexID vertexID;
 	private List<Edge> outgoingEdges;
-	private Data<T> data;
+	private Data<?> data;
 	private long superstepCounter;
 	/**
 	 * 
@@ -62,13 +62,13 @@ public abstract class Vertex<T> implements Serializable {
 		return "(" + vertexID + "-" + outgoingEdges + ")";
 	}
 
-	public abstract Map<VertexID, Message<?>> compute(Iterator<Message<?>> iterator);
+	public abstract Map<VertexID, Message> compute(Iterator<Message> iterator);
 
-	public Data<T> getData(){
+	public Data<?> getData(){
 		return data;
 	}
 	
-	public void setData(Data<T> data){
+	public void setData(Data<?> data){
 		this.data = data;
 	}
 	

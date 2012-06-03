@@ -27,10 +27,10 @@ public class ShortestPathData implements Data<Double>{
 	 */
 	@Override
 	public int compareTo(Data<Double> other) {
-		if(this.value == other.getValue()){
+		if(this.getValue() == other.getValue()){
 			return 0;
 		}
-		else if(this.value > other.getValue()){
+		else if(this.getValue() > other.getValue()){
 			return 1;
 		}
 		return -1;
@@ -52,6 +52,4 @@ public class ShortestPathData implements Data<Double>{
 		this.value = value;
 	}
 
-	
-		
 }

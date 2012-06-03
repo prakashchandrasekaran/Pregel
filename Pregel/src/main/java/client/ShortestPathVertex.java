@@ -16,7 +16,7 @@ import api.Vertex;
 /**
  * Defines the Vertex implementation for the Shortest-Path graph problem.
  */
-public class ShortestPathVertex extends Vertex<Double>{
+public class ShortestPathVertex extends Vertex{
 
 	private static final long serialVersionUID = -4522743163505176658L;
 
@@ -34,14 +34,14 @@ public class ShortestPathVertex extends Vertex<Double>{
 	/* (non-Javadoc)
 	 * @see api.Vertex#compute(java.util.Iterator)
 	 */
-/*
+
 	@Override
-	public Map<VertexID, Message<Double>> compute(Iterator<Message<Double>> messageIterator) {
-		Map<VertexID, Message<Double>> vertexMessageMap = new HashMap<>();
+	public Map<VertexID, Message> compute(Iterator<Message> messageIterator) {
+		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
 		ShortestPathData minData = (ShortestPathData) this.getData();
 		
 		while (messageIterator.hasNext()) {
-			Message<Double> message = messageIterator.next();
+			Message message = messageIterator.next();
 			ShortestPathData currData = (ShortestPathData) message.getData();
 			if(minData.compareTo(currData) > 0) {
 				minData = currData;
@@ -56,13 +56,8 @@ public class ShortestPathVertex extends Vertex<Double>{
 
 		for (Edge edge : this.getOutgoingEdges()) {
 			vertexMessageMap.put(edge.getDestID(), 
-					new Message<>(this.getID(), new ShortestPathData(this.getData().getValue() + edge.getEdgeWeight())));
+					new Message(this.getID(), new ShortestPathData(((ShortestPathData)this.getData()).getValue() + edge.getEdgeWeight())));
 		}
 		return vertexMessageMap;
-	}
-*/
-	@Override
-	public Map<VertexID, Message<?>> compute(Iterator<Message<?>> iterator) {
-		return null;
 	}
 }
