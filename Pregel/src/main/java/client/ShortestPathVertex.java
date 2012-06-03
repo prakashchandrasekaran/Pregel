@@ -53,7 +53,4 @@ public class ShortestPathVertex extends Vertex<Double>{
 		}
 		return vertexMessageMap;
 	}
-	
-	
-	
 }
