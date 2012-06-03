@@ -3,6 +3,7 @@ package system;
 import exceptions.PropertyNotFoundException;
 import graphs.GraphPartitioner;
 
+import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,7 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import api.Client2Master;
 import api.Partition;
+
 
 /**
  * The Class Master.
@@ -25,7 +29,7 @@ import api.Partition;
  * @author Gautham Narayanasamy
  * @author Vijayaraghavan Subbaiah
  */
-public class Master extends UnicastRemoteObject implements Worker2Master {
+public class Master extends UnicastRemoteObject implements Worker2Master, Client2Master {
 
 	/** The master thread. */
 	// private Thread masterThread;
@@ -42,10 +46,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	/** The total number of worker threads. */
 	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
 
-	/** The graph partitioner */
-	private GraphPartitioner graphPartitioner;
-	
-	/** Superstep Counter **/
+	/** Superstep Counter *. */
 	private long superstepCounter;
 
 	/** The workerID to WorkerProxy map. */
@@ -62,11 +63,12 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	
 	/** Set of workers who will be active in the next superstep. */
 	Set<String> activeWorkerSet = new HashSet<>();
+	
 	/**
 	 * Instantiates a new master.
-	 * 
-	 * @throws RemoteException
-	 *             the remote exception
+	 *
+	 * @throws RemoteException the remote exception
+	 * @throws PropertyNotFoundException the property not found exception
 	 */
 	public Master() throws RemoteException, PropertyNotFoundException {
 		super();
@@ -74,15 +76,15 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	}
 
 	/**
-	 * Registers the worker computation nodes with the master
-	 * 
-	 * @param worker
-	 *            Represents the {@link system.Worker Worker}
-	 * @param numWorkerThreads
-	 *            Represents the number of worker threads available in the
-	 *            worker computation node
-	 * @throws RemoteException
-	 * @throws AccessException
+	 * Registers the worker computation nodes with the master.
+	 *
+	 * @param worker Represents the {@link system.Worker Worker}
+	 * @param workerID the worker id
+	 * @param numWorkerThreads Represents the number of worker threads available in the
+	 * worker computation node
+	 * @return worker2 master
+	 * @throws AccessException the access exception
+	 * @throws RemoteException the remote exception
 	 */
 	public Worker2Master register(Worker worker, String workerID,
 			int numWorkerThreads) throws AccessException, RemoteException {
@@ -95,21 +97,23 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
 	}
 
-	/**
-	 * The application programmer calls this method to give submit the task (in
-	 * the form of a GraphPartitioner object) to the master.
-	 * 
-	 * @param graphPartitioner
-	 *            the graph
+	
+	/* (non-Javadoc)
+	 * @see api.Client2Master#putTask(java.lang.String, java.lang.String)
 	 */
-	public void putTask(GraphPartitioner graphPartitioner) {
-		this.graphPartitioner = graphPartitioner;
-		assignPartitions();
-		sendWorkerPartitionInfo();
+	@Override
+	public void putTask(String graphFileName, String vertexClassName) throws RemoteException{
+		try {
+			GraphPartitioner graphPartitioner = new GraphPartitioner(graphFileName, vertexClassName);
+			assignPartitions(graphPartitioner);
+			sendWorkerPartitionInfo();
+		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
-	 * 
+	 * Send worker partition info.
 	 */
 	private void sendWorkerPartitionInfo() {
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
@@ -121,10 +125,12 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	/**
 	 * Assign partitions to workers based on the number of processors (threads)
 	 * that each worker has.
+	 *
+	 * @param graphPartitioner the graph partitioner
 	 */
-	private void assignPartitions() {
-		int totalPartitions = this.graphPartitioner.getNumPartitions();
-		Iterator<Partition> iter = this.graphPartitioner.iterator();
+	private void assignPartitions(GraphPartitioner graphPartitioner) {
+		int totalPartitions = graphPartitioner.getNumPartitions();
+		Iterator<Partition> iter = graphPartitioner.iterator();
 		Partition partition = null;
 		partitionWorkerMap = new HashMap<>();
 		// Assign partitions to workers in the ratio of the number of worker
@@ -163,9 +169,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 
 	/**
 	 * The main method.
-	 * 
-	 * @param args
-	 *            the arguments
+	 *
+	 * @param args the arguments
+	 * @throws Exception the exception
 	 */
 	public static void main(String[] args) throws Exception {
 		if (System.getSecurityManager() == null) {
@@ -188,10 +194,19 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	 * @see java.lang.Runnable#run()
 	 */
 
+	/**
+	 * Removes the worker.
+	 *
+	 * @param serviceName the service name
+	 * @throws RemoteException the remote exception
+	 */
 	public void removeWorker(String serviceName) throws RemoteException {
 		workerProxyMap.remove(serviceName);
 	}
 
+	/* (non-Javadoc)
+	 * @see system.Worker2Master#superStepCompleted(java.lang.String, java.util.Set)
+	 */
 	@Override
 	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) {
 		this.activeWorkerSet.addAll(activeWorkerSet);
@@ -202,6 +217,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 		}
 	}
 
+	/**
+	 * Start super step.
+	 *
+	 * @param superstepCounter the superstep counter
+	 */
 	private void startSuperStep(long superstepCounter) {
 		for(String workerID : this.activeWorkerSet){
 			this.workerProxyMap.get(workerID).startSuperStep(superstepCounter);
@@ -209,6 +229,12 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 		
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
 		this.activeWorkerSet.clear();		
+	}
+
+	@Override
+	public String takeResult() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
