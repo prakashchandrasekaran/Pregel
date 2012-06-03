@@ -222,12 +222,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @param superstepCounter the superstep counter
 	 */
 	private void startSuperStep(long superstepCounter) {
+		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
+		this.activeWorkerSet.clear();
 		for(String workerID : this.activeWorkerSet){
 			this.workerProxyMap.get(workerID).startSuperStep(superstepCounter);
-		}
-		
-		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
-		this.activeWorkerSet.clear();		
+		}				
 	}
 
 	@Override

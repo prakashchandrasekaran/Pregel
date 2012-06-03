@@ -360,12 +360,12 @@ public class Worker extends UnicastRemoteObject {
 	 * The worker receives the command to start the next superstep from the master.
 	 * Set startSuperStep to true; assign previousIncomingMessages to currentIncomingMessages; reset currentIncomingMessages;
 	 */
-	public void startSuperStep(long startSuperstep){
-		this.startSuperStep = true;
+	public void startSuperStep(long startSuperstep){		
 		this.previousIncomingMessages.clear();
 		ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> temp = this.previousIncomingMessages;
 		this.previousIncomingMessages = this.currentIncomingMessages;
 		this.currentIncomingMessages = temp;
+		this.startSuperStep = true;
 	}
 	
 }
