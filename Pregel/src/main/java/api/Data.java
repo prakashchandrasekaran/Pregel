@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author Vijayaraghavan Subbaiah
  */
 
-public interface Data<T> extends Comparable<T>, Serializable{
+public interface Data<T> extends Comparable<Data<T>>, Serializable{
 	/**
 	 * Override this method to do a comparison between the value contained as
 	 * data
@@ -20,7 +20,7 @@ public interface Data<T> extends Comparable<T>, Serializable{
 	 *            Represents the other data object to be compared
 	 */
 	@Override
-	public int compareTo(T other);
+	public int compareTo(Data<T> other);
 
 	/**
 	 * Gets the value contained in Data

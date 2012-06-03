@@ -13,16 +13,27 @@ import api.Data;
  * @author Vijayaraghavan Subbaiah
  */
 public class ShortestPathData implements Data<Double>{
-
+	
+	Double value;
+	
 	private static final long serialVersionUID = -3455938165928334533L;
-
+	
+	public ShortestPathData(Double value){
+		this.value = value;
+	}
+	
 	/* (non-Javadoc)
 	 * @see api.Data#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(Double other) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int compareTo(Data<Double> other) {
+		if(this.getValue() == other.getValue()){
+			return 0;
+		}
+		else if(this.getValue() > other.getValue()){
+			return 1;
+		}
+		return -1;
 	}
 
 	/* (non-Javadoc)
@@ -30,8 +41,7 @@ public class ShortestPathData implements Data<Double>{
 	 */
 	@Override
 	public Double getValue() {
-		// TODO Auto-generated method stub
-		return null;
+		return value;
 	}
 
 	/* (non-Javadoc)
@@ -39,8 +49,7 @@ public class ShortestPathData implements Data<Double>{
 	 */
 	@Override
 	public void setValue(Double value) {
-		// TODO Auto-generated method stub
-		
+		this.value = value;
 	}
 
 	
