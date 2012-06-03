@@ -8,7 +8,7 @@ public class Message {
 	private VertexID sourceID;
 	private VertexID destID;
 	private Data data;
-	
+
 	/**
 	 * @param args
 	 */
@@ -25,5 +25,4 @@ public class Message {
 		this.data = data;
 	}
 
-	
 }

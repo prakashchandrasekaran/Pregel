@@ -9,6 +9,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,40 +34,44 @@ public class Worker extends UnicastRemoteObject {
 
 	private static final long serialVersionUID = -8137628519082382850L;
 	private int numThreads;
-	
-	
+
 	/** */
 	private BlockingQueue<Partition> partitionQueue;
-	
+
 	/** */
 	private Queue<Partition> completedPartitions;
-	
-	/** Hostname of the node with timestamp information*/
+
+	/** Hostname of the node with timestamp information */
 	private String workerID;
-	
-	/** Master Proxy object to interact with Master*/
+
+	/** Master Proxy object to interact with Master */
 	private Worker2Master masterProxy;
-	
-	/** PartitionID to WorkerID Map*/
+
+	/** PartitionID to WorkerID Map */
 	private Map<Integer, String> mapPartitionIdToWorkerId;
-	
-	/** Worker2WorkerProxy Object*/
+
+	/** Worker2WorkerProxy Object */
 	private Worker2WorkerProxy worker2WorkerProxy;
-	
-	/** Worker to Outgoing Messages Map*/
-	private Map<Worker, Map<VertexID, List<Message>>> outgoingMessages;
-	
-	/** partitionId to Previous Incoming messages - Used in current Super Step*/
+
+	/** Worker to Outgoing Messages Map */
+	private Map<String, Map<VertexID, List<Message>>> outgoingMessages;
+
+	/** partitionId to Previous Incoming messages - Used in current Super Step */
 	private Map<Integer, Map<VertexID, List<Message>>> previousIncomingMessages;
-	
-	/** partitionId to Current Incoming messages - used in next Super Step*/
+
+	/** partitionId to Current Incoming messages - used in next Super Step */
 	private Map<Integer, Map<VertexID, List<Message>>> currentIncomingMessages;
 
-	/** boolean variable indicating whether the partitions can be worked upon by the workers in each superstep. **/
+	/**
+	 * boolean variable indicating whether the partitions can be worked upon by
+	 * the workers in each superstep.
+	 **/
 	boolean startSuperStep = false;
+
 	public Worker() throws RemoteException {
 		InetAddress address = null;
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYMMMdd.HHmmss.SSS");
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+				"YYYMMMdd.HHmmss.SSS");
 		String timestamp = simpleDateFormat.format(new Date());
 
 		String hostName = new String();
@@ -76,7 +81,7 @@ public class Worker extends UnicastRemoteObject {
 		} catch (UnknownHostException e) {
 			hostName = "UnKnownHost";
 			e.printStackTrace();
-		} 
+		}
 
 		this.workerID = hostName + "_" + timestamp;
 		this.partitionQueue = new LinkedBlockingDeque<>();
@@ -117,10 +122,15 @@ public class Worker extends UnicastRemoteObject {
 			while (startSuperStep) {
 				try {
 					Partition partition = partitionQueue.take();
-					Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages.get(partition.getPartitionID());
-					for(Entry<VertexID, List<Message>> entry : messageForThisPartition.entrySet()) {
+					Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages
+							.get(partition.getPartitionID());
+					Map<VertexID, Message> messagesFromCompute = null;
+					for (Entry<VertexID, List<Message>> entry : messageForThisPartition
+							.entrySet()) {
 						Vertex vertex = partition.getVertex(entry.getKey());
-						vertex.compute(entry.getValue().iterator());
+						messagesFromCompute = vertex.compute(entry.getValue()
+								.iterator());
+						updateOutgoingMessages(messagesFromCompute);
 					}
 					completedPartitions.add(partition);
 				} catch (InterruptedException e) {
@@ -128,9 +138,52 @@ public class Worker extends UnicastRemoteObject {
 				}
 			}
 		}
+
 	}
 
-	public void setWorkerPartitionInfo(Map<Integer, String> mapPartitionIdToWorkerId,
+	/**
+	 * Updates the outgoing messages for every superstep
+	 * 
+	 * @param messagesFromCompute
+	 *            Represents the map of destination vertex and its associated
+	 *            message to be send
+	 */
+	private void updateOutgoingMessages(
+			Map<VertexID, Message> messagesFromCompute) {
+		String workerID = null;
+		VertexID vertexID = null;
+		Message message = null;
+		Map<VertexID, List<Message>> workerMessages = null;
+		ArrayList<Message> messageList = null;
+		for (Entry<VertexID, Message> entry : messagesFromCompute.entrySet()) {
+			vertexID = entry.getKey();
+			message = entry.getValue();
+			workerID = mapPartitionIdToWorkerId.get(vertexID.getPartitionID());
+			if (workerID.equals(getWorkerID())) {
+				updateIncomingMessages(vertexID, message);
+			} else {
+				if (outgoingMessages.containsKey(workerID)) {
+					workerMessages = outgoingMessages.get(workerID);
+					if (workerMessages.containsKey(vertexID)) {
+						workerMessages.get(vertexID).add(message);
+					} else {
+						messageList = new ArrayList<Message>();
+						messageList.add(message);
+						workerMessages.put(vertexID, messageList);
+					}
+				} else {
+					messageList = new ArrayList<Message>();
+					messageList.add(message);
+					workerMessages = new HashMap<>();
+					workerMessages.put(vertexID, messageList);
+					outgoingMessages.put(workerID, workerMessages);
+				}
+			}
+		}
+	}
+
+	public void setWorkerPartitionInfo(
+			Map<Integer, String> mapPartitionIdToWorkerId,
 			Map<String, Worker> mapWorkerIdToWorker) {
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
 		this.worker2WorkerProxy = new Worker2WorkerProxy(mapWorkerIdToWorker);
@@ -148,7 +201,7 @@ public class Worker extends UnicastRemoteObject {
 					.lookup(Worker2Master.SERVICE_NAME);
 			Worker worker = new Worker();
 			Worker2Master masterProxy = worker2Master.register(worker,
-					worker.getWorkerID(), worker.getNumThreads());			
+					worker.getWorkerID(), worker.getNumThreads());
 			worker.setMasterProxy(masterProxy);
 			System.out.println("Worker is bound and ready for computations ");
 		} catch (Exception e) {
@@ -165,18 +218,40 @@ public class Worker extends UnicastRemoteObject {
 		Map<VertexID, List<Message>> partitionMessages = null;
 		int partitionID = 0;
 		VertexID vertexID = null;
-		for(Entry<VertexID, List<Message>> entry : incomingMessages.entrySet()) {
+		for (Entry<VertexID, List<Message>> entry : incomingMessages.entrySet()) {
 			vertexID = entry.getKey();
-			partitionID = vertexID.getPartitionID(); 
+			partitionID = vertexID.getPartitionID();
 			partitionMessages = currentIncomingMessages.get(partitionID);
-			if(partitionMessages.containsKey(vertexID))
-			{
+			if (partitionMessages.containsKey(vertexID)) {
 				partitionMessages.get(vertexID).addAll(entry.getValue());
-			}
-			else
-			{
+			} else {
 				partitionMessages.put(vertexID, entry.getValue());
 			}
+		}
+	}
+
+	/**
+	 * Receives the messages send by all the vertices in the same node and
+	 * updates the current incoming message queue
+	 * 
+	 * @param destinationVertex
+	 *            Represents the destination vertex to which the message has to
+	 *            be sent
+	 * @param incomingMessage
+	 *            Represents the incoming message for the destination vertex
+	 */
+	public void updateIncomingMessages(VertexID destinationVertex,
+			Message incomingMessage) {
+		Map<VertexID, List<Message>> partitionMessages = null;
+		ArrayList<Message> newMessageList = null;
+		int partitionID = destinationVertex.getPartitionID();
+		partitionMessages = currentIncomingMessages.get(partitionID);
+		if (partitionMessages.containsKey(destinationVertex)) {
+			partitionMessages.get(destinationVertex).add(incomingMessage);
+		} else {
+			newMessageList = new ArrayList<Message>();
+			newMessageList.add(incomingMessage);
+			partitionMessages.put(destinationVertex, newMessageList);
 		}
 	}
 }

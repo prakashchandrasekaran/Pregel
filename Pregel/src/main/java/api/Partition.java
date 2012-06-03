@@ -3,7 +3,6 @@ package api;
 import graphs.VertexID;
 import java.util.*;
 
-
 /**
  * Represents the partition of a graph consisting of set of vertices and their
  * outgoing edges
@@ -37,6 +36,6 @@ public class Partition {
 
 	public Vertex getVertex(VertexID vertexID) {
 		return vertexMap.get(vertexID);
-	}	
-	
+	}
+
 }

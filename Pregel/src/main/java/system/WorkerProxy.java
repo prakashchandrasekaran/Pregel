@@ -26,9 +26,9 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	private Master master;
 	private Thread t;
 	private int numWorkerThreads;
-	String workerID; 
+	String workerID;
 	BlockingQueue<Partition> partitionList;
-	
+
 	/**
 	 * 
 	 * @param worker
@@ -49,7 +49,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		this.master = master;
 		partitionList = new LinkedBlockingQueue<>();
 		t = new Thread(this);
-		t.start();		
+		t.start();
 	}
 
 	/**
@@ -107,18 +107,20 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		}
 	}
 
-	public void setWorkerPartitionInfo(Map<Integer, String> mapPartitionIdToWorkerId,
-			Map<String, Worker> mapWorkerIdToWorker){
-		worker.setWorkerPartitionInfo(mapPartitionIdToWorkerId, mapWorkerIdToWorker);		
+	public void setWorkerPartitionInfo(
+			Map<Integer, String> mapPartitionIdToWorkerId,
+			Map<String, Worker> mapWorkerIdToWorker) {
+		worker.setWorkerPartitionInfo(mapPartitionIdToWorkerId,
+				mapWorkerIdToWorker);
 	}
-	
-	public String getWorkerID(){
+
+	public String getWorkerID() {
 		return workerID;
 	}
-	
+
 	@Override
-	public Worker2Master register(Worker worker, String workerID, int numWorkerThreads)
-			throws RemoteException {
+	public Worker2Master register(Worker worker, String workerID,
+			int numWorkerThreads) throws RemoteException {
 		return null;
 	}
 }

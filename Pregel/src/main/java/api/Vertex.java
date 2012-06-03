@@ -57,20 +57,20 @@ public class Vertex {
 		return "(" + vertexID + "-" + outgoingEdges + ")";
 	}
 
-
-	public Map<VertexID, Message> compute(Iterator<Message> messageIterator){
+	public Map<VertexID, Message> compute(Iterator<Message> messageIterator) {
 		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
 		Data resultData = null;
-		while(messageIterator.hasNext()){
+		while (messageIterator.hasNext()) {
 			Message message = messageIterator.next();
 			resultData = message.getData();
 			// do some operation on the data and get the aggregate value.
 		}
-		
+
 		Message resultMsg = new Message();
 		resultMsg.setData(resultData);
-		// Iterate the outgoing edges and assign the resultant message to be sent to each of the destination vertices.
-		for(Edge edge : outgoingEdges){
+		// Iterate the outgoing edges and assign the resultant message to be
+		// sent to each of the destination vertices.
+		for (Edge edge : outgoingEdges) {
 			vertexMessageMap.put(edge.getDestID(), resultMsg);
 		}
 		return vertexMessageMap;
