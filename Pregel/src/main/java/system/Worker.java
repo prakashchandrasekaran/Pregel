@@ -33,8 +33,14 @@ import api.Partition;
 public class Worker extends UnicastRemoteObject {
 
 	private static final long serialVersionUID = -8137628519082382850L;
+	
+	
+	/** */
 	private int numThreads;
 
+	/** */
+	private int totalPartitionsAssigned;
+	
 	/** */
 	private BlockingQueue<Partition> partitionQueue;
 
@@ -133,12 +139,12 @@ public class Worker extends UnicastRemoteObject {
 						updateOutgoingMessages(messagesFromCompute);
 					}
 					completedPartitions.add(partition);
+					
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -183,8 +189,10 @@ public class Worker extends UnicastRemoteObject {
 	}
 
 	public void setWorkerPartitionInfo(
+			int totalPartitionsAssigned,
 			Map<Integer, String> mapPartitionIdToWorkerId,
 			Map<String, Worker> mapWorkerIdToWorker) {
+		this.totalPartitionsAssigned = totalPartitionsAssigned;
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
 		this.worker2WorkerProxy = new Worker2WorkerProxy(mapWorkerIdToWorker);
 		startSuperStep = true;
