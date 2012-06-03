@@ -92,7 +92,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				numWorkerThreads, this);
 		workerProxyMap.put(workerID, workerProxy);
 		workerMap.put(workerID, worker);
-		workerAcknowledgementSet.add(workerID);
 		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
 	}
 
