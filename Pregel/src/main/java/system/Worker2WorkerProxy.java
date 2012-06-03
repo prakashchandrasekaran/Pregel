@@ -13,7 +13,7 @@ public class Worker2WorkerProxy implements Worker2Worker {
 	}
 
 	public void sendMessage(String receiverWorkerID,
-			Map<VertexID, List<Message>> outgoingMessages)
+			Map<VertexID, List<Message<?>>> outgoingMessages)
 			throws RemoteException {
 		mapWorkerIdToWorker.get(receiverWorkerID).receiveMessage(
 				outgoingMessages);

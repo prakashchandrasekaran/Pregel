@@ -28,7 +28,7 @@ public class PageRankVertex extends Vertex<Double>{
 	public PageRankVertex(VertexID vertexID, List<Edge> outgoingEdges) {
 		super(vertexID, outgoingEdges);		
 	}
-
+/*
 	@Override
 	public Map<VertexID, Message<Double>> compute(
 			Iterator<Message<Double>> messageIterator) {
@@ -59,6 +59,12 @@ public class PageRankVertex extends Vertex<Double>{
 			// votetohalt
 		}
 		return vertexMessageMap;
+	}
+*/
+	@Override
+	public Map<VertexID, Message<?>> compute(Iterator<Message<?>> iterator) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

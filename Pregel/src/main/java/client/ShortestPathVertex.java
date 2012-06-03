@@ -34,6 +34,7 @@ public class ShortestPathVertex extends Vertex<Double>{
 	/* (non-Javadoc)
 	 * @see api.Vertex#compute(java.util.Iterator)
 	 */
+/*
 	@Override
 	public Map<VertexID, Message<Double>> compute(Iterator<Message<Double>> messageIterator) {
 		Map<VertexID, Message<Double>> vertexMessageMap = new HashMap<>();
@@ -58,5 +59,10 @@ public class ShortestPathVertex extends Vertex<Double>{
 					new Message<>(this.getID(), new ShortestPathData(this.getData().getValue() + edge.getEdgeWeight())));
 		}
 		return vertexMessageMap;
+	}
+*/
+	@Override
+	public Map<VertexID, Message<?>> compute(Iterator<Message<?>> iterator) {
+		return null;
 	}
 }

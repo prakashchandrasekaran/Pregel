@@ -62,7 +62,7 @@ public abstract class Vertex<T> implements Serializable {
 		return "(" + vertexID + "-" + outgoingEdges + ")";
 	}
 
-	public abstract Map<VertexID, Message<T>> compute(Iterator<Message<T>> messageIterator);
+	public abstract Map<VertexID, Message<?>> compute(Iterator<Message<?>> iterator);
 
 	public Data<T> getData(){
 		return data;
