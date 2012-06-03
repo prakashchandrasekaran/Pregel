@@ -1,3 +1,6 @@
+/*
+ * @author sam
+ */
 package system;
 
 import graphs.VertexID;
@@ -25,53 +28,55 @@ import java.util.concurrent.LinkedBlockingDeque;
 import api.Partition;
 import api.Vertex;
 
+// TODO: Auto-generated Javadoc
 /**
- * Represents the computation node
- * 
+ * Represents the computation node.
+ *
  * @author Prakash Chandrasekaran
  * @author Gautham Narayanasamy
  * @author Vijayaraghavan Subbaiah
- **/
+ */
 
 public class Worker extends UnicastRemoteObject {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -8137628519082382850L;
 	
 	
-	/** */
+	/** The num threads. */
 	private int numThreads;
 
-	/** */
+	/** The total partitions assigned. */
 	private int totalPartitionsAssigned;
 	
-	/** flag is true when Worker is sending messages to other workers */
+	/** flag is true when Worker is sending messages to other workers. */
 	private boolean sendingMessage;
 	
-	/** */
+	/** The partition queue. */
 	private BlockingQueue<Partition> partitionQueue;
 
-	/** */
+	/** The completed partitions. */
 	private Queue<Partition> completedPartitions;
 
-	/** Hostname of the node with timestamp information */
+	/** Hostname of the node with timestamp information. */
 	private String workerID;
 
-	/** Master Proxy object to interact with Master */
+	/** Master Proxy object to interact with Master. */
 	private Worker2Master masterProxy;
 
-	/** PartitionID to WorkerID Map */
+	/** PartitionID to WorkerID Map. */
 	private Map<Integer, String> mapPartitionIdToWorkerId;
 
-	/** Worker2WorkerProxy Object */
+	/** Worker2WorkerProxy Object. */
 	private Worker2WorkerProxy worker2WorkerProxy;
 
-	/** Worker to Outgoing Messages Map */
+	/** Worker to Outgoing Messages Map. */
 	private ConcurrentHashMap<String, Map<VertexID, List<Message>>> outgoingMessages;
 
-	/** partitionId to Previous Incoming messages - Used in current Super Step */
+	/** partitionId to Previous Incoming messages - Used in current Super Step. */
 	private ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> previousIncomingMessages;
 
-	/** partitionId to Current Incoming messages - used in next Super Step */
+	/** partitionId to Current Incoming messages - used in next Super Step. */
 	private ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> currentIncomingMessages;
 
 	/**
@@ -80,6 +85,11 @@ public class Worker extends UnicastRemoteObject {
 	 **/
 	private boolean startSuperStep = false;
 
+	/**
+	 * Instantiates a new worker.
+	 *
+	 * @throws RemoteException the remote exception
+	 */
 	public Worker() throws RemoteException {
 		InetAddress address = null;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
@@ -111,28 +121,51 @@ public class Worker extends UnicastRemoteObject {
 
 	/**
 	 * Adds the partition to be assigned to the worker.
-	 * 
-	 * @param partition
-	 *            the partition to be assigned
+	 *
+	 * @param partition the partition to be assigned
+	 * @throws RemoteException the remote exception
 	 */
 	public void addPartition(Partition partition) throws RemoteException {
 		this.partitionQueue.add(partition);
 	}
 
+	/**
+	 * Adds the partition list.
+	 *
+	 * @param workerPartitions the worker partitions
+	 * @throws RemoteException the remote exception
+	 */
 	public void addPartitionList(List<Partition> workerPartitions)
 			throws RemoteException {
 		this.partitionQueue.addAll(workerPartitions);
 	}
 
+	/**
+	 * Gets the num threads.
+	 *
+	 * @return the num threads
+	 */
 	public int getNumThreads() {
 		return numThreads;
 	}
 
+	/**
+	 * Gets the worker id.
+	 *
+	 * @return the worker id
+	 */
 	public String getWorkerID() {
 		return workerID;
 	}
 
+	/**
+	 * The Class WorkerThread.
+	 */
 	private class WorkerThread extends Thread {
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Thread#run()
+		 */
 		@Override
 		public void run() {
 			while(true) {
@@ -158,6 +191,9 @@ public class Worker extends UnicastRemoteObject {
 			}
 		}
 
+		/**
+		 * Check and send message.
+		 */
 		private synchronized void checkAndSendMessage() {
 			if( (! sendingMessage) && (completedPartitions.size() == totalPartitionsAssigned)) {
 				sendingMessage = true;
@@ -190,11 +226,10 @@ public class Worker extends UnicastRemoteObject {
 	
 
 	/**
-	 * Updates the outgoing messages for every superstep
-	 * 
-	 * @param messagesFromCompute
-	 *            Represents the map of destination vertex and its associated
-	 *            message to be send
+	 * Updates the outgoing messages for every superstep.
+	 *
+	 * @param messagesFromCompute Represents the map of destination vertex and its associated
+	 * message to be send
 	 */
 	private void updateOutgoingMessages(
 			Map<VertexID, Message> messagesFromCompute) {
@@ -230,6 +265,13 @@ public class Worker extends UnicastRemoteObject {
 		}
 	}
 
+	/**
+	 * Sets the worker partition info.
+	 *
+	 * @param totalPartitionsAssigned the total partitions assigned
+	 * @param mapPartitionIdToWorkerId the map partition id to worker id
+	 * @param mapWorkerIdToWorker the map worker id to worker
+	 */
 	public void setWorkerPartitionInfo(
 			int totalPartitionsAssigned,
 			Map<Integer, String> mapPartitionIdToWorkerId,
@@ -240,6 +282,12 @@ public class Worker extends UnicastRemoteObject {
 		startSuperStep = true;
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 * @throws Exception the exception
+	 */
 	public static void main(String[] args) throws Exception {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
@@ -261,10 +309,20 @@ public class Worker extends UnicastRemoteObject {
 	}
 	
 
+	/**
+	 * Sets the master proxy.
+	 *
+	 * @param masterProxy the new master proxy
+	 */
 	private void setMasterProxy(Worker2Master masterProxy) {
 		this.masterProxy = masterProxy;
 	}
 
+	/**
+	 * Receive message.
+	 *
+	 * @param incomingMessages the incoming messages
+	 */
 	public void receiveMessage(Map<VertexID, List<Message>> incomingMessages) {
 		Map<VertexID, List<Message>> partitionMessages = null;
 		int partitionID = 0;
@@ -283,13 +341,11 @@ public class Worker extends UnicastRemoteObject {
 
 	/**
 	 * Receives the messages send by all the vertices in the same node and
-	 * updates the current incoming message queue
-	 * 
-	 * @param destinationVertex
-	 *            Represents the destination vertex to which the message has to
-	 *            be sent
-	 * @param incomingMessage
-	 *            Represents the incoming message for the destination vertex
+	 * updates the current incoming message queue.
+	 *
+	 * @param destinationVertex Represents the destination vertex to which the message has to
+	 * be sent
+	 * @param incomingMessage Represents the incoming message for the destination vertex
 	 */
 	public void updateIncomingMessages(VertexID destinationVertex,
 			Message incomingMessage) {
@@ -305,15 +361,12 @@ public class Worker extends UnicastRemoteObject {
 			partitionMessages.put(destinationVertex, newMessageList);
 		}
 	}
-
-	public boolean isStartSuperStep() {
-		return startSuperStep;
-	}
-
-	public void setStartSuperStep(boolean startSuperStep) {
-		this.startSuperStep = startSuperStep;
-	}
 	
+	
+	/**
+	 * The worker receives the command to start the next superstep from the master.
+	 * Set startSuperStep to true; assign previousIncomingMessages to currentIncomingMessages; reset currentIncomingMessages;
+	 */
 	public void startSuperStep(){
 		this.startSuperStep = true;
 		this.previousIncomingMessages.clear();

@@ -1,12 +1,15 @@
 package utility;
 
-import graphs.VertexID;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
-import exceptions.InvalidVertexLineException;
-import exceptions.PropertyNotFoundException;
+
 import api.Edge;
 import api.Vertex;
+import exceptions.InvalidVertexLineException;
+import exceptions.PropertyNotFoundException;
+import graphs.VertexID;
 
 /**
  * General Utility class
@@ -42,12 +45,13 @@ public class GeneralUtils {
 	 * @return
 	 * @throws InvalidVertexLineException
 	 */
-	public static Vertex generateVertex(String vertexLine)
+	public static Vertex generateVertex(String vertexLine, String vertexClassName)
 			throws InvalidVertexLineException {
 		if (vertexLine == null || vertexLine.length() == 0)
 			throw new InvalidVertexLineException(vertexLine,
 					"Vertex Line is Null");
-
+		
+		Vertex vertex = null;
 		String[] vertexSplit = vertexLine.split(sourceVertexDelimiter);
 
 		// Source Vertex
@@ -71,8 +75,17 @@ public class GeneralUtils {
 			edgeWeight = Double.parseDouble(edgeData[1]);
 			outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
 		}
-
-		return new Vertex(sourceVertex, outGoingEdges);
+		
+		// Create a new instance of the vertex class that the application programmer passes.
+		try {
+			Class<?> c = Class.forName(vertexClassName);		
+			Constructor<?> constructor = c.getConstructor(sourceVertex.getClass(), outGoingEdges.getClass());
+			vertex = (Vertex) constructor.newInstance(new Object[]{sourceVertex, outGoingEdges});
+			
+		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {			
+			e.printStackTrace();			
+		}	
+		return vertex;
 	}
 
 	/**
@@ -90,7 +103,7 @@ public class GeneralUtils {
 
 	public static void main(String args[]) {
 		try {
-			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12"));
+			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12", "Vertex"));
 			System.out.println(GeneralUtils.getPartitionId(123456));
 		} catch (InvalidVertexLineException e) {
 			// TODO Auto-generated catch block

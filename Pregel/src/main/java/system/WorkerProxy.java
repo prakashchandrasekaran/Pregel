@@ -132,7 +132,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	}
 
 	public void startSuperStep() {
-		this.worker.setStartSuperStep(true);
+		this.worker.startSuperStep();
 	}
 
 	

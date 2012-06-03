@@ -26,7 +26,9 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 */
 	private long numVertices;
 	private int numPartitions;
-	BufferedReader br;
+	private BufferedReader br;
+	private String vertexClassName;
+	
 	public static long MAX_VERTICES_PER_PARTITION;
 
 	static {
@@ -51,7 +53,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-	public GraphPartitioner(String fileName) throws NumberFormatException,
+	public GraphPartitioner(String fileName, String vertexClassName) throws NumberFormatException,
 			IOException {
 		br = new BufferedReader(new FileReader(fileName));
 		numVertices = Long.parseLong(br.readLine());
@@ -77,7 +79,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 			while ((vertexCounter < MAX_VERTICES_PER_PARTITION)
 					&& ((strLine = br.readLine()) != null)) {
 				vertexCounter += 1;
-				vertex = GeneralUtils.generateVertex(strLine);
+				vertex = GeneralUtils.generateVertex(strLine, vertexClassName);
 				vertexMap.put(vertex.getID(), vertex);
 			}
 		} catch (Exception e) {
