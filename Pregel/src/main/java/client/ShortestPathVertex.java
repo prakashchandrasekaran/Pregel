@@ -22,6 +22,7 @@ public class ShortestPathVertex extends Vertex{
 	public Map<VertexID, Message> compute(Iterator<Message> messageIterator) {
 		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
 		Data resultData = null;
+		
 		while (messageIterator.hasNext()) {
 			Message message = messageIterator.next();
 			resultData = message.getData();
@@ -32,7 +33,7 @@ public class ShortestPathVertex extends Vertex{
 		resultMsg.setData(resultData);
 		// Iterate the outgoing edges and assign the resultant message to be
 		// sent to each of the destination vertices.
-		for (Edge edge : outgoingEdges) {
+		for (Edge edge : this.getOutgoingEdges()) {
 			vertexMessageMap.put(edge.getDestID(), resultMsg);
 		}
 		return vertexMessageMap;
