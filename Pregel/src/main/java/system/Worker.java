@@ -162,6 +162,7 @@ public class Worker extends UnicastRemoteObject {
 			if( (! sendingMessage) && (completedPartitions.size() == totalPartitionsAssigned)) {
 				sendingMessage = true;
 				startSuperStep = false;
+				
 				partitionQueue.addAll(completedPartitions);
 				completedPartitions.clear();
 				
@@ -313,5 +314,12 @@ public class Worker extends UnicastRemoteObject {
 		this.startSuperStep = startSuperStep;
 	}
 	
+	public void startSuperStep(){
+		this.startSuperStep = true;
+		this.previousIncomingMessages.clear();
+		ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> temp = this.previousIncomingMessages;
+		this.previousIncomingMessages = this.currentIncomingMessages;
+		this.currentIncomingMessages = temp;
+	}
 	
 }
