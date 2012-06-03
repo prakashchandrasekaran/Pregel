@@ -43,8 +43,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	/** The total number of worker threads. */
 	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
 
-	/** The graph. */
+	/** The graph partitioner */
 	private GraphPartitioner graphPartitioner;
+	
+	/** Superstep Counter **/
+	private long superstepCounter;
 
 	/** The workerID to WorkerProxy map. */
 	Map<String, WorkerProxy> workerProxyMap = new HashMap<>();
@@ -68,6 +71,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 	 */
 	public Master() throws RemoteException, PropertyNotFoundException {
 		super();
+		superstepCounter = 0;
 	}
 
 	/**
@@ -195,13 +199,13 @@ public class Master extends UnicastRemoteObject implements Worker2Master {
 		this.workerAcknowledgementSet.remove(workerID);
 		// If the acknowledgment has been received from all the workers, start the next superstep
 		if(this.workerAcknowledgementSet.size() == 0) {			
-			startSuperStep();
+			startSuperStep(++superstepCounter);
 		}
 	}
 
-	private void startSuperStep() {
+	private void startSuperStep(long superstepCounter) {
 		for(String workerID : this.activeWorkerSet){
-			this.workerProxyMap.get(workerID).startSuperStep();
+			this.workerProxyMap.get(workerID).startSuperStep(superstepCounter);
 		}
 		
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
