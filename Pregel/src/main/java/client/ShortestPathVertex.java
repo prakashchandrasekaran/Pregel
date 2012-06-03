@@ -45,12 +45,10 @@ public class ShortestPathVertex extends Vertex<Double>{
 				minData = currData;
 			}
 		}
+		// sets the current vertex data to minimum data computed 
 		this.setData(minData);
 
-		// Message<Double> resultMsg = new Message<Double>(this.getID(), this.);
-		// resultMsg.setData(resultData);
-		// Iterate the outgoing edges and assign the resultant message to be
-		// sent to each of the destination vertices.
+		// create message to all outgoing edges
 		for (Edge edge : this.getOutgoingEdges()) {
 			vertexMessageMap.put(edge.getDestID(), 
 					new Message<>(this.getID(), new ShortestPathData(this.getData().getValue() + edge.getEdgeWeight())));
