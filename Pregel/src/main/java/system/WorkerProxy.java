@@ -22,7 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Vijayaraghavan Subbaiah
  */
 
-public class WorkerProxy extends UnicastRemoteObject implements Runnable,
+public class WorkerProxy implements Runnable,
 		Worker2Master {
 	
 	/** The Constant serialVersionUID. */
@@ -52,7 +52,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	/**
 	 * Instantiates a new worker proxy.
 	 *
-	 * @param worker Represents the remote {@link system.Worker Worker}
+	 * @param worker Represents the remote {@link system.WorkerImpl Worker}
 	 * @param workerID Represents the unique serviceName to identify the worker
 	 * @param numWorkerThreads the num worker threads
 	 * @param master Represents the {@link system.Master Master}
@@ -123,7 +123,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	/**
 	 * Halts the worker and prints the final solution
 	 */
-	public void halt(){
+	public void halt() throws RemoteException{
 		worker.halt();
 	}
 
@@ -154,10 +154,11 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	 *
 	 * @param mapPartitionIdToWorkerId the map partition id to worker id
 	 * @param mapWorkerIdToWorker the map worker id to worker
+	 * @throws RemoteException 
 	 */
 	public void setWorkerPartitionInfo(
 			Map<Integer, String> mapPartitionIdToWorkerId,
-			Map<String, Worker> mapWorkerIdToWorker) {
+			Map<String, Worker> mapWorkerIdToWorker) throws RemoteException {
 		worker.setWorkerPartitionInfo(
 				totalPartitions, 
 				mapPartitionIdToWorkerId, 
@@ -179,6 +180,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	@Override
 	public Worker2Master register(Worker worker, String workerID,
 			int numWorkerThreads) throws RemoteException {
+		
 		return null;
 	}
 
@@ -186,7 +188,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	 * @see system.Worker2Master#superStepCompleted(java.lang.String, java.util.Set)
 	 */
 	@Override
-	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) {
+	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
 		master.superStepCompleted(workerID, activeWorkerSet);
 	}
 
@@ -195,7 +197,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	 *
 	 * @param superStepCounter the super step counter
 	 */
-	public void startSuperStep(long superStepCounter) {
+	public void startSuperStep(long superStepCounter) throws RemoteException{
 		this.worker.startSuperStep(superStepCounter);
 	}
 
@@ -205,7 +207,7 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	 *
 	 * @param initialMessage the initial message
 	 */
-	public void setInitialMessage(ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage){
+	public void setInitialMessage(ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage) throws RemoteException{
 		this.worker.setInitialMessage(initialMessage);
 	}
 }

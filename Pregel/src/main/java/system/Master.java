@@ -2,6 +2,7 @@ package system;
 
 import java.io.IOException;
 import java.rmi.AccessException;
+import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -80,7 +81,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Registers the worker computation nodes with the master.
 	 *
-	 * @param worker Represents the {@link system.Worker Worker}
+	 * @param worker Represents the {@link system.WorkerImpl Worker}
 	 * @param workerID the worker id
 	 * @param numWorkerThreads Represents the number of worker threads available in the
 	 * worker computation node
@@ -89,7 +90,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @throws RemoteException the remote exception
 	 */
 	public Worker2Master register(Worker worker, String workerID,
-			int numWorkerThreads) throws AccessException, RemoteException {
+			int numWorkerThreads) throws RemoteException {
+		System.out.println("Master: Register");
 		totalWorkerThreads.getAndAdd(numWorkerThreads);
 		WorkerProxy workerProxy = new WorkerProxy(worker, workerID,
 				numWorkerThreads, this);
@@ -117,8 +119,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 
 	/**
 	 * Send worker partition info.
+	 * @throws RemoteException 
 	 */
-	private void sendWorkerPartitionInfo() {
+	private void sendWorkerPartitionInfo() throws RemoteException {
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			workerProxy.setWorkerPartitionInfo(partitionWorkerMap, workerMap);
@@ -135,7 +138,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @param initData the data
 	 * @throws PropertyNotFoundException the property not found exception
 	 */
-	private <T> void assignPartitions(GraphPartitioner graphPartitioner, long sourceVertexID, Data<T> initData) throws PropertyNotFoundException {
+	private <T> void assignPartitions(GraphPartitioner graphPartitioner, long sourceVertexID, Data<T> initData) throws PropertyNotFoundException, RemoteException {
 		int totalPartitions = graphPartitioner.getNumPartitions();
 		Iterator<Partition> iter = graphPartitioner.iterator();
 		Partition partition = null;
@@ -198,7 +201,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @param sourceVertex_partitionID the source vertex partition id
 	 * @param sourceVertexID the source vertex id
 	 */
-	private <T> void setInitialMessage(int sourceVertex_partitionID, long sourceVertexID, Data<T> initData){
+	private <T> void setInitialMessage(int sourceVertex_partitionID, long sourceVertexID, Data<T> initData) throws RemoteException{
 		List<Message> messageList = new ArrayList<>();
 		messageList.add(new Message(null, initData));
 		Map<VertexID, List<Message>> map = new HashMap<>();
@@ -217,9 +220,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @throws Exception the exception
 	 */
 	public static void main(String[] args) throws Exception {
-		if (System.getSecurityManager() == null) {
-			System.setSecurityManager(new SecurityManager());
-		}
+//		if (System.getSecurityManager() == null) {
+//			System.setSecurityManager(new SecurityManager());
+//		}
+		System.setSecurityManager(new RMISecurityManager());
 		Master master;
 		try {
 			master = new Master();
@@ -234,7 +238,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Halts all the workers and prints the final solution 
 	 */
-	public void halt(){
+	public void halt() throws RemoteException{
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet())
 		{
 		     entry.getValue().halt();	
@@ -261,7 +265,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @see system.Worker2Master#superStepCompleted(java.lang.String, java.util.Set)
 	 */
 	@Override
-	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) {
+	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
 		this.activeWorkerSet.addAll(activeWorkerSet);
 		this.workerAcknowledgementSet.remove(workerID);
 		// If the acknowledgment has been received from all the workers, start the next superstep
@@ -278,7 +282,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 *
 	 * @param superStepCounter the super step counter
 	 */
-	private void startSuperStep(long superStepCounter) {
+	private void startSuperStep(long superStepCounter) throws RemoteException {
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
 		this.activeWorkerSet.clear();
 		for(String workerID : this.activeWorkerSet){

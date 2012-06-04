@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import exceptions.PropertyNotFoundException;
@@ -26,8 +27,10 @@ public class Props {
 	}
 
 	public static synchronized Props getInstance() {
+		URL location = Props.class.getProtectionDomain().getCodeSource().getLocation();
+		System.out.println(location.getFile());
 		if (props == null) {
-			props = new Props("../../config/system.properties");
+			props = new Props("config/system.properties");
 		}
 		return props;
 	}

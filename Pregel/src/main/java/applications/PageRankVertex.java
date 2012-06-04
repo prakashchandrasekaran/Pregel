@@ -2,6 +2,7 @@ package applications;
 
 import graphs.VertexID;
 
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,8 +27,9 @@ public class PageRankVertex extends Vertex {
 	 *            the vertex id
 	 * @param outgoingEdges
 	 *            the outgoing edges
+	 * @throws RemoteException 
 	 */
-	public PageRankVertex(VertexID vertexID, List<Edge> outgoingEdges) {
+	public PageRankVertex(VertexID vertexID, List<Edge> outgoingEdges) throws RemoteException {
 		super(vertexID, outgoingEdges);
 		this.setData(new PageRankData(new Double(0)));
 	}

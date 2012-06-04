@@ -3,6 +3,8 @@ package api;
 import graphs.VertexID;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,7 @@ import system.Message;
  * @author Vijayaraghavan Subbaiah
  * 
  */
-public abstract class Vertex implements Serializable {
+public abstract class Vertex extends UnicastRemoteObject implements Serializable {
 
 	/**
 	 * 
@@ -36,7 +38,7 @@ public abstract class Vertex implements Serializable {
 	 * @param outgoingEdges
 	 *            Represents the list of outgoing edges from the source vertex
 	 */
-	protected Vertex(VertexID vertexID, List<Edge> outgoingEdges) {
+	protected Vertex(VertexID vertexID, List<Edge> outgoingEdges) throws RemoteException{
 		this.vertexID = vertexID;
 		this.outgoingEdges = outgoingEdges;
 	}

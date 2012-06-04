@@ -15,7 +15,6 @@ import api.Client2Master;
  */
 
 public class Client {
-
 	public static void main(String[] args) throws RemoteException, NotBoundException {
 		String masterMachineName = args[0];
 		Registry registry = LocateRegistry.getRegistry(masterMachineName);

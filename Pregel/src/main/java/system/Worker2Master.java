@@ -3,11 +3,12 @@
  */
 package system;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Set;
 
 /**
- * Defines an interface to register remote ({@link system.Worker Worker}) with
+ * Defines an interface to register remote ({@link system.WorkerImpl Worker}) with
  * the {@link system.Master Master}.
  * 
  * @author Prakash Chandrasekaran
@@ -15,7 +16,7 @@ import java.util.Set;
  * @author Vijayaraghavan Subbaiah
  */
 
-public interface Worker2Master extends java.rmi.Remote {
+public interface Worker2Master extends java.rmi.Remote, Serializable {
 
 	/** The Constant SERVICE_NAME. */
 	public static final String SERVICE_NAME = "Master";
@@ -39,5 +40,5 @@ public interface Worker2Master extends java.rmi.Remote {
 	 *
 	 * @param workerID the worker id
 	 */
-	public void superStepCompleted(String workerID, Set<String> activeWorkerIDs);
+	public void superStepCompleted(String workerID, Set<String> activeWorkerIDs) throws RemoteException;
 }

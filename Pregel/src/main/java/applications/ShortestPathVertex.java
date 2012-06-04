@@ -3,6 +3,7 @@ package applications;
 
 import graphs.VertexID;
 
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,8 +26,9 @@ public class ShortestPathVertex extends Vertex{
 	 *
 	 * @param vertexID the vertex id
 	 * @param outgoingEdges the outgoing edges
+	 * @throws RemoteException 
 	 */
-	public ShortestPathVertex(VertexID vertexID, List<Edge> outgoingEdges) {
+	public ShortestPathVertex(VertexID vertexID, List<Edge> outgoingEdges) throws RemoteException {
 		super(vertexID, outgoingEdges);
 		this.setData(new ShortestPathData(Double.MAX_VALUE));
 	}
