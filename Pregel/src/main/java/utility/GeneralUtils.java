@@ -71,7 +71,7 @@ public class GeneralUtils {
 			edgeData = edge.split(vertexWeightDelimiter);
 			vertexIdentifier = Long.parseLong(edgeData[0]);
 			destVertex = new VertexID(
-					(int) (vertexIdentifier / maxVerticesPerPartition),
+					getPartitionID(vertexIdentifier),
 					vertexIdentifier);
 			edgeWeight = Double.parseDouble(edgeData[1]);
 			outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
@@ -97,7 +97,7 @@ public class GeneralUtils {
 	 *            , input vertedId for which PatitionId is computed
 	 * @return respective partition Id
 	 */
-	public static int getPartitionId(long vertexId) {
+	public static int getPartitionID(long vertexId) {
 		int partitionId = (int) (vertexId / maxVerticesPerPartition);
 		return partitionId;
 	}
@@ -105,7 +105,7 @@ public class GeneralUtils {
 	public static void main(String args[]) {
 		try {
 			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12", "Vertex"));
-			System.out.println(GeneralUtils.getPartitionId(123456));
+			System.out.println(GeneralUtils.getPartitionID(123456));
 		} catch (InvalidVertexLineException e) {
 			e.printStackTrace();
 		}

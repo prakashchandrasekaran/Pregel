@@ -1,8 +1,5 @@
 package system;
 
-import exceptions.PropertyNotFoundException;
-import graphs.GraphPartitioner;
-
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
@@ -18,7 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import utility.GeneralUtils;
 import api.Client2Master;
+import exceptions.PropertyNotFoundException;
+import graphs.GraphPartitioner;
 
 
 /**
@@ -91,7 +91,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		WorkerProxy workerProxy = new WorkerProxy(worker, workerID,
 				numWorkerThreads, this);
 		workerProxyMap.put(workerID, workerProxy);
-		workerMap.put(workerID, worker);
+		workerMap.put(workerID, worker);		
 		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
 	}
 
@@ -100,12 +100,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @see api.Client2Master#putTask(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void putTask(String graphFileName, String vertexClassName) throws RemoteException{
+	public void putTask(String graphFileName, String vertexClassName, long sourceVertexID) throws RemoteException{
 		try {
 			GraphPartitioner graphPartitioner = new GraphPartitioner(graphFileName, vertexClassName);
-			assignPartitions(graphPartitioner);
+			assignPartitions(graphPartitioner, sourceVertexID);
 			sendWorkerPartitionInfo();
 		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
+		} catch (PropertyNotFoundException e) {		
 			e.printStackTrace();
 		}
 	}
@@ -125,12 +127,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * that each worker has.
 	 *
 	 * @param graphPartitioner the graph partitioner
+	 * @throws PropertyNotFoundException 
 	 */
-	private void assignPartitions(GraphPartitioner graphPartitioner) {
+	private void assignPartitions(GraphPartitioner graphPartitioner, long sourceVertexID) throws PropertyNotFoundException {
 		int totalPartitions = graphPartitioner.getNumPartitions();
 		Iterator<Partition> iter = graphPartitioner.iterator();
 		Partition partition = null;
-		partitionWorkerMap = new HashMap<>();
+		partitionWorkerMap = new HashMap<>();		
+		int sourceVertex_partitionID = GeneralUtils.getPartitionID(sourceVertexID);
 		// Assign partitions to workers in the ratio of the number of worker
 		// threads that each worker has.
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
@@ -141,6 +145,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			List<Partition> workerPartitions = new ArrayList<>();
 			for (int i = 0; i < numPartitionsToAssign; i++) {
 				partition = iter.next();
+				// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received..
+				if(partition.getPartitionID() == sourceVertex_partitionID){
+					workerAcknowledgementSet.add(entry.getKey());
+				}
 				workerPartitions.add(partition);
 				partitionWorkerMap.put(partition.getPartitionID(),
 						workerProxy.getWorkerID());
@@ -158,7 +166,12 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				workerMapIter = workerProxyMap.entrySet().iterator();
 			}
 			partition = iter.next();
+			
 			WorkerProxy workerProxy = workerMapIter.next().getValue();
+			// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received.
+			if(partition.getPartitionID() == sourceVertex_partitionID){
+				workerAcknowledgementSet.add(workerProxy.getWorkerID());
+			}
 			workerProxy.addPartition(partition);
 			partitionWorkerMap.put(partition.getPartitionID(),
 					workerProxy.getWorkerID());

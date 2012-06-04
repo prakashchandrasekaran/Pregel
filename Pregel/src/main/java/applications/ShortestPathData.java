@@ -52,4 +52,10 @@ public class ShortestPathData implements Data<Double>{
 		this.value = value;
 	}
 
+	/**
+	 * 
+	 */
+	public String toString() {
+		return Double.toString(this.value);
+	}
 }

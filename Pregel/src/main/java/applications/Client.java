@@ -7,7 +7,12 @@ import java.rmi.registry.Registry;
 
 import api.Client2Master;
 
-import system.Worker2Master;
+/**
+ * Client class
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
+ */
 
 public class Client {
 
@@ -15,9 +20,9 @@ public class Client {
 		String masterMachineName = args[0];
 		Registry registry = LocateRegistry.getRegistry(masterMachineName);
 		Client2Master client2Master = (Client2Master) registry
-				.lookup(Worker2Master.SERVICE_NAME);
+				.lookup(Client2Master.SERVICE_NAME);
 		String graphFileName = "output/output.txt";
 		String vertexClassName = "ShortestPathVertex";
-		client2Master.putTask(graphFileName, vertexClassName);
+		client2Master.putTask(graphFileName, vertexClassName, 0);
 	}
 }

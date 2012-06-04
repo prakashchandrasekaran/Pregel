@@ -36,4 +36,9 @@ public interface Data<T> extends Comparable<Data<T>>, Serializable{
 	 *            Represents the value to be set to the data value
 	 */
 	public void setValue(T value);
+	
+	/**
+	 * 
+	 */
+	public String toString();
 }
