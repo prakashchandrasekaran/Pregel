@@ -59,24 +59,49 @@ public abstract class Vertex implements Serializable {
 		return outgoingEdges;
 	}
 
+	/**
+	 * returns String representation of the Vertex 
+	 */
 	public String toString() {
 		return "(" + vertexID + "-" + outgoingEdges + ")";
 	}
-
+	
+	/**
+	 * abstract compute method, When a vertex is active, it executes it compute method
+	 * by taking all input messages and sends message to all its outgoing edges
+	 * @param iterator, iterator of messages
+	 * @return
+	 */
 	public abstract Map<VertexID, Message> compute(Iterator<Message> iterator);
 
+	/**
+	 * gets Data associated with the vertex
+	 * @return
+	 */
 	public Data<?> getData(){
 		return data;
 	}
 	
+	/**
+	 * sets Data associated with the Vertex
+	 * @param data
+	 */
 	public void setData(Data<?> data){
 		this.data = data;
 	}
 	
+	/**
+	 * returns SuperStep in which the Vertex is executing 
+	 * @return
+	 */
 	public long getSuperstepCounter(){
 		return superstepCounter;
 	}
 	
+	/**
+	 * sets the SuperStep value for current Vertex
+	 * @param superstepCounter
+	 */
 	public void setSuperstepCounter(long superstepCounter){
 		this.superstepCounter = superstepCounter;
 	}
