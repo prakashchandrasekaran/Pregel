@@ -13,13 +13,15 @@ import java.rmi.RemoteException;
  
 public interface Client2Master extends Remote{
 	
+	public static final String SERVICE_NAME = "Master";
+
 	/**
 	 * Submits the graph problem to be computed.
 	 *
 	 * @param graphFileName the graph file name
 	 * @param vertexClassName the application specific vertex class name
 	 */
-	public void putTask(String graphFileName, String vertexClassName) throws RemoteException;
+	public void putTask(String graphFileName, String vertexClassName, long sourceVertexID) throws RemoteException;
 	
 	/**
 	 * Take the computed result from the Master.
