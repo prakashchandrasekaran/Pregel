@@ -4,11 +4,15 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
 import api.Client2Master;
-
 import system.Worker2Master;
 
+/**
+ * Client class
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
+ */
 public class Client {
 
 	public static void main(String[] args) throws RemoteException, NotBoundException {
