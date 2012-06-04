@@ -8,6 +8,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -122,6 +123,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @throws RemoteException 
 	 */
 	private void sendWorkerPartitionInfo() throws RemoteException {
+		System.out.println("Master: sendWorkerPartitionInfo");
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			workerProxy.setWorkerPartitionInfo(partitionWorkerMap, workerMap);
@@ -202,6 +204,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @param sourceVertexID the source vertex id
 	 */
 	private <T> void setInitialMessage(int sourceVertex_partitionID, long sourceVertexID, Data<T> initData) throws RemoteException{
+		System.out.println("Master: setInitialMessage");
 		List<Message> messageList = new ArrayList<>();
 		messageList.add(new Message(null, initData));
 		Map<VertexID, List<Message>> map = new HashMap<>();
@@ -239,6 +242,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * Halts all the workers and prints the final solution 
 	 */
 	public void halt() throws RemoteException{
+		System.out.println("Master: halt");
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet())
 		{
 		     entry.getValue().halt();	
@@ -266,6 +270,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	@Override
 	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
+		System.out.println("Master: superStepCompleted");
+		System.out.println("Acknowledgment from Worker: " + workerID + " - activeWorkerSet " + activeWorkerSet);
 		this.activeWorkerSet.addAll(activeWorkerSet);
 		this.workerAcknowledgementSet.remove(workerID);
 		// If the acknowledgment has been received from all the workers, start the next superstep
@@ -283,11 +289,13 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @param superStepCounter the super step counter
 	 */
 	private void startSuperStep(long superStepCounter) throws RemoteException {
+		System.out.println("Master: startSuperStep " + superStepCounter);
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
-		this.activeWorkerSet.clear();
+		
 		for(String workerID : this.activeWorkerSet){
 			this.workerProxyMap.get(workerID).startSuperStep(superStepCounter);
-		}				
+		}
+		this.activeWorkerSet.clear();
 	}
 
 	/* (non-Javadoc)

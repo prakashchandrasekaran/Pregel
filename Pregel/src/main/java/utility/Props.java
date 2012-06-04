@@ -30,7 +30,7 @@ public class Props {
 		URL location = Props.class.getProtectionDomain().getCodeSource().getLocation();
 		System.out.println(location.getFile());
 		if (props == null) {
-			props = new Props("config/system.properties");
+			props = new Props("/storage/shelf2/eclipse-workspace/Pregel/config/system.properties");
 		}
 		return props;
 	}

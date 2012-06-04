@@ -2,7 +2,11 @@ package system;
 
 import graphs.VertexID;
 
-import java.util.*;
+import java.io.Serializable;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import api.Vertex;
@@ -17,28 +21,35 @@ import api.Vertex;
  * 
  */
 
-public class Partition {
+public class Partition implements Serializable, Remote{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7212204736364464061L;
 	private Map<VertexID, Vertex> vertexMap;
 	int partitionID;
 
+	public Partition() throws RemoteException{
+		
+	}
 	/**
 	 * @param vertexList
 	 *            Represents the list of vertices in a partition
 	 */
-	public Partition(int partitionID, Map<VertexID, Vertex> vertexMap) {
+	public Partition(int partitionID, Map<VertexID, Vertex> vertexMap) throws RemoteException{
 		this.partitionID = partitionID;
 		this.vertexMap = vertexMap;
 	}
 
-	public int getPartitionID() {
+	public int getPartitionID() throws RemoteException{
 		return partitionID;
 	}
 
-	public void setPartitionID(int partitionID) {
+	public void setPartitionID(int partitionID) throws RemoteException{
 		this.partitionID = partitionID;
 	}
 
-	public Vertex getVertex(VertexID vertexID) {
+	public Vertex getVertex(VertexID vertexID) throws RemoteException{
 		return vertexMap.get(vertexID);
 	}
 

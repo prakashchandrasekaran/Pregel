@@ -3,6 +3,7 @@ package api;
 import graphs.VertexID;
 
 import java.io.Serializable;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
@@ -20,7 +21,7 @@ import system.Message;
  * @author Vijayaraghavan Subbaiah
  * 
  */
-public abstract class Vertex extends UnicastRemoteObject implements Serializable {
+public abstract class Vertex implements Serializable, Remote {
 
 	/**
 	 * 
@@ -74,7 +75,7 @@ public abstract class Vertex extends UnicastRemoteObject implements Serializable
 	 * @param iterator, iterator of messages
 	 * @return
 	 */
-	public abstract Map<VertexID, Message> compute(Iterator<Message> iterator);
+	public abstract Map<VertexID, Message> compute(Iterator<Message> iterator) throws RemoteException;
 
 	/**
 	 * gets Data associated with the vertex

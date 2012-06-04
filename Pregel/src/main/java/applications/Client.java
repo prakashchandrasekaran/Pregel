@@ -1,9 +1,9 @@
 package applications;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 import api.Client2Master;
 
@@ -15,13 +15,16 @@ import api.Client2Master;
  */
 
 public class Client {
-	public static void main(String[] args) throws RemoteException, NotBoundException {
+	public static void main(String[] args) throws RemoteException, NotBoundException, MalformedURLException, ClassNotFoundException {
+		
 		String masterMachineName = args[0];
-		Registry registry = LocateRegistry.getRegistry(masterMachineName);
-		Client2Master client2Master = (Client2Master) registry
-				.lookup(Client2Master.SERVICE_NAME);
-		String graphFileName = "output/output.txt";
-		String vertexClassName = "ShortestPathVertex";
+		System.out.println("masterMachineName " + masterMachineName);
+		
+		String masterURL = "//" + masterMachineName + "/" + Client2Master.SERVICE_NAME;
+		Client2Master client2Master = (Client2Master) Naming.lookup(masterURL);
+		String graphFileName = "/storage/shelf2/eclipse-workspace/Pregel/output/output.txt";
+		String vertexClassName = "applications.ShortestPathVertex";
+		Class.forName(vertexClassName);
 		ShortestPathData data = new ShortestPathData(new Double(0));
 		client2Master.putTask(graphFileName, vertexClassName, 0, data);
 	}

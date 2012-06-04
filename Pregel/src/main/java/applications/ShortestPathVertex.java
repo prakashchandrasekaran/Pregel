@@ -38,7 +38,8 @@ public class ShortestPathVertex extends Vertex{
 	 */
 
 	@Override
-	public Map<VertexID, Message> compute(Iterator<Message> messageIterator) {
+	public Map<VertexID, Message> compute(Iterator<Message> messageIterator) throws RemoteException{
+		System.out.println("ShortestPathVertex: compute");
 		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
 		ShortestPathData minData = (ShortestPathData) this.getData();
 		

@@ -3,6 +3,7 @@ package graphs;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.*;
 
 import exceptions.PropertyNotFoundException;
@@ -55,6 +56,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 */
 	public GraphPartitioner(String fileName, String vertexClassName) throws NumberFormatException,
 			IOException {
+		this.vertexClassName = vertexClassName;
 		br = new BufferedReader(new FileReader(fileName));
 		numVertices = Long.parseLong(br.readLine());
 		if (numVertices < MAX_VERTICES_PER_PARTITION)
@@ -83,7 +85,8 @@ public class GraphPartitioner implements Iterable<Partition> {
 				vertexMap.put(vertex.getID(), vertex);
 			}
 		} catch (Exception e) {
-			System.err.println("File Read Error: " + e.getMessage());
+			e.printStackTrace();
+			// System.err.println("File Read Error: " + e.getMessage());
 		}
 		return vertexMap;
 	}
@@ -113,8 +116,14 @@ public class GraphPartitioner implements Iterable<Partition> {
 
 			@Override
 			public Partition next() {
-				Partition nextPartition = new Partition(partitionCounter,
-						getNextVertices());
+				Partition nextPartition = null;
+				try {
+					nextPartition = new Partition(partitionCounter,
+							getNextVertices());
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				partitionCounter += 1;
 				return nextPartition;
 			}

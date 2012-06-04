@@ -2,6 +2,9 @@ package system;
 
 import graphs.VertexID;
 
+import java.io.Serializable;
+import java.rmi.Remote;
+
 /**
  * Represents the edge containing source and destination vertex along with their
  * edge weight
@@ -12,8 +15,12 @@ import graphs.VertexID;
  * 
  */
 
-public class Edge {
+public class Edge implements Remote, Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 349936200862773459L;
 	private VertexID sourceID;
 	private VertexID destID;
 	private double weight;

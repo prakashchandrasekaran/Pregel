@@ -4,7 +4,6 @@ import graphs.VertexID;
 
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -133,10 +132,12 @@ public class WorkerProxy implements Runnable,
 	 * @param workerPartitions the worker partitions
 	 */
 	public void addPartitionList(List<Partition> workerPartitions) {
+		System.out.println("WorkerProxy: addPartitionList");
 		try {
 			totalPartitions += workerPartitions.size();
 			worker.addPartitionList(workerPartitions);
 		} catch (RemoteException e) {
+			e.printStackTrace();
 			System.out.println("Remote Exception received from the Worker");
 			System.out.println("Giving back the partition to the Master ");
 			try {

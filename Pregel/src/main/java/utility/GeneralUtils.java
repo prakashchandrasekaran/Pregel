@@ -80,7 +80,7 @@ public class GeneralUtils {
 		// Create a new instance of the vertex class that the application programmer passes.
 		try {
 			Class<?> c = Class.forName(vertexClassName);		
-			Constructor<?> constructor = c.getConstructor(sourceVertex.getClass(), outGoingEdges.getClass());
+			Constructor<?> constructor = c.getConstructor(VertexID.class, List.class);
 			vertex = (Vertex) constructor.newInstance(new Object[]{sourceVertex, outGoingEdges});
 			
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {			
