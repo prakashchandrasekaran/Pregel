@@ -134,8 +134,8 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		master.superStepCompleted(workerID, activeWorkerSet);
 	}
 
-	public void startSuperStep(long superstepCounter) {
-		this.worker.startSuperStep(superstepCounter);
+	public void startSuperStep(long superStepCounter) {
+		this.worker.startSuperStep(superStepCounter);
 	}
 
 	
