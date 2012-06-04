@@ -232,7 +232,7 @@ public class Worker extends UnicastRemoteObject {
 		Iterator<Partition> iter = partitionQueue.iterator();
 		while(iter.hasNext())
 		{
-			System.out.println(iter);
+			System.out.println(iter.next());
 		}
 	}
 	
