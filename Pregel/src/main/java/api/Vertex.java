@@ -63,7 +63,7 @@ public abstract class Vertex implements Serializable {
 	 * returns String representation of the Vertex 
 	 */
 	public String toString() {
-		return "(" + vertexID + "-" + outgoingEdges + ")";
+		return "(" + vertexID + "{" + data + "}" + "-" + outgoingEdges + ")";
 	}
 	
 	/**

@@ -7,6 +7,13 @@ import java.rmi.registry.Registry;
 
 import api.Client2Master;
 
+/**
+ * Client class
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
+ */
+
 public class Client {
 
 	public static void main(String[] args) throws RemoteException, NotBoundException {
@@ -16,6 +23,6 @@ public class Client {
 				.lookup(Client2Master.SERVICE_NAME);
 		String graphFileName = "output/output.txt";
 		String vertexClassName = "ShortestPathVertex";
-		client2Master.putTask(graphFileName, vertexClassName);
+		client2Master.putTask(graphFileName, vertexClassName, 0);
 	}
 }
