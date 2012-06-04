@@ -92,7 +92,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				numWorkerThreads, this);
 		workerProxyMap.put(workerID, workerProxy);
 		workerMap.put(workerID, worker);
-		workerAcknowledgementSet.add(workerID);
 		return (Worker2Master) UnicastRemoteObject.exportObject(workerProxy, 0);
 	}
 
@@ -221,11 +220,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 *
 	 * @param superstepCounter the superstep counter
 	 */
-	private void startSuperStep(long superstepCounter) {
+	private void startSuperStep(long superStepCounter) {
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
 		this.activeWorkerSet.clear();
 		for(String workerID : this.activeWorkerSet){
-			this.workerProxyMap.get(workerID).startSuperStep(superstepCounter);
+			this.workerProxyMap.get(workerID).startSuperStep(superStepCounter);
 		}				
 	}
 

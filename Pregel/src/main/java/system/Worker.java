@@ -24,7 +24,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 import api.Vertex;
 
-// TODO: Auto-generated Javadoc
 /**
  * Represents the computation node.
  *
@@ -79,6 +78,8 @@ public class Worker extends UnicastRemoteObject {
 	 * the workers in each superstep.
 	 **/
 	private boolean startSuperStep = false;
+	
+	private long superStepCounter = 0;
 
 	/**
 	 * Instantiates a new worker.
@@ -173,6 +174,7 @@ public class Worker extends UnicastRemoteObject {
 						for (Entry<VertexID, List<Message>> entry : messageForThisPartition
 								.entrySet()) {
 							Vertex vertex = partition.getVertex(entry.getKey());
+							vertex.setSuperstepCounter(superStepCounter);
 							messagesFromCompute = vertex.compute(entry.getValue()
 									.iterator());
 							updateOutgoingMessages(messagesFromCompute);
@@ -360,11 +362,12 @@ public class Worker extends UnicastRemoteObject {
 	 * The worker receives the command to start the next superstep from the master.
 	 * Set startSuperStep to true; assign previousIncomingMessages to currentIncomingMessages; reset currentIncomingMessages;
 	 */
-	public void startSuperStep(long startSuperstep){		
+	public void startSuperStep(long superStepCounter){		
 		this.previousIncomingMessages.clear();
 		ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> temp = this.previousIncomingMessages;
 		this.previousIncomingMessages = this.currentIncomingMessages;
 		this.currentIncomingMessages = temp;
+		this.superStepCounter = superStepCounter;
 		this.startSuperStep = true;
 	}
 	
