@@ -1,7 +1,9 @@
 package system;
 
 import graphs.VertexID;
+
 import java.util.*;
+import java.util.Map.Entry;
 
 import api.Vertex;
 
@@ -40,4 +42,10 @@ public class Partition {
 		return vertexMap.get(vertexID);
 	}
 
+	public String toString() {
+		String result = "Partition ID :" + this.partitionID +"\n";
+		for (Entry<VertexID, Vertex> entry : vertexMap.entrySet()) 
+				result += entry.getValue().toString();
+		return result;
+	}
 }

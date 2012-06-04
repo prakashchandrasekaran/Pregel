@@ -92,6 +92,12 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 	public int getNumThreads() {
 		return numWorkerThreads;
 	}
+	/**
+	 * Halts the worker and prints the final solution
+	 */
+	public void halt(){
+		worker.halt();
+	}
 
 	public void addPartitionList(List<Partition> workerPartitions) {
 		try {
