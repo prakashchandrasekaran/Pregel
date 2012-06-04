@@ -1,5 +1,7 @@
 package system;
 
+import graphs.VertexID;
+
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -7,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
  * Represents a thread which is used by the master to talk to workers and
- * vice-versa
- * 
+ * vice-versa.
+ *
  * @author Prakash Chandrasekaran
  * @author Gautham Narayanasamy
  * @author Vijayaraghavan Subbaiah
@@ -21,25 +24,40 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		Worker2Master {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -2001231189089230248L;
+	
+	/** The worker. */
 	private Worker worker;
+	
+	/** The master. */
 	private Master master;
+	
+	/** The t. */
 	private Thread t;
+	
+	/** The num worker threads. */
 	private int numWorkerThreads;
+	
+	/** The worker id. */
 	String workerID;
+	
+	/** The partition list. */
 	BlockingQueue<Partition> partitionList;
+	
+	/** The total partitions. */
 	private int totalPartitions = 0;
 	
 	/**
-	 * 
-	 * @param worker
-	 *            Represents the remote {@link system.Worker Worker}
-	 * @param master
-	 *            Represents the {@link system.Master Master}
-	 * @param workerID
-	 *            Represents the unique serviceName to identify the worker
-	 * @throws RemoteException
-	 * @throws AccessException
+	 * Instantiates a new worker proxy.
+	 *
+	 * @param worker Represents the remote {@link system.Worker Worker}
+	 * @param workerID Represents the unique serviceName to identify the worker
+	 * @param numWorkerThreads the num worker threads
+	 * @param master Represents the {@link system.Master Master}
+	 * @throws AccessException the access exception
+	 * @throws RemoteException the remote exception
 	 */
 
 	public WorkerProxy(Worker worker, String workerID, int numWorkerThreads,
@@ -84,15 +102,30 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		}
 	}
 
+	/**
+	 * Adds the partition.
+	 *
+	 * @param partition the partition
+	 */
 	public void addPartition(Partition partition) {
 		totalPartitions += 1;
 		partitionList.add(partition);
 	}
 
+	/**
+	 * Gets the num threads.
+	 *
+	 * @return the num threads
+	 */
 	public int getNumThreads() {
 		return numWorkerThreads;
 	}
 
+	/**
+	 * Adds the partition list.
+	 *
+	 * @param workerPartitions the worker partitions
+	 */
 	public void addPartitionList(List<Partition> workerPartitions) {
 		try {
 			totalPartitions += workerPartitions.size();
@@ -110,6 +143,12 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 		}
 	}
 
+	/**
+	 * Sets the worker partition info.
+	 *
+	 * @param mapPartitionIdToWorkerId the map partition id to worker id
+	 * @param mapWorkerIdToWorker the map worker id to worker
+	 */
 	public void setWorkerPartitionInfo(
 			Map<Integer, String> mapPartitionIdToWorkerId,
 			Map<String, Worker> mapWorkerIdToWorker) {
@@ -119,24 +158,48 @@ public class WorkerProxy extends UnicastRemoteObject implements Runnable,
 				mapWorkerIdToWorker);
 	}
 
+	/**
+	 * Gets the worker id.
+	 *
+	 * @return the worker id
+	 */
 	public String getWorkerID() {
 		return workerID;
 	}
 
+	/* (non-Javadoc)
+	 * @see system.Worker2Master#register(system.Worker, java.lang.String, int)
+	 */
 	@Override
 	public Worker2Master register(Worker worker, String workerID,
 			int numWorkerThreads) throws RemoteException {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see system.Worker2Master#superStepCompleted(java.lang.String, java.util.Set)
+	 */
 	@Override
 	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) {
 		master.superStepCompleted(workerID, activeWorkerSet);
 	}
 
+	/**
+	 * Start super step.
+	 *
+	 * @param superStepCounter the super step counter
+	 */
 	public void startSuperStep(long superStepCounter) {
 		this.worker.startSuperStep(superStepCounter);
 	}
 
 	
+	/**
+	 * Sets the initial message for the Worker that has the source vertex.
+	 *
+	 * @param initialMessage the initial message
+	 */
+	public void setInitialMessage(ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage){
+		this.worker.setInitialMessage(initialMessage);
+	}
 }

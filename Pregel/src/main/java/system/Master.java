@@ -13,12 +13,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import utility.GeneralUtils;
 import api.Client2Master;
+import api.Data;
 import exceptions.PropertyNotFoundException;
 import graphs.GraphPartitioner;
+import graphs.VertexID;
 
 
 /**
@@ -100,10 +103,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @see api.Client2Master#putTask(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void putTask(String graphFileName, String vertexClassName, long sourceVertexID) throws RemoteException{
+	public <T> void putTask(String graphFileName, String vertexClassName, long sourceVertexID, Data<T> initData) throws RemoteException{
 		try {
 			GraphPartitioner graphPartitioner = new GraphPartitioner(graphFileName, vertexClassName);
-			assignPartitions(graphPartitioner, sourceVertexID);
+			assignPartitions(graphPartitioner, sourceVertexID, initData);
 			sendWorkerPartitionInfo();
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
@@ -126,15 +129,20 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * Assign partitions to workers based on the number of processors (threads)
 	 * that each worker has.
 	 *
+	 * @param <T> the generic type
 	 * @param graphPartitioner the graph partitioner
-	 * @throws PropertyNotFoundException 
+	 * @param sourceVertexID the source vertex id
+	 * @param initData the data
+	 * @throws PropertyNotFoundException the property not found exception
 	 */
-	private void assignPartitions(GraphPartitioner graphPartitioner, long sourceVertexID) throws PropertyNotFoundException {
+	private <T> void assignPartitions(GraphPartitioner graphPartitioner, long sourceVertexID, Data<T> initData) throws PropertyNotFoundException {
 		int totalPartitions = graphPartitioner.getNumPartitions();
 		Iterator<Partition> iter = graphPartitioner.iterator();
 		Partition partition = null;
-		partitionWorkerMap = new HashMap<>();		
+		partitionWorkerMap = new HashMap<>();
+		
 		int sourceVertex_partitionID = GeneralUtils.getPartitionID(sourceVertexID);
+		
 		// Assign partitions to workers in the ratio of the number of worker
 		// threads that each worker has.
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
@@ -145,9 +153,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			List<Partition> workerPartitions = new ArrayList<>();
 			for (int i = 0; i < numPartitionsToAssign; i++) {
 				partition = iter.next();
-				// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received..
+				// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received.
 				if(partition.getPartitionID() == sourceVertex_partitionID){
 					workerAcknowledgementSet.add(entry.getKey());
+					
 				}
 				workerPartitions.add(partition);
 				partitionWorkerMap.put(partition.getPartitionID(),
@@ -176,8 +185,31 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			partitionWorkerMap.put(partition.getPartitionID(),
 					workerProxy.getWorkerID());
 		}
+		
+		setInitialMessage(sourceVertex_partitionID, sourceVertexID, initData);
 	}
 
+	
+	/**
+	 * Sets the initial message for the Worker that has the source vertex.
+	 *
+	 * @param <T> the generic type
+	 * @param initData the data
+	 * @param sourceVertex_partitionID the source vertex partition id
+	 * @param sourceVertexID the source vertex id
+	 */
+	private <T> void setInitialMessage(int sourceVertex_partitionID, long sourceVertexID, Data<T> initData){
+		List<Message> messageList = new ArrayList<>();
+		messageList.add(new Message(null, initData));
+		Map<VertexID, List<Message>> map = new HashMap<>();
+		VertexID sourceVertex = new VertexID(sourceVertex_partitionID, sourceVertexID);
+		map.put(sourceVertex, messageList);
+		ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage = new ConcurrentHashMap<>();
+		initialMessage.put(sourceVertex_partitionID, map);
+		workerProxyMap.get(workerAcknowledgementSet.toArray()[0]).setInitialMessage(initialMessage);
+		
+	}
+	
 	/**
 	 * The main method.
 	 *
@@ -231,7 +263,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Start super step.
 	 *
-	 * @param superstepCounter the superstep counter
+	 * @param superStepCounter the super step counter
 	 */
 	private void startSuperStep(long superStepCounter) {
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
@@ -241,6 +273,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		}				
 	}
 
+	/* (non-Javadoc)
+	 * @see api.Client2Master#takeResult()
+	 */
 	@Override
 	public String takeResult() throws RemoteException {
 		// TODO Auto-generated method stub

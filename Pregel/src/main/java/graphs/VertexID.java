@@ -74,4 +74,5 @@ public class VertexID implements Serializable {
 	public long getVertexID() {
 		return vertexID;
 	}
+	
 }

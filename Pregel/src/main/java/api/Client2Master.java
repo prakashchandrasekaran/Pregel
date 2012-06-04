@@ -21,7 +21,7 @@ public interface Client2Master extends Remote{
 	 * @param graphFileName the graph file name
 	 * @param vertexClassName the application specific vertex class name
 	 */
-	public void putTask(String graphFileName, String vertexClassName, long sourceVertexID) throws RemoteException;
+	public <T> void putTask(String graphFileName, String vertexClassName, long sourceVertexID, Data<T> data) throws RemoteException;
 	
 	/**
 	 * Take the computed result from the Master.

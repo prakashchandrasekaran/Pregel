@@ -23,6 +23,7 @@ public class Client {
 				.lookup(Client2Master.SERVICE_NAME);
 		String graphFileName = "output/output.txt";
 		String vertexClassName = "ShortestPathVertex";
-		client2Master.putTask(graphFileName, vertexClassName, 0);
+		ShortestPathData data = new ShortestPathData(new Double(0));
+		client2Master.putTask(graphFileName, vertexClassName, 0, data);
 	}
 }

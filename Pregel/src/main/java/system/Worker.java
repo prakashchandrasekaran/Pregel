@@ -79,6 +79,7 @@ public class Worker extends UnicastRemoteObject {
 	 **/
 	private boolean startSuperStep = false;
 	
+	/** The super step counter. */
 	private long superStepCounter = 0;
 
 	/**
@@ -361,6 +362,8 @@ public class Worker extends UnicastRemoteObject {
 	/**
 	 * The worker receives the command to start the next superstep from the master.
 	 * Set startSuperStep to true; assign previousIncomingMessages to currentIncomingMessages; reset currentIncomingMessages;
+	 *
+	 * @param superStepCounter the super step counter
 	 */
 	public void startSuperStep(long superStepCounter){		
 		this.previousIncomingMessages.clear();
@@ -371,4 +374,14 @@ public class Worker extends UnicastRemoteObject {
 		this.startSuperStep = true;
 	}
 	
+	
+	/**
+	 *
+	 * Sets the initial message for the Worker that has the source vertex.
+	 *
+	 * @param initialMessage the initial message
+	 */
+	public void setInitialMessage(ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage){
+		previousIncomingMessages = initialMessage;
+	}
 }
