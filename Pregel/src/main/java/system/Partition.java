@@ -5,7 +5,6 @@ import graphs.VertexID;
 import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -56,7 +55,7 @@ public class Partition implements Serializable, Remote{
 	public String toString() {
 		String result = "Partition ID :" + this.partitionID +"\n";
 		for (Entry<VertexID, Vertex> entry : vertexMap.entrySet()) 
-				result += entry.getValue().toString();
+				result += entry.getValue().toString() + "\n";
 		return result;
 	}
 }

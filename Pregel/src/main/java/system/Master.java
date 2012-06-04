@@ -163,6 +163,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 					workerAcknowledgementSet.add(entry.getKey());
 					
 				}
+				System.out.println("Adding partition  " + i + " to worker " + workerProxy.getWorkerID());
 				workerPartitions.add(partition);
 				partitionWorkerMap.put(partition.getPartitionID(),
 						workerProxy.getWorkerID());

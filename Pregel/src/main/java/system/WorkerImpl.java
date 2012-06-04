@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import api.Vertex;
 
@@ -51,7 +52,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	private BlockingQueue<Partition> partitionQueue;
 
 	/** The completed partitions. */
-	private Queue<Partition> completedPartitions;
+	private BlockingQueue<Partition> completedPartitions;
 
 	/** Hostname of the node with timestamp information. */
 	private String workerID;
@@ -82,6 +83,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	
 	/** The super step counter. */
 	private long superStepCounter = 0;
+	
+	private boolean halted = false;
 
 	
 	/**
@@ -106,11 +109,11 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 
 		this.workerID = hostName + "_" + timestamp;
 		this.partitionQueue = new LinkedBlockingDeque<>();
-		this.completedPartitions = new LinkedList<>();
+		this.completedPartitions = new LinkedBlockingQueue<>();
 		this.currentIncomingMessages = new ConcurrentHashMap<>();
 		this.previousIncomingMessages = new ConcurrentHashMap<>();
 		this.outgoingMessages = new ConcurrentHashMap<>();
-		this.numThreads = 1;//Runtime.getRuntime().availableProcessors();
+		this.numThreads = 1; // Runtime.getRuntime().availableProcessors();
 		this.sendingMessage = false;
 		for (int i = 0; i < numThreads; i++) {
 			System.out.println("Starting thread " + (i + 1));
@@ -168,24 +171,32 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		 */
 		@Override
 		public void run() {
-			while(true) {
-				System.out.println("startSuperStep: " + startSuperStep );
+			while(!halted) {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				System.out.println(this + "startSuperStep: " + startSuperStep );
 				while (startSuperStep) {
-					System.out.println("WorkerImpl: Superstep started");
+					System.out.println(this + "WorkerImpl: Superstep started");
 					try {
 						Partition partition = partitionQueue.take();
-						System.out.println("Partition taken from queue.");
-						System.out.println("previousIncomingMessages size: " + previousIncomingMessages.size());
+						System.out.println(this + "Partition taken from queue. superstep counter:" + superStepCounter);
+						System.out.println(this + "previousIncomingMessages size: " + previousIncomingMessages.size());
 						Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages
 								.get(partition.getPartitionID());
-						Map<VertexID, Message> messagesFromCompute = null;
-						for (Entry<VertexID, List<Message>> entry : messageForThisPartition
-								.entrySet()) {
-							Vertex vertex = partition.getVertex(entry.getKey());
-							vertex.setSuperstepCounter(superStepCounter);
-							messagesFromCompute = vertex.compute(entry.getValue()
-									.iterator());
-							updateOutgoingMessages(messagesFromCompute);
+						if(messageForThisPartition != null){
+							Map<VertexID, Message> messagesFromCompute = null;
+							for (Entry<VertexID, List<Message>> entry : messageForThisPartition
+									.entrySet()) {
+								Vertex vertex = partition.getVertex(entry.getKey());
+								
+								vertex.setSuperstepCounter(superStepCounter);
+								messagesFromCompute = vertex.compute(entry.getValue()
+										.iterator());
+								updateOutgoingMessages(messagesFromCompute);
+							}
 						}
 						completedPartitions.add(partition);
 						checkAndSendMessage();
@@ -204,9 +215,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		 * @throws RemoteException 
 		 */
 		private synchronized void checkAndSendMessage() {
-			System.out.println("sendingMessage:" + sendingMessage + " - completedPartitions: " + completedPartitions.size() + " - totalPartitionsAssigned: " + totalPartitionsAssigned);
+			System.out.println(this + "sendingMessage:" + sendingMessage + " - completedPartitions: " + completedPartitions.size() + " - totalPartitionsAssigned: " + totalPartitionsAssigned);
 			if( (! sendingMessage) && (completedPartitions.size() == totalPartitionsAssigned)) {
-				System.out.println("WorkerImpl: checkAndSendMessage");
+				System.out.println(this + "WorkerImpl: checkAndSendMessage");
 				
 				sendingMessage = true;
 				startSuperStep = false;
@@ -231,8 +242,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 				try {
 					masterProxy.superStepCompleted(workerID, activeWorkerSet);
 				} catch (RemoteException e) {
-					e.printStackTrace();
-					System.exit(0);
+					e.printStackTrace();					
 				}
 				sendingMessage = false;
 			}
@@ -246,8 +256,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void halt() throws RemoteException
 	{
 		System.out.println("Worker Machine " + workerID + " halts");
-		System.out.println("Printing the final state of the partitions");
-		Iterator<Partition> iter = partitionQueue.iterator();
+		halted = true;
+		System.out.println("Printing the final state of the partitions");		
+		Iterator<Partition> iter = completedPartitions.iterator();
 		while(iter.hasNext())
 		{
 			System.out.println(iter.next());

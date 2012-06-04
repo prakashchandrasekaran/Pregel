@@ -61,22 +61,25 @@ public class GeneralUtils {
 				(int) (vertexIdentifier / maxVerticesPerPartition),
 				vertexIdentifier);
 
-		// List of Edges
-		String[] edges = vertexSplit[1].split(edgesDelimiter);
 		List<Edge> outGoingEdges = new LinkedList<Edge>();
-		String[] edgeData = null;
-		VertexID destVertex = null;
-		Double edgeWeight = 0.0;
-		for (String edge : edges) {
-			edgeData = edge.split(vertexWeightDelimiter);
-			vertexIdentifier = Long.parseLong(edgeData[0]);
-			destVertex = new VertexID(
-					getPartitionID(vertexIdentifier),
-					vertexIdentifier);
-			edgeWeight = Double.parseDouble(edgeData[1]);
-			outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
+		// A vertex may not have any outgoing edges.
+		if(vertexSplit.length > 1){
+			// List of Edges
+			String[] edges = vertexSplit[1].split(edgesDelimiter);
+			
+			String[] edgeData = null;
+			VertexID destVertex = null;
+			Double edgeWeight = 0.0;
+			for (String edge : edges) {
+				edgeData = edge.split(vertexWeightDelimiter);
+				vertexIdentifier = Long.parseLong(edgeData[0]);
+				destVertex = new VertexID(
+						getPartitionID(vertexIdentifier),
+						vertexIdentifier);
+				edgeWeight = Double.parseDouble(edgeData[1]);
+				outGoingEdges.add(new Edge(sourceVertex, destVertex, edgeWeight));
+			}
 		}
-		
 		// Create a new instance of the vertex class that the application programmer passes.
 		try {
 			Class<?> c = Class.forName(vertexClassName);		

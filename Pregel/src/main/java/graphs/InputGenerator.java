@@ -107,14 +107,16 @@ public class InputGenerator {
 		adjacencyList.append(lineSeparator);
 
 		for (int vertexId = 0; vertexId < numVertices; vertexId++) {
-			int rightVertexId = (vertexId % squareRoot != 0) ? (vertexId + 1)
+			int rightVertexId = ((vertexId + 1) % squareRoot != 0) ? (vertexId + 1)
 					: 0;
-			int topVertexId = ((vertexId + squareRoot) <= numVertices) ? (vertexId + squareRoot)
+			
+			int topVertexId = ((vertexId + 1 + squareRoot) <= numVertices) ? (vertexId + squareRoot)
 					: 0;
+			// System.out.println("vertexId: " + vertexId + " rightvertexId: " + rightVertexId + " topVertexId: " + topVertexId);
 			adjacencyList.append(vertexId).append(vertexListSeparator);
 
 			// if the right vertex exists, add it to the adjacency list
-			if (rightVertexId != 0) {
+			if (rightVertexId != 0 && rightVertexId < numVertices) {
 				double weight = minEdgeWeight + (maxEdgeWeight - minEdgeWeight)
 						* random.nextDouble();
 				adjacencyList.append(rightVertexId)
@@ -122,7 +124,7 @@ public class InputGenerator {
 			}
 
 			// if the top vertex exists, add it to the adjacency list
-			if (topVertexId != 0) {
+			if (topVertexId != 0 && topVertexId < numVertices) {
 				if (rightVertexId != 0) {
 					adjacencyList.append(listVertexSeparator);
 				}
@@ -173,11 +175,11 @@ public class InputGenerator {
 	 *             the exception
 	 */
 	public static void main(String[] args) throws Exception {
-		int numVertices = 100;// Integer.parseInt(args[0]);
+		int numVertices = 625;// Integer.parseInt(args[0]);
 		double minEdgeWeight = 1;// Double.parseDouble(args[1]);
 		double maxEdgeWeight = 1;// Double.parseDouble(args[2]);
 		String outputFilePath = "output/output.txt";
-
+		
 		InputGenerator inputGenerator = new InputGenerator(numVertices,
 				minEdgeWeight, maxEdgeWeight, outputFilePath);
 		inputGenerator.generateInput();

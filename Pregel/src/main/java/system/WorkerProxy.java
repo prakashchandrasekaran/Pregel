@@ -107,6 +107,7 @@ public class WorkerProxy implements Runnable,
 	 * @param partition the partition
 	 */
 	public void addPartition(Partition partition) {
+		
 		totalPartitions += 1;
 		partitionList.add(partition);
 	}
