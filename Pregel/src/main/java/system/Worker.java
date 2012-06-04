@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -218,6 +219,20 @@ public class Worker extends UnicastRemoteObject {
 				masterProxy.superStepCompleted(workerID, activeWorkerSet);
 			}
 			
+		}
+	}
+	
+	/**
+	 * Halts the run for this application and prints the output in a file
+	 */
+	public void halt()
+	{
+		System.out.println("Worker Machine " + workerID + " halts");
+		System.out.println("Printing the final state of the partitions");
+		Iterator<Partition> iter = partitionQueue.iterator();
+		while(iter.hasNext())
+		{
+			System.out.println(iter);
 		}
 	}
 	

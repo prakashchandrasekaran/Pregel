@@ -230,6 +230,16 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Halts all the workers and prints the final solution 
+	 */
+	public void halt(){
+		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet())
+		{
+		     entry.getValue().halt();	
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -256,7 +266,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		this.workerAcknowledgementSet.remove(workerID);
 		// If the acknowledgment has been received from all the workers, start the next superstep
 		if(this.workerAcknowledgementSet.size() == 0) {			
-			startSuperStep(++superstepCounter);
+			if(activeWorkerSet.size() != 0)
+				startSuperStep(++superstepCounter);
+			else
+				halt();
 		}
 	}
 
