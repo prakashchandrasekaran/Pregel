@@ -3,7 +3,6 @@ package system;
 import graphs.VertexID;
 
 import java.io.Serializable;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,7 +19,7 @@ import api.Vertex;
  * 
  */
 
-public class Partition implements Serializable, Remote{
+public class Partition implements Serializable{
 	/**
 	 * 
 	 */

@@ -68,6 +68,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/** Set of workers who will be active in the next superstep. */
 	Set<String> activeWorkerSet = new HashSet<>();
 	
+	long startTime;
 	/**
 	 * Instantiates a new master.
 	 *
@@ -108,6 +109,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	@Override
 	public <T> void putTask(String graphFileName, String vertexClassName, long sourceVertexID, Data<T> initData) throws RemoteException{
 		try {
+			startTime = System.currentTimeMillis();
 			GraphPartitioner graphPartitioner = new GraphPartitioner(graphFileName, vertexClassName);
 			assignPartitions(graphPartitioner, sourceVertexID, initData);
 			sendWorkerPartitionInfo();
@@ -248,6 +250,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		{
 		     entry.getValue().halt();	
 		}
+		long endTime = System.currentTimeMillis();
+		System.out.println("Time taken: " + (endTime - startTime) + " ms");
 	}
 
 	/*

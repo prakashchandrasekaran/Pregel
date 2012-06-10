@@ -175,10 +175,10 @@ public class InputGenerator {
 	 *             the exception
 	 */
 	public static void main(String[] args) throws Exception {
-		int numVertices = 625;// Integer.parseInt(args[0]);
+		int numVertices = 100;// Integer.parseInt(args[0]);
 		double minEdgeWeight = 1;// Double.parseDouble(args[1]);
 		double maxEdgeWeight = 1;// Double.parseDouble(args[2]);
-		String outputFilePath = "output/output.txt";
+		String outputFilePath = "input/input.txt";
 		
 		InputGenerator inputGenerator = new InputGenerator(numVertices,
 				minEdgeWeight, maxEdgeWeight, outputFilePath);

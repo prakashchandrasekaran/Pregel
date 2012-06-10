@@ -177,13 +177,13 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
-				System.out.println(this + "startSuperStep: " + startSuperStep );
+				// System.out.println(this + "startSuperStep: " + startSuperStep );
 				while (startSuperStep) {
 					System.out.println(this + "WorkerImpl: Superstep started");
 					try {
 						Partition partition = partitionQueue.take();
-						System.out.println(this + "Partition taken from queue. superstep counter:" + superStepCounter);
-						System.out.println(this + "previousIncomingMessages size: " + previousIncomingMessages.size());
+						// System.out.println(this + "Partition taken from queue. superstep counter:" + superStepCounter);
+						// System.out.println(this + "previousIncomingMessages size: " + previousIncomingMessages.size());
 						Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages
 								.get(partition.getPartitionID());
 						if(messageForThisPartition != null){

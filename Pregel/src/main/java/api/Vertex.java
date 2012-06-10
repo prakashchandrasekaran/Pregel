@@ -21,7 +21,7 @@ import system.Message;
  * @author Vijayaraghavan Subbaiah
  * 
  */
-public abstract class Vertex implements Serializable, Remote {
+public abstract class Vertex implements Serializable {
 
 	/**
 	 * 
