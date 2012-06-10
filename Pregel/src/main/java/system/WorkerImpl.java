@@ -84,6 +84,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	/** The super step counter. */
 	private long superstep = 0;
 	
+	/** */
 	private boolean halted = false;
 
 	
@@ -493,6 +494,6 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 
 	@Override
 	public void checkPoint() {
-		
+		WorkerData wd = 
 	}
 }
