@@ -1,7 +1,11 @@
 package system;
 
+import exceptions.PropertyNotFoundException;
 import graphs.VertexID;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.Naming;
@@ -21,6 +25,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import utility.Props;
 
 import api.Vertex;
 
@@ -87,6 +93,17 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	/** */
 	private boolean halted = false;
 
+	/** */
+	private static String CHECKPOINTING_DIRECTORY;
+	
+	static {
+		try {
+			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINTING_DIRECTORY");
+		} catch (PropertyNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Instantiates a new worker.
@@ -493,7 +510,17 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	}
 
 	@Override
-	public void checkPoint() {
-		WorkerData wd = 
+	public void checkPoint() throws Exception{
+		WorkerData wd = new WorkerData(
+				this.partitionQueue, 
+				this.previousIncomingMessages
+				);
+		// Serialization 
+		FileOutputStream fileOutputStream 
+			= new FileOutputStream(CHECKPOINTING_DIRECTORY + File.pathSeparator + workerID); 
+		ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream); 
+		objectOutputStream.writeObject(wd); 
+		objectOutputStream.flush(); 
+		objectOutputStream.close();
 	}
 }

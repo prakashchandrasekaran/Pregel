@@ -98,6 +98,6 @@ public interface Worker extends Remote{
 	 */
 	public void receiveMessage(Map<VertexID, List<Message>> incomingMessages) throws RemoteException;
 
-	public void checkPoint();
+	public void checkPoint() throws Exception;
 	
 }

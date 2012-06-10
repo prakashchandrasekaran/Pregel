@@ -219,7 +219,7 @@ public class WorkerProxy implements Runnable,
 		this.totalPartitions = 0;
 	}
 
-	public void checkPoint() {
+	public void checkPoint() throws Exception {
 		this.worker.checkPoint();
 	}
 }

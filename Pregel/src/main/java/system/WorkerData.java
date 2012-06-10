@@ -13,14 +13,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WorkerData implements Serializable {
 
-	List<Partition> partitions;
+	Queue<Partition> partitions;
 	Map<Integer, Map<VertexID, List<Message>>> messages;
 	
-	public WorkerData(List<Partition> partitions,
+	public WorkerData(Queue<Partition> partitions,
 			Map<Integer, Map<VertexID, List<Message>>> messages) {
 		this.partitions = partitions;
 		this.messages = messages;

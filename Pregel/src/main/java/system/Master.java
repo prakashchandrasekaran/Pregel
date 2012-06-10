@@ -356,7 +356,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	private void checkPoint() {
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
-			workerProxy.checkPoint();
+			try {
+				workerProxy.checkPoint();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
