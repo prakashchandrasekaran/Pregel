@@ -104,6 +104,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	
 	/* (non-Javadoc)
 	 * @see api.Client2Master#putTask(java.lang.String, java.lang.String)
+	 * Steps
+	 *  1. graph file -> partitions
+	 *  2. assign partitions to workers through Proxy
+	 *  3. send partition assignment info to all workers through Proxy
+	 *  4. start super step execution
 	 */
 	@Override
 	public <T> void putTask(String graphFileName, String vertexClassName, long sourceVertexID, Data<T> initData) throws RemoteException{
@@ -112,6 +117,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			GraphPartitioner graphPartitioner = new GraphPartitioner(graphFileName, vertexClassName);
 			assignPartitions(graphPartitioner, sourceVertexID, initData);
 			sendWorkerPartitionInfo();
+			startSuperStep();
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
 		} catch (PropertyNotFoundException e) {		
@@ -224,6 +230,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		workerProxyMap.get(workerAcknowledgementSet.toArray()[0]).setInitialMessage(initialMessage);
 		
 	}
+	
 	
 	/**
 	 * The main method.

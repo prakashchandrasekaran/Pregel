@@ -338,7 +338,10 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		this.totalPartitionsAssigned = totalPartitionsAssigned;
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
 		this.worker2WorkerProxy = new Worker2WorkerProxy(mapWorkerIdToWorker);
-		startSuperStep = true;
+		/*
+		 * 
+		 */
+		// startSuperStep = true;
 	}
 
 	/**
