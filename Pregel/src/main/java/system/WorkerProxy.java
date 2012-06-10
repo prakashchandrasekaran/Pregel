@@ -218,4 +218,8 @@ public class WorkerProxy implements Runnable,
 	private void restoreInitialState(){
 		this.totalPartitions = 0;
 	}
+
+	public void checkPoint() {
+		this.worker.checkPoint();
+	}
 }

@@ -97,5 +97,7 @@ public interface Worker extends Remote{
 	 * @throws RemoteException the remote exception
 	 */
 	public void receiveMessage(Map<VertexID, List<Message>> incomingMessages) throws RemoteException;
+
+	public void checkPoint();
 	
 }

@@ -490,4 +490,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void setInitialMessage(ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage) throws RemoteException{
 		this.currentIncomingMessages = initialMessage;
 	}
+
+	@Override
+	public void checkPoint() {
+		
+	}
 }

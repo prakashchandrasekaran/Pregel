@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import utility.GeneralUtils;
+import utility.Props;
 import api.Client2Master;
 import api.Data;
 import exceptions.PropertyNotFoundException;
@@ -43,8 +44,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/** The Constant SERVICE_NAME. */
 	private static final String SERVICE_NAME = "Master";
 
-	/** The worker id. */
-	// private static int workerID = 0;
+	/** */ 
+	private static int CHECKPOINT_FREQUENCY = 0;
 
 	/** The total number of worker threads. */
 	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
@@ -69,6 +70,17 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	
 	/** The start time. */
 	long startTime;
+	
+	static {
+		try {
+			CHECKPOINT_FREQUENCY = Props.getInstance().getIntProperty("CHECKPOINT_FREQUENCY");
+		} catch (PropertyNotFoundException e) {
+			/** set to default frequency value **/
+			CHECKPOINT_FREQUENCY = 5;
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Instantiates a new master.
 	 *
@@ -326,7 +338,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @throws RemoteException the remote exception
 	 */
 	private void startSuperStep() throws RemoteException {
-		
+		if((superstep % CHECKPOINT_FREQUENCY) == 0) {
+			checkPoint();
+		}
 		System.out.println("Master: Starting Superstep " + superstep);
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
 		
@@ -334,6 +348,16 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			this.workerProxyMap.get(workerID).startSuperStep(superstep);
 		}
 		this.activeWorkerSet.clear();
+	}
+
+	/**
+	 * start checkpointing in master
+	 */
+	private void checkPoint() {
+		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
+			WorkerProxy workerProxy = entry.getValue();
+			workerProxy.checkPoint();
+		}
 	}
 
 	/* (non-Javadoc)
