@@ -3,7 +3,6 @@ package system;
 import graphs.VertexID;
 
 import java.io.Serializable;
-import java.rmi.Remote;
 
 /**
  * Represents the edge containing source and destination vertex along with their
@@ -15,7 +14,7 @@ import java.rmi.Remote;
  * 
  */
 
-public class Edge implements Remote, Serializable{
+public class Edge implements Serializable{
 
 	/**
 	 * 

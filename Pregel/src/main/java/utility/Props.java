@@ -28,9 +28,9 @@ public class Props {
 
 	public static synchronized Props getInstance() {
 		URL location = Props.class.getProtectionDomain().getCodeSource().getLocation();
-		System.out.println(location.getFile());
 		if (props == null) {
-			props = new Props("/storage/shelf2/eclipse-workspace/Pregel/config/system.properties");
+			props = new Props("/storage/shelf2/ucsb/cs290b/Pregel/Pregel/config/system.properties");
+			// props = new Props("/home/vijay/cs290b/project/Pregel/config/system.properties");
 		}
 		return props;
 	}

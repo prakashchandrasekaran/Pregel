@@ -81,8 +81,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 			while ((vertexCounter < MAX_VERTICES_PER_PARTITION)
 					&& ((strLine = br.readLine()) != null)) {
 				vertexCounter += 1;
-				vertex = GeneralUtils.generateVertex(strLine, vertexClassName);
-				System.out.println("Adding vertex ID " + vertex.getID());
+				vertex = GeneralUtils.generateVertex(strLine, vertexClassName);				
 				vertexMap.put(vertex.getID(), vertex);
 			}
 		} catch (Exception e) {

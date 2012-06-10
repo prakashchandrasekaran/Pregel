@@ -137,14 +137,12 @@ public class InputGenerator {
 
 			// append the content to the file in batches.
 			if (vertexId % inputBufferSize == 0) {
-				System.out.println("Flushing to file");
 				// Write the graph input to the output file path
 				writeToFile(adjacencyList.toString());
 				adjacencyList = new StringBuilder();
 			}
 		}
-		if (adjacencyList.length() > 0) {
-			System.out.println("Writing the remaining content to file");
+		if (adjacencyList.length() > 0) {			
 			// Write the graph input to the output file path
 			writeToFile(adjacencyList.toString());
 		}
@@ -175,10 +173,10 @@ public class InputGenerator {
 	 *             the exception
 	 */
 	public static void main(String[] args) throws Exception {
-		int numVertices = 625;// Integer.parseInt(args[0]);
+		int numVertices = 100;// Integer.parseInt(args[0]);
 		double minEdgeWeight = 1;// Double.parseDouble(args[1]);
 		double maxEdgeWeight = 1;// Double.parseDouble(args[2]);
-		String outputFilePath = "output/output.txt";
+		String outputFilePath = "input/input.txt";
 		
 		InputGenerator inputGenerator = new InputGenerator(numVertices,
 				minEdgeWeight, maxEdgeWeight, outputFilePath);
