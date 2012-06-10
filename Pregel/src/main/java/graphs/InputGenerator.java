@@ -101,7 +101,7 @@ public class InputGenerator {
 		String listVertexWeightSeparator = properties
 				.getStringProperty("LIST_VERTEX_WEIGHT_SEPARATOR");
 		String lineSeparator = properties.getStringProperty("LINE_SEPARATOR");
-		int inputBufferSize = properties.getIntProperty("INPUTGEN_BUFFER_SIZE");
+		int inputBufferSize = properties.getIntProperty("TOTAL_NUM_VERTICES");
 
 		adjacencyList.append(numVertices);
 		adjacencyList.append(lineSeparator);
