@@ -27,10 +27,8 @@ public class Props {
 	}
 
 	public static synchronized Props getInstance() {
-		URL location = Props.class.getProtectionDomain().getCodeSource().getLocation();
 		if (props == null) {
-			props = new Props("/storage/shelf2/ucsb/cs290b/Pregel/Pregel/config/system.properties");
-			// props = new Props("/home/vijay/cs290b/project/Pregel/config/system.properties");
+			props = new Props("../config/system.properties");			
 		}
 		return props;
 	}

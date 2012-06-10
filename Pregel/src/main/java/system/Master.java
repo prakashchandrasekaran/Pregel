@@ -50,7 +50,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
 
 	/** Superstep Counter *. */
-	private long superstep;
+	private long superstep = 1;
 
 	/** The workerID to WorkerProxy map. */
 	Map<String, WorkerProxy> workerProxyMap = new HashMap<>();
@@ -172,7 +172,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				partition = iter.next();
 				// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received.
 				if(partition.getPartitionID() == sourceVertex_partitionID){
-					workerAcknowledgementSet.add(entry.getKey());
+					activeWorkerSet.add(entry.getKey());
 					
 				}
 				System.out.println("Adding partition  " + partition.getPartitionID() + " to worker " + workerProxy.getWorkerID());
@@ -197,7 +197,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			WorkerProxy workerProxy = workerMapIter.next().getValue();
 			// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received.
 			if(partition.getPartitionID() == sourceVertex_partitionID){
-				workerAcknowledgementSet.add(workerProxy.getWorkerID());
+				activeWorkerSet.add(workerProxy.getWorkerID());
 			}
 			System.out.println("Adding partition  " + partition.getPartitionID() + " to worker " + workerProxy.getWorkerID());
 			workerProxy.addPartition(partition);
@@ -227,7 +227,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		map.put(sourceVertex, messageList);
 		ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage = new ConcurrentHashMap<>();
 		initialMessage.put(sourceVertex_partitionID, map);
-		workerProxyMap.get(workerAcknowledgementSet.toArray()[0]).setInitialMessage(initialMessage);
+		workerProxyMap.get(activeWorkerSet.toArray()[0]).setInitialMessage(initialMessage);
 		
 	}
 	
@@ -303,7 +303,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @see system.Worker2Master#superStepCompleted(java.lang.String, java.util.Set)
 	 */
 	@Override
-	public synchronized void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
+	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
 		System.out.println("Master: superStepCompleted");
 		System.out.println("Acknowledgment from Worker: " + workerID + " - activeWorkerSet " + activeWorkerSet);
 		this.activeWorkerSet.addAll(activeWorkerSet);
