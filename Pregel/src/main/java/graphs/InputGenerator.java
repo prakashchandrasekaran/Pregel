@@ -137,14 +137,12 @@ public class InputGenerator {
 
 			// append the content to the file in batches.
 			if (vertexId % inputBufferSize == 0) {
-				System.out.println("Flushing to file");
 				// Write the graph input to the output file path
 				writeToFile(adjacencyList.toString());
 				adjacencyList = new StringBuilder();
 			}
 		}
-		if (adjacencyList.length() > 0) {
-			System.out.println("Writing the remaining content to file");
+		if (adjacencyList.length() > 0) {			
 			// Write the graph input to the output file path
 			writeToFile(adjacencyList.toString());
 		}

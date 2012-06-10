@@ -84,6 +84,7 @@ public class WorkerProxy implements Runnable,
 		while (true) {
 			try {
 				partition = partitionList.take();
+				System.out.println("Partition taken");
 				worker.addPartition(partition);
 			} catch (RemoteException e) {
 				System.out.println("Remote Exception received from the Worker");
@@ -124,6 +125,7 @@ public class WorkerProxy implements Runnable,
 	 * Halts the worker and prints the final solution
 	 */
 	public void halt() throws RemoteException{
+		this.restoreInitialState();
 		worker.halt();
 	}
 
@@ -211,5 +213,9 @@ public class WorkerProxy implements Runnable,
 	 */
 	public void setInitialMessage(ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage) throws RemoteException{
 		this.worker.setInitialMessage(initialMessage);
+	}
+	
+	private void restoreInitialState(){
+		this.totalPartitions = 0;
 	}
 }

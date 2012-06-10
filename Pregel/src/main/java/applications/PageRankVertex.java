@@ -39,7 +39,7 @@ public class PageRankVertex extends Vertex {
 		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
 		int numOutgoingEdges = this.getOutgoingEdges().size();
 		PageRankData data = null;
-		if (this.getSuperstepCounter() < 30) {
+		if (this.getSuperstep() < 30) {
 			double sum = 0;
 			double updatedRank = 0;
 			while (messageIterator.hasNext()) {

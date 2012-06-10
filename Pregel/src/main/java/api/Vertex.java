@@ -3,9 +3,7 @@ package api;
 import graphs.VertexID;
 
 import java.io.Serializable;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +28,7 @@ public abstract class Vertex implements Serializable {
 	private VertexID vertexID;
 	private List<Edge> outgoingEdges;
 	private Data<?> data;
-	private long superstepCounter;
+	private long superstep;
 	/**
 	 * 
 	 * @param vertexID
@@ -97,15 +95,15 @@ public abstract class Vertex implements Serializable {
 	 * returns SuperStep in which the Vertex is executing 
 	 * @return
 	 */
-	public long getSuperstepCounter(){
-		return superstepCounter;
+	public long getSuperstep(){
+		return superstep;
 	}
 	
 	/**
 	 * sets the SuperStep value for current Vertex
 	 * @param superstepCounter
 	 */
-	public void setSuperstepCounter(long superstepCounter){
-		this.superstepCounter = superstepCounter;
+	public void setSuperstep(long superstepCounter){
+		this.superstep = superstepCounter;
 	}
 }
