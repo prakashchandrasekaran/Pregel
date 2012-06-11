@@ -8,13 +8,12 @@ import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
-import java.util.Map.Entry;
-
-import exceptions.PropertyNotFoundException;
 
 import utility.Props;
+import exceptions.PropertyNotFoundException;
 
 /**
  * Represents a thread which checks the health of the workers using heart beat
@@ -110,6 +109,7 @@ public class HealthManager implements Runnable {
 	{
 	    String workerID;
 		WorkerProxy workerProxy;
+		recoverActiveWorkerSet();
 		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap().entrySet()) {
 			workerProxy = entry.getValue();
 			try {
@@ -121,6 +121,26 @@ public class HealthManager implements Runnable {
 				failedWorkers.add(workerID);
 				master.removeWorker(workerID);
 				continue;
+			}
+		}
+	}
+	
+	private void recoverActiveWorkerSet(){
+		FileInputStream fis = null;
+		ObjectInputStream ois = null;
+		try{
+			fis = new FileInputStream(checkpointDir + File.pathSeparator + "activeworkers");
+		    ois = new ObjectInputStream(fis);
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				fis.close();			
+				ois.close();
+			} catch (IOException e) {				
+				e.printStackTrace();
 			}
 		}
 	}
@@ -145,32 +165,46 @@ public class HealthManager implements Runnable {
 	}
 	
 	/**
-	 * Assign the recovered partitions from the dead Worker to another random Worker
+	 * Assign the recovered partitions from the dead Worker to other random Workers.
 	 *
+	 * @param workerID the dead worker's id
 	 * @param workerData the dead Worker's data
 	 */
-	public void assignRecoveredPartitions(String workerID, WorkerData workerData){
-		Set<Entry<String, WorkerProxy>> set = master.getWorkerProxyMap().entrySet();
-		Entry<String, WorkerProxy>[] entries = (Entry<String, WorkerProxy>[])set.toArray();
-		// Choose a random worker from the map and assign the partitions to it.		
-		Random rand = new Random();
-		int index = (rand.nextInt() % entries.length);
-		WorkerProxy workerProxy = entries[index].getValue();
+	private void assignRecoveredPartitions(String workerID, WorkerData workerData){
+		Map<Integer, String> partitionWorkerMap = this.master.getPartitionWorkerMap();
+		Map<String, WorkerProxy> workerProxyMap = this.master.getWorkerProxyMap();
+		Set<String> activeWorkerSet = this.master.getActiveWorkerSet();
 		
+		Set<Entry<String, WorkerProxy>> set = workerProxyMap.entrySet();
+		Entry<String, WorkerProxy>[] entries = (Entry<String, WorkerProxy>[])set.toArray();
+		
+		// Remove the dead worker from the active worker set if at all it was present during checkpointing.
+		boolean wasDeadWorkerActive = activeWorkerSet.contains(workerID);
+		if(wasDeadWorkerActive){
+			activeWorkerSet.remove(workerID);
+		}
+		Random rand = new Random();
 		for(Iterator<Partition> iter = workerData.getPartitions().iterator(); iter.hasNext();){
 			Partition partition = iter.next();
-			master.partitionWorkerMap.put(partition.getPartitionID(),
+			int index = (rand.nextInt() % entries.length);
+			// Choose a random worker from the map and assign the partition to it.
+			WorkerProxy workerProxy = entries[index].getValue();
+			partitionWorkerMap.put(partition.getPartitionID(),
 					workerProxy.getWorkerID());
+			// If the dead worker was active during checkpointing, add the worker to which the dead worker's partition is assigned.
+			if(wasDeadWorkerActive){
+				activeWorkerSet.add(workerProxy.getWorkerID());
+			}
+			try {
+				workerProxy.addRecoveredData(workerData);
+				// Send the modified maps to all the workers.
+				this.master.sendWorkerPartitionInfo();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
-		
-		try {
-			workerProxy.addRecoveredData(workerData);
-			master.sendWorkerPartitionInfo();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
 
+	}
 
 	public static void main(String[] args) {
 	}

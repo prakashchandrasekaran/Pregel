@@ -82,7 +82,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	static {
 		try {
 			CHECKPOINT_FREQUENCY = Props.getInstance().getIntProperty("CHECKPOINT_FREQUENCY");
-			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINTING_DIRECTORY");
+			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINTING_DIR");
 		} catch (PropertyNotFoundException e) {
 			/** set to default frequency value **/
 			CHECKPOINT_FREQUENCY = 5;
@@ -100,6 +100,18 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		super();
 		superstep = 0;
 	}
+
+	
+	
+	public Set<String> getActiveWorkerSet() {
+		return activeWorkerSet;
+	}
+
+	public void setActiveWorkerSet(Set<String> activeWorkerSet) {
+		this.activeWorkerSet = activeWorkerSet;
+	}
+
+
 
 	/**
 	 * Registers the worker computation nodes with the master.
@@ -372,6 +384,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * start checkpointing in master.
 	 */
 	private void checkPoint() {
+		File f = new File(CHECKPOINTING_DIRECTORY);
+		if(! f.exists()) {
+			f.mkdirs();
+		}
+		
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			try {
@@ -380,6 +397,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				e.printStackTrace();
 			}
 		}
+		this.serializeActiveWorkerSet();
+	}
+	
+	private void serializeActiveWorkerSet(){
 		// Serialize the active worker set 
 		FileOutputStream fileOutputStream = null;
 		ObjectOutputStream objectOutputStream = null;
@@ -408,5 +429,17 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	public String takeResult() throws RemoteException {
 		return null;
 	}
-	
+
+
+
+	public Map<Integer, String> getPartitionWorkerMap() {
+		return partitionWorkerMap;
 	}
+
+
+
+	public void setPartitionWorkerMap(Map<Integer, String> partitionWorkerMap) {
+		this.partitionWorkerMap = partitionWorkerMap;
+	}
+
+}
