@@ -4,7 +4,11 @@ import exceptions.PropertyNotFoundException;
 import graphs.VertexID;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -529,5 +533,31 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 */
 	@Override
 	public void heartBeat() throws RemoteException{
+	}
+
+	@Override
+	public void startRecovery() throws PropertyNotFoundException, IOException, ClassNotFoundException {
+		this.canSendMessage = false;
+		this.startSuperStep = false;
+		FileInputStream fis;
+		ObjectInputStream ois;
+		WorkerData workerData;
+		String checkpointDir = Props.getInstance().getStringProperty("CHECKPOINT_DIR");
+		String workerStateFile = checkpointDir + File.pathSeparator + workerID;
+		fis = new FileInputStream(workerStateFile);
+	    ois = new ObjectInputStream(fis);
+	    workerData = (WorkerData)ois.readObject();
+	 
+	    ois.close();
+	}
+
+	@Override
+	public void finishRecovery() throws RemoteException {
+		try {
+			checkPoint();
+		} catch (Exception e) {
+			System.out.println("checkpoint failure");
+			throw new RemoteException();
+		}
 	}
 }

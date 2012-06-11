@@ -135,6 +135,15 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Gets the worker proxy map info
+	 * 
+	 * @return Returns the worker proxy map info
+	 */
+	public Map<String, WorkerProxy> getWorkerProxyMap()
+	{
+		return workerProxyMap;
+	}
 
 	/**
 	 * Send worker partition info.
@@ -369,6 +378,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	@Override
 	public String takeResult() throws RemoteException {
 		return null;
+	}
+
+	public void assignRecoveredPartitions(WorkerData workerData) {
+		
 	}
 
 }

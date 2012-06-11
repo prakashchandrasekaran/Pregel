@@ -1,5 +1,6 @@
 package system;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,26 +24,28 @@ import utility.Props;
 
 public class HealthManager implements Runnable {
 	Set<String> failedWorkers;
-	Map<String, WorkerProxy> workerProxyMap;
 	Master master;
 	long pingInterval;
 	String checkpointDir;
 
-	public HealthManager(Map<String, WorkerProxy> workerProxyMap, Master master)
+	public HealthManager(Master master)
 			throws PropertyNotFoundException {
-		this.workerProxyMap = workerProxyMap;
 		this.master = master;
 		Props properties = Props.getInstance();
 		pingInterval = properties.getLongProperty("PING_INTERVAL");
 		checkpointDir = properties.getStringProperty("CHECKPOINT_DIR");
 		failedWorkers = new HashSet<>();
 	}
-
+	
+	/**
+	 * Checks the health of all the workers
+	 * 
+	 * @return
+	 */
 	public boolean checkHealth() {
-		boolean health = true;
 		String workerID;
 		WorkerProxy workerProxy;
-		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
+		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap().entrySet()) {
 			workerProxy = entry.getValue();
 			try {
 				workerProxy.heartBeat();
@@ -52,11 +55,10 @@ public class HealthManager implements Runnable {
 				workerID = entry.getKey();
 				failedWorkers.add(workerID);
 				master.removeWorker(workerID);
-				health = false;
 				continue;
 			}
 		}
-		return health;
+		return (failedWorkers.size() == 0)? true : false;
 	}
 
 	@Override
@@ -80,6 +82,7 @@ public class HealthManager implements Runnable {
 	}
 
 	private void recovery() throws IOException, ClassNotFoundException {
+		startRecovery();
 		FileInputStream fis;
 		ObjectInputStream ois;
 		Iterator<String> iter = failedWorkers.iterator();
@@ -89,14 +92,54 @@ public class HealthManager implements Runnable {
 		while(iter.hasNext())
 		{
 			workerID = iter.next();
-			workerStateFile = checkpointDir + workerID;
+			workerStateFile = checkpointDir + File.pathSeparator + workerID;
 			fis = new FileInputStream(workerStateFile);
 		    ois = new ObjectInputStream(fis);
 		    workerData = (WorkerData)ois.readObject();
-		    // assign partitions
+		    master.assignRecoveredPartitions(workerData);
 		    ois.close();
 		}
-		workerProxyMap = master.workerProxyMap;
+		failedWorkers.clear();
+		finishRecovery();
+		
+	}
+	
+	private void startRecovery()
+	{
+	    String workerID;
+		WorkerProxy workerProxy;
+		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap().entrySet()) {
+			workerProxy = entry.getValue();
+			try {
+				workerProxy.startRecovery();
+			} catch (RemoteException e) {
+				System.out.println("Remote Exception received from the Worker");
+				workerProxy.exit();
+				workerID = entry.getKey();
+				failedWorkers.add(workerID);
+				master.removeWorker(workerID);
+				continue;
+			}
+		}
+	}
+	
+	private void finishRecovery()
+	{
+		String workerID;
+		WorkerProxy workerProxy;
+		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap().entrySet()) {
+			workerProxy = entry.getValue();
+			try {
+				workerProxy.finishRecovery();
+			} catch (RemoteException e) {
+				System.out.println("Remote Exception received from the Worker");
+				workerProxy.exit();
+				workerID = entry.getKey();
+				failedWorkers.add(workerID);
+				master.removeWorker(workerID);
+				continue;
+			}
+		}
 	}
 
 	public static void main(String[] args) {
