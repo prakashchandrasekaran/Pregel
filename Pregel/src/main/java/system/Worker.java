@@ -104,9 +104,9 @@ public interface Worker extends Remote{
 	public void heartBeat() throws RemoteException;
 	public void checkPoint() throws Exception;
 
-	public void startRecovery() throws RemoteException, PropertyNotFoundException, FileNotFoundException, IOException, ClassNotFoundException;
+	public void startRecovery() throws RemoteException;
 
-	public void finishRecovery() throws RemoteException, PropertyNotFoundException, FileNotFoundException;
+	public void finishRecovery() throws RemoteException;
 	
 	public void addRecoveredData(WorkerData workerData) throws RemoteException;
 }

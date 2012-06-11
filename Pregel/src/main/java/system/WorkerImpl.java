@@ -538,22 +538,34 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 * Method to prepare the worker
 	 */
 	@Override
-	public void startRecovery() throws PropertyNotFoundException, IOException, ClassNotFoundException {
+	public void startRecovery() throws RemoteException{
 		this.canSendMessage = false;
 		this.startSuperStep = false;
 		this.partitionQueue.clear();
 		this.previousIncomingMessages.clear();
+		this.outgoingMessages.clear();
 		FileInputStream fis;
 		ObjectInputStream ois;
 		WorkerData workerData;
-		String checkpointDir = Props.getInstance().getStringProperty("CHECKPOINT_DIR");
-		String workerStateFile = checkpointDir + File.pathSeparator + workerID;
-		fis = new FileInputStream(workerStateFile);
-	    ois = new ObjectInputStream(fis);
-	    workerData = (WorkerData)ois.readObject();
-	    this.currentIncomingMessages = (ConcurrentHashMap<Integer, Map<VertexID, List<Message>>>)workerData.getMessages();
-	    this.completedPartitions = (BlockingQueue<Partition>)workerData.getPartitions();
-	    ois.close();
+		String checkpointDir;
+		try {
+			checkpointDir = Props.getInstance().getStringProperty("CHECKPOINT_DIR");
+	        String workerStateFile = checkpointDir + File.pathSeparator + workerID;
+			fis = new FileInputStream(workerStateFile);
+			ois = new ObjectInputStream(fis);
+			workerData = (WorkerData)ois.readObject();
+			this.currentIncomingMessages = (ConcurrentHashMap<Integer, Map<VertexID, List<Message>>>)workerData.getMessages();
+			this.completedPartitions = (BlockingQueue<Partition>)workerData.getPartitions();
+			ois.close();
+		}
+		catch(PropertyNotFoundException p){
+			p.printStackTrace();
+		}
+		catch(IOException i){
+			i.printStackTrace();
+		} catch (ClassNotFoundException c) {
+			c.printStackTrace();
+		}
 	}
 
 	@Override
