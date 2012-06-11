@@ -530,4 +530,12 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	@Override
 	public void heartBeat() throws RemoteException{
 	}
+
+	@Override
+	public void addRecoveredData(WorkerData workerData) throws RemoteException {
+		this.currentIncomingMessages.putAll(workerData.getMessages());
+		this.completedPartitions.addAll(workerData.getPartitions());
+	}
+	
+	
 }

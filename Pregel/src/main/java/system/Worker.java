@@ -101,4 +101,5 @@ public interface Worker extends Remote{
 	public void heartBeat() throws RemoteException;
 	public void checkPoint() throws Exception;
 	
+	public void addRecoveredData(WorkerData workerData) throws RemoteException;
 }
