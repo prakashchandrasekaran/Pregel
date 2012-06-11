@@ -16,19 +16,33 @@ import utility.Props;
 import exceptions.PropertyNotFoundException;
 
 /**
- * Represents a thread which checks the health of the workers using heart beat
- * 
+ * Represents a thread which checks the health of the workers using heart beat.
+ *
  * @author Prakash Chandrasekaran
  * @author Gautham Narayanasamy
  * @author Vijayaraghavan Subbaiah
  */
 
 public class HealthManager implements Runnable {
+	
+	/** The failed workers. */
 	Set<String> failedWorkers;
+	
+	/** The master. */
 	Master master;
+	
+	/** The ping interval. */
 	long pingInterval;
+	
+	/** The checkpoint dir. */
 	String checkpointDir;
 
+	/**
+	 * Instantiates a new health manager.
+	 *
+	 * @param master the master
+	 * @throws PropertyNotFoundException the property not found exception
+	 */
 	public HealthManager(Master master)
 			throws PropertyNotFoundException {
 		this.master = master;
@@ -39,9 +53,9 @@ public class HealthManager implements Runnable {
 	}
 	
 	/**
-	 * Checks the health of all the workers
-	 * 
-	 * @return
+	 * Checks the health of all the workers.
+	 *
+	 * @return true, if successful
 	 */
 	public boolean checkHealth() {
 		String workerID;
@@ -59,9 +73,12 @@ public class HealthManager implements Runnable {
 				continue;
 			}
 		}
-		return (failedWorkers.size() == 0)? true : false;
+		return (failedWorkers.size() == 0);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	@Override
 	public void run() {
 		boolean health = true;
@@ -82,6 +99,12 @@ public class HealthManager implements Runnable {
 		}
 	}
 
+	/**
+	 * Recovery.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void recovery() throws IOException, ClassNotFoundException {
 		startRecovery();
 		FileInputStream fis;
@@ -105,6 +128,9 @@ public class HealthManager implements Runnable {
 		
 	}
 	
+	/**
+	 * Start recovery.
+	 */
 	private void startRecovery()
 	{
 	    String workerID;
@@ -125,14 +151,18 @@ public class HealthManager implements Runnable {
 		}
 	}
 	
+	/**
+	 * Recover the serialized active worker set.
+	 */
 	private void recoverActiveWorkerSet(){
 		FileInputStream fis = null;
 		ObjectInputStream ois = null;
 		try{
 			fis = new FileInputStream(checkpointDir + File.pathSeparator + "activeworkers");
 		    ois = new ObjectInputStream(fis);
+		    master.setActiveWorkerSet((Set<String>)ois.readObject());
 		}
-		catch(IOException e){
+		catch(IOException | ClassNotFoundException e){
 			e.printStackTrace();
 		}
 		finally{
@@ -145,6 +175,9 @@ public class HealthManager implements Runnable {
 		}
 	}
 	
+	/**
+	 * Finish recovery.
+	 */
 	private void finishRecovery()
 	{
 		String workerID;
@@ -186,7 +219,7 @@ public class HealthManager implements Runnable {
 		Random rand = new Random();
 		for(Iterator<Partition> iter = workerData.getPartitions().iterator(); iter.hasNext();){
 			Partition partition = iter.next();
-			int index = (rand.nextInt() % entries.length);
+			int index = (rand.nextInt(entries.length));
 			// Choose a random worker from the map and assign the partition to it.
 			WorkerProxy workerProxy = entries[index].getValue();
 			partitionWorkerMap.put(partition.getPartitionID(),
@@ -206,6 +239,11 @@ public class HealthManager implements Runnable {
 
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 	}
 }
