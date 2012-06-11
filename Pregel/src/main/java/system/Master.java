@@ -385,6 +385,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	private void checkPoint() {
 		File f = new File(CHECKPOINTING_DIRECTORY);
+		System.out.println("File path " + f.getAbsolutePath());
 		if(! f.exists()) {
 			f.mkdirs();
 		}

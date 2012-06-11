@@ -137,11 +137,11 @@ public class HealthManager implements Runnable {
 	/**
 	 * Prepares all the workers for the recovery process
 	 */
-	private void startRecovery() {
-		String workerID;
-		WorkerProxy workerProxy;
-		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap()
-				.entrySet()) {
+	private void startRecovery()
+	{
+	    String workerID;
+		WorkerProxy workerProxy;		
+		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap().entrySet()) {
 			workerProxy = entry.getValue();
 			try {
 				workerProxy.startRecovery();
@@ -246,7 +246,8 @@ public class HealthManager implements Runnable {
 				activeWorkerSet.add(workerProxy.getWorkerID());
 			}
 			try {
-				workerProxy.addRecoveredData(workerData);
+				// send this partition and the messages that were sent to this partition to the Worker.
+				workerProxy.addRecoveredData(partition, workerData.getMessages().get(partition.getPartitionID()));
 				// Send the modified maps to all the workers.
 				this.master.sendWorkerPartitionInfo();
 			} catch (RemoteException e) {

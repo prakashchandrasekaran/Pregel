@@ -578,8 +578,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		}
 	}
 
-	public void addRecoveredData(WorkerData workerData) throws RemoteException {
-		this.currentIncomingMessages.putAll(workerData.getMessages());
-		this.completedPartitions.addAll(workerData.getPartitions());
+	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException {
+		this.currentIncomingMessages.put(partition.getPartitionID(), messages);
+		this.completedPartitions.add(partition);
 	}
 }
