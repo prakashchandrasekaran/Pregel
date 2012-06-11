@@ -49,6 +49,11 @@ public class WorkerData implements Serializable {
 	}
 
 
+	@Override
+	public String toString(){
+		return "Partitions:  " + partitions.toString() + "\n" + "Messages: " + messages;
+	}
+	
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		
 		Map<Integer, Map<VertexID, List<Message>>> messages

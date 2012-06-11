@@ -1,10 +1,9 @@
 package system;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.InputStreamReader;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,10 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -79,6 +75,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	
 	/** The start time. */
 	long startTime;
+	
+	private long lastCheckpointedSuperstep = 1;
 	
 	private static String CHECKPOINTING_DIRECTORY;
 	
@@ -170,6 +168,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	{
 		return workerProxyMap;
 	}
+
+	public void setCheckpointSuperstep(){
+		this.superstep = this.lastCheckpointedSuperstep;
+	}
+
 
 	/**
 	 * Send worker partition info.
@@ -356,6 +359,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		System.out.println("Acknowledgment from Worker: " + workerID + " - activeWorkerSet " + activeWorkerSet);
 		this.activeWorkerSet.addAll(activeWorkerSet);
 		this.workerAcknowledgementSet.remove(workerID);
+		System.out.println("WorkerAcknowledgmentSet: " + this.workerAcknowledgementSet);
 		// If the acknowledgment has been received from all the workers, start the next superstep
 		if(this.workerAcknowledgementSet.size() == 0) {
 			System.out.println("Acknowledgment received from all workers " + activeWorkerSet);
@@ -374,9 +378,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	public void startSuperStep() throws RemoteException {
 		if((superstep % CHECKPOINT_FREQUENCY) == 0) {
-			checkPoint();
+			if(superstep != lastCheckpointedSuperstep){
+				checkPoint();
+				lastCheckpointedSuperstep = superstep;
+			}
 		}
 		System.out.println("Master: Starting Superstep " + superstep);
+		System.out.println("Active worker set: " + this.activeWorkerSet);
+		this.workerAcknowledgementSet.clear();
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
 		
 		for(String workerID : this.activeWorkerSet){
@@ -398,6 +407,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
+			System.out.println("Checkpointing for Worker: " + workerProxy.getWorkerID());
 			try {
 				workerProxy.checkPoint();
 			} catch (Exception e) {
@@ -405,6 +415,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			}
 		}
 		this.serializeActiveWorkerSet();
+		System.out.println("Press any key to continue");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));  
+		try {
+			br.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
 	}
 	
 	private void serializeActiveWorkerSet(){

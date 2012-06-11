@@ -63,6 +63,7 @@ public class HealthManager implements Runnable {
 	public void exit() {
 		try {
 			t.interrupt();
+			t = null;
 		} catch (Exception e) {
 			System.out.println("HealthManager Stopped");
 		}
@@ -117,6 +118,7 @@ public class HealthManager implements Runnable {
 	 * Represents the process of recovery
 	 */
 	private void recover() {
+		System.out.println("HealthManager: recover");
 		startRecovery();
 		recoverActiveWorkerSet();
 		FileInputStream fis;
@@ -166,9 +168,9 @@ public class HealthManager implements Runnable {
 			try {
 				workerProxy.startRecovery();
 			} catch (Exception e) {
-				System.out.println("Remote Exception received from the Worker");
-				workerProxy.exit();
 				workerID = entry.getKey();
+				System.out.println("Remote Exception received from the Worker " + workerID);
+				workerProxy.exit();				
 				failedWorkers.add(workerID);
 				master.removeWorker(workerID);
 				continue;
@@ -180,13 +182,16 @@ public class HealthManager implements Runnable {
 	 * Recover the serialized active worker set.
 	 */
 	private void recoverActiveWorkerSet() {
+		System.out.println("HealthManager: recoverActiveWorkerSet");
 		FileInputStream fis = null;
 		ObjectInputStream ois = null;
 		try {
 			fis = new FileInputStream(checkpointDir + File.separator
 					+ "activeworkers");
 			ois = new ObjectInputStream(fis);
-			master.setActiveWorkerSet((Set<String>) ois.readObject());
+			Set<String> set = (Set<String>) ois.readObject();
+			System.out.println("Active worker set: " + set);
+			master.setActiveWorkerSet(set);
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
@@ -203,6 +208,7 @@ public class HealthManager implements Runnable {
 	 * Finishes the recovery process.
 	 */
 	private void finishRecovery() {
+		System.out.println("HealthManager: finishRecovery");
 		String workerID;
 		WorkerProxy workerProxy;
 		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap()
@@ -222,7 +228,9 @@ public class HealthManager implements Runnable {
 		if(failedWorkers.size() != 0)
 			recover();
 		else{
-			try {				
+			try {
+				System.out.println("Calling start superstep");
+				this.master.setCheckpointSuperstep();
 				this.master.startSuperStep();
 			} catch (RemoteException e) {				
 				e.printStackTrace();
@@ -241,6 +249,7 @@ public class HealthManager implements Runnable {
 	 */
 	private void assignRecoveredPartitions(String workerID,
 			WorkerData workerData) {
+		System.out.println("HealthManager: Assigning recovered partitions");
 		Map<Integer, String> partitionWorkerMap = this.master
 				.getPartitionWorkerMap();
 		Map<String, WorkerProxy> workerProxyMap = this.master
@@ -254,14 +263,18 @@ public class HealthManager implements Runnable {
 		if (wasDeadWorkerActive) {
 			activeWorkerSet.remove(workerID);
 		}
+		System.out.println("WorkerData Partitions " + workerData);
 		Random rand = new Random();
 		for (Iterator<Partition> iter = workerData.getPartitions().iterator(); iter
 				.hasNext();) {
+			
 			Partition partition = iter.next();
+			
 			int index = (rand.nextInt(workerProxyCollection.length));
 			// Choose a random worker from the map and assign the partition to
 			// it.
 			WorkerProxy workerProxy = (WorkerProxy) workerProxyCollection[index];
+			System.out.println("Assigning " + partition + " to " + workerProxy.getWorkerID() );
 			partitionWorkerMap.put(partition.getPartitionID(),
 					workerProxy.getWorkerID());
 			// If the dead worker was active during checkpointing, add the

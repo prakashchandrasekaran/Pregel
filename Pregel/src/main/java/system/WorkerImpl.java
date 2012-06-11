@@ -151,7 +151,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 * @throws RemoteException the remote exception
 	 */
 	public void addPartition(Partition partition) throws RemoteException {
-		this.partitionQueue.add(partition);
+		this.completedPartitions.add(partition);
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 */
 	public void addPartitionList(List<Partition> workerPartitions)
 			throws RemoteException {
-		this.partitionQueue.addAll(workerPartitions);
+		this.completedPartitions.addAll(workerPartitions);
 	}
 
 	/**
@@ -201,10 +201,10 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 				}
 				// System.out.println(this + "startSuperStep: " + startSuperStep );
 				while (startSuperStep) {
-					System.out.println(this + "Superstep loop started for superstep " + superstep);
+					//System.out.println(this + "Superstep loop started for superstep " + superstep);
 					try {
 						Partition partition = partitionQueue.take();
-						System.out.println(this + " - Partition taken from queue. superstep:" + superstep);
+						//System.out.println(this + " - Partition taken from queue. superstep:" + superstep);
 						// System.out.println(this + "previousIncomingMessages size: " + previousIncomingMessages.size());
 						Map<VertexID, List<Message>> messageForThisPartition = previousIncomingMessages
 								.get(partition.getPartitionID());
@@ -354,6 +354,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 			Map<Integer, String> mapPartitionIdToWorkerId,
 			Map<String, Worker> mapWorkerIdToWorker) throws RemoteException {
 		System.out.println("WorkerImpl: setWorkerPartitionInfo");
+		System.out.println("totalPartitionsAssigned " + totalPartitionsAssigned + " mapPartitionIdToWorkerId: " + mapPartitionIdToWorkerId);
 		this.totalPartitionsAssigned = totalPartitionsAssigned;
 		this.mapPartitionIdToWorkerId = mapPartitionIdToWorkerId;
 		this.worker2WorkerProxy = new Worker2WorkerProxy(mapWorkerIdToWorker);
@@ -515,11 +516,14 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 
 	@Override
 	public void checkPoint() throws Exception{
+		System.out.println(this + " WorkerImpl: checkPoint");
+		
 		WorkerData wd = new WorkerData(
-				this.partitionQueue, 
-				this.previousIncomingMessages
+				this.completedPartitions, 
+				this.currentIncomingMessages
 				);
 		// Serialization
+		System.out.println("Checkpointing WorkerData " + wd + " for " + workerID);
 		String filePath = CHECKPOINTING_DIRECTORY + File.separator + workerID;
 		GeneralUtils.serialize(filePath, wd);		
 	}
@@ -536,6 +540,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 */
 	@Override
 	public void startRecovery() throws RemoteException{
+		System.out.println("WorkerImpl: startRecovery");
 		this.canSendMessage = false;
 		this.startSuperStep = false;
 		this.partitionQueue.clear();
@@ -553,6 +558,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 			workerData = (WorkerData)ois.readObject();
 			this.currentIncomingMessages = (ConcurrentHashMap<Integer, Map<VertexID, List<Message>>>)workerData.getMessages();
 			this.completedPartitions = (BlockingQueue<Partition>)workerData.getPartitions();
+			System.out.println("Restoring checkpointed data " + this.completedPartitions);
 			ois.close();
 		}
 		catch(PropertyNotFoundException p){
@@ -567,8 +573,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 
 	@Override
 	public void finishRecovery() throws RemoteException {
+		System.out.println("WorkerImpl: finishRecovery");
 		try {
-			checkPoint();
+			 checkPoint();
 		} catch (Exception e) {
 			System.out.println("checkpoint failure");
 			throw new RemoteException();
@@ -576,7 +583,12 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	}
 
 	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException {
-		this.currentIncomingMessages.put(partition.getPartitionID(), messages);
-		this.completedPartitions.add(partition);
+		System.out.println("WorkerImpl: addRecoveredData");
+		System.out.println("Partition " + partition.getPartitionID());
+		System.out.println("Messages: " + messages);
+		if(messages != null){
+			this.currentIncomingMessages.put(partition.getPartitionID(), messages);
+		}
+		this.completedPartitions.add(partition);		
 	}
 }

@@ -1,16 +1,14 @@
 package applications;
 
-import exceptions.PropertyNotFoundException;
-import graphs.InputGenerator;
-
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import utility.Props;
-
 import api.Client2Master;
+import exceptions.PropertyNotFoundException;
+import graphs.InputGenerator;
 
 /**
  * Client class
@@ -33,8 +31,9 @@ public class Client {
 		InputGenerator inputGenerator = new InputGenerator(numVertices,
 				minEdgeWeight, maxEdgeWeight, graphFile);
 		inputGenerator.generateInput();
-		String vertexClassName = "applications.ShortestPathVertex";
+		String vertexClassName = "applications.PageRankVertex";
 		ShortestPathData data = new ShortestPathData(new Double(0));
-		client2Master.putTask(graphFile, vertexClassName, 0, data);
+		PageRankData pageRankData = new PageRankData(new Double(0));
+		client2Master.putTask(graphFile, vertexClassName, 0, pageRankData);
 	}
 }

@@ -91,12 +91,15 @@ public class WorkerProxy implements Runnable, Worker2Master {
 				System.out.println("Partition taken");
 				worker.addPartition(partition);
 			} catch (RemoteException e) {
-				System.out.println("Remote Exception received from the Worker");
-				System.out.println("Giving back the partition to the Master ");
+				System.out.println("Remote Exception received from the Worker " + workerID);
+				// System.out.println("Giving back the partition to the Master ");
+				System.out.println("RemoteException: Removing Worker from Master");
 				master.removeWorker(workerID);
-				return;
+				// return;
 			} catch (InterruptedException e) {
 				System.out.println("Thread interrupted");
+				System.out.println("InterruptedException: Removing Worker from Master");
+				master.removeWorker(workerID);
 				//e.printStackTrace();
 			}
 		}
@@ -252,6 +255,7 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	}
 	
 	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException {
+		this.totalPartitions += 1;
 		this.worker.addRecoveredData(partition, messages);
 	}
 }
