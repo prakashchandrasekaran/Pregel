@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import utility.GeneralUtils;
 import utility.Props;
 
 import api.Vertex;
@@ -518,13 +519,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 				this.partitionQueue, 
 				this.previousIncomingMessages
 				);
-		// Serialization 
-		FileOutputStream fileOutputStream 
-			= new FileOutputStream(CHECKPOINTING_DIRECTORY + File.pathSeparator + workerID); 
-		ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream); 
-		objectOutputStream.writeObject(wd); 
-		objectOutputStream.flush(); 
-		objectOutputStream.close();
+		// Serialization
+		String filePath = CHECKPOINTING_DIRECTORY + File.separator + workerID;
+		GeneralUtils.serialize(filePath, wd);		
 	}
 
 	/**
@@ -550,7 +547,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		String checkpointDir;
 		try {
 			checkpointDir = Props.getInstance().getStringProperty("CHECKPOINT_DIR");
-	        String workerStateFile = checkpointDir + File.pathSeparator + workerID;
+	        String workerStateFile = checkpointDir + File.separator + workerID;
 			fis = new FileInputStream(workerStateFile);
 			ois = new ObjectInputStream(fis);
 			workerData = (WorkerData)ois.readObject();

@@ -96,7 +96,8 @@ public class WorkerProxy implements Runnable, Worker2Master {
 				master.removeWorker(workerID);
 				return;
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				System.out.println("Thread interrupted");
+				//e.printStackTrace();
 			}
 		}
 	}

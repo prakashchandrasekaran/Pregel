@@ -63,7 +63,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	private HealthManager healthManager;
 
 	/** The workerID to WorkerProxy map. */
-	Map<String, WorkerProxy> workerProxyMap = new HashMap<>();
+	Map<String, WorkerProxy> workerProxyMap = new ConcurrentHashMap<>();
 
 	/** The workerID to Worker map. **/
 	Map<String, Worker> workerMap = new HashMap<>();
@@ -308,6 +308,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	public void halt() throws RemoteException{
 		System.out.println("Master: halt");
+		System.out.println("Worker Proxy Map " + workerProxyMap);
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()){
 		     WorkerProxy workerProxy = entry.getValue();
 		     workerProxy.halt();     
@@ -371,7 +372,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 *
 	 * @throws RemoteException the remote exception
 	 */
-	private void startSuperStep() throws RemoteException {
+	public void startSuperStep() throws RemoteException {
 		if((superstep % CHECKPOINT_FREQUENCY) == 0) {
 			checkPoint();
 		}
@@ -388,6 +389,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * start checkpointing in master.
 	 */
 	private void checkPoint() {
+		System.out.println("Master: checkpointing!");
 		File f = new File(CHECKPOINTING_DIRECTORY);
 		System.out.println("File path " + f.getAbsolutePath());
 		if(! f.exists()) {
@@ -407,24 +409,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	
 	private void serializeActiveWorkerSet(){
 		// Serialize the active worker set 
-		FileOutputStream fileOutputStream = null;
-		ObjectOutputStream objectOutputStream = null;
-		try {
-			fileOutputStream = new FileOutputStream(CHECKPOINTING_DIRECTORY + File.pathSeparator + "activeworkers");
-			objectOutputStream = new ObjectOutputStream(fileOutputStream); 
-			objectOutputStream.writeObject(activeWorkerSet); 
-			objectOutputStream.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		finally{
-			try {
-				fileOutputStream.close();			
-				objectOutputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		String filePath = CHECKPOINTING_DIRECTORY + File.separator + "activeworkers";
+		GeneralUtils.serialize(filePath, activeWorkerSet);		
 	}
 
 	/* (non-Javadoc)

@@ -1,5 +1,10 @@
 package utility;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
@@ -104,7 +109,30 @@ public class GeneralUtils {
 		int partitionId = (int) (vertexId / maxVerticesPerPartition);
 		return partitionId;
 	}
+	
+	public static void serialize(String filePath, Object obj){
+		FileOutputStream fileOutputStream = null;
+		ObjectOutputStream objectOutputStream = null;
+		try {			
+			fileOutputStream = new FileOutputStream(filePath); 
+			objectOutputStream = new ObjectOutputStream(fileOutputStream); 
+			objectOutputStream.writeObject(obj); 
+			objectOutputStream.flush(); 
+			objectOutputStream.close();
+		} catch (IOException e) {			
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				fileOutputStream.close();			
+				objectOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
+	
 	public static void main(String args[]) {
 		try {
 			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12", "Vertex"));
