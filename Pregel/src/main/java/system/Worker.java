@@ -108,5 +108,5 @@ public interface Worker extends Remote{
 
 	public void finishRecovery() throws RemoteException, PropertyNotFoundException, FileNotFoundException;
 	
-	public void addRecoveredData(WorkerData workerData) throws RemoteException;
+	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException;
 }

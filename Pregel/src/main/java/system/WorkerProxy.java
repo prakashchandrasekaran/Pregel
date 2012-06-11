@@ -250,7 +250,7 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		worker.finishRecovery();
 	}
 	
-	public void addRecoveredData(WorkerData workerData) throws RemoteException{
-		this.worker.addRecoveredData(workerData);
+	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException {
+		this.worker.addRecoveredData(partition, messages);
 	}
 }
