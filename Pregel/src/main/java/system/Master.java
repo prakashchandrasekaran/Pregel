@@ -82,7 +82,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	static {
 		try {
 			CHECKPOINT_FREQUENCY = Props.getInstance().getIntProperty("CHECKPOINT_FREQUENCY");
-			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINTING_DIR");
+			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINT_DIR");
 		} catch (PropertyNotFoundException e) {
 			/** set to default frequency value **/
 			CHECKPOINT_FREQUENCY = 5;

@@ -102,7 +102,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	
 	static {
 		try {
-			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINTING_DIRECTORY");
+			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINT_DIR");
 		} catch (PropertyNotFoundException e) {
 			e.printStackTrace();
 		}
