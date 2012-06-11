@@ -1,13 +1,9 @@
 package system;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -89,13 +85,14 @@ public class HealthManager implements Runnable {
 		Iterator<String> iter = failedWorkers.iterator();
 		String workerID;
 		String workerStateFile;
+		WorkerData workerData;
 		while(iter.hasNext())
 		{
 			workerID = iter.next();
 			workerStateFile = checkpointDir + workerID;
 			fis = new FileInputStream(workerStateFile);
 		    ois = new ObjectInputStream(fis);
-		    Object obj = ois.readObject();
+		    workerData = (WorkerData)ois.readObject();
 		    // assign partitions
 		    ois.close();
 		}

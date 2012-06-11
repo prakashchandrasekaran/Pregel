@@ -237,4 +237,7 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	public void heartBeat() throws RemoteException {
 		this.worker.heartBeat();
 	}
+	public void checkPoint() throws Exception {
+		this.worker.checkPoint();
+	}
 }

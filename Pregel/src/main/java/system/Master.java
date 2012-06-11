@@ -1,7 +1,6 @@
 package system;
 
 import java.io.IOException;
-import java.rmi.AccessException;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -18,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import utility.GeneralUtils;
+import utility.Props;
 import api.Client2Master;
 import api.Data;
 import exceptions.PropertyNotFoundException;
@@ -43,14 +43,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/** The Constant SERVICE_NAME. */
 	private static final String SERVICE_NAME = "Master";
 
-	/** The worker id. */
-	// private static int workerID = 0;
+	/** */ 
+	private static int CHECKPOINT_FREQUENCY = 0;
 
 	/** The total number of worker threads. */
 	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
 
 	/** Superstep Counter *. */
-	private long superstep;
+	private long superstep = 1;
 
 	/** The workerID to WorkerProxy map. */
 	Map<String, WorkerProxy> workerProxyMap = new HashMap<>();
@@ -69,6 +69,17 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	
 	/** The start time. */
 	long startTime;
+	
+	static {
+		try {
+			CHECKPOINT_FREQUENCY = Props.getInstance().getIntProperty("CHECKPOINT_FREQUENCY");
+		} catch (PropertyNotFoundException e) {
+			/** set to default frequency value **/
+			CHECKPOINT_FREQUENCY = 5;
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Instantiates a new master.
 	 *
@@ -172,7 +183,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				partition = iter.next();
 				// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received.
 				if(partition.getPartitionID() == sourceVertex_partitionID){
-					workerAcknowledgementSet.add(entry.getKey());
+					activeWorkerSet.add(entry.getKey());
 					
 				}
 				System.out.println("Adding partition  " + partition.getPartitionID() + " to worker " + workerProxy.getWorkerID());
@@ -197,7 +208,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			WorkerProxy workerProxy = workerMapIter.next().getValue();
 			// Get the partition that has the sourceVertex, and add the worker that has the partition to the worker set from which acknowledgments will be received.
 			if(partition.getPartitionID() == sourceVertex_partitionID){
-				workerAcknowledgementSet.add(workerProxy.getWorkerID());
+				activeWorkerSet.add(workerProxy.getWorkerID());
 			}
 			System.out.println("Adding partition  " + partition.getPartitionID() + " to worker " + workerProxy.getWorkerID());
 			workerProxy.addPartition(partition);
@@ -227,7 +238,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		map.put(sourceVertex, messageList);
 		ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage = new ConcurrentHashMap<>();
 		initialMessage.put(sourceVertex_partitionID, map);
-		workerProxyMap.get(workerAcknowledgementSet.toArray()[0]).setInitialMessage(initialMessage);
+		workerProxyMap.get(activeWorkerSet.toArray()[0]).setInitialMessage(initialMessage);
 		
 	}
 	
@@ -303,7 +314,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @see system.Worker2Master#superStepCompleted(java.lang.String, java.util.Set)
 	 */
 	@Override
-	public synchronized void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
+	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
 		System.out.println("Master: superStepCompleted");
 		System.out.println("Acknowledgment from Worker: " + workerID + " - activeWorkerSet " + activeWorkerSet);
 		this.activeWorkerSet.addAll(activeWorkerSet);
@@ -326,7 +337,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @throws RemoteException the remote exception
 	 */
 	private void startSuperStep() throws RemoteException {
-		
+		if((superstep % CHECKPOINT_FREQUENCY) == 0) {
+			checkPoint();
+		}
 		System.out.println("Master: Starting Superstep " + superstep);
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
 		
@@ -336,12 +349,25 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		this.activeWorkerSet.clear();
 	}
 
+	/**
+	 * start checkpointing in master
+	 */
+	private void checkPoint() {
+		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
+			WorkerProxy workerProxy = entry.getValue();
+			try {
+				workerProxy.checkPoint();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see api.Client2Master#takeResult()
 	 */
 	@Override
 	public String takeResult() throws RemoteException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
