@@ -146,6 +146,12 @@ public class HealthManager implements Runnable {
 			}
 		}
 		failedWorkers.clear();
+		// Send the modified maps to all the workers.
+		try {
+			this.master.sendWorkerPartitionInfo();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		finishRecovery();
 	}
 
@@ -263,8 +269,7 @@ public class HealthManager implements Runnable {
 			try {
 				// send this partition and the messages that were sent to this partition to the Worker.
 				workerProxy.addRecoveredData(partition, workerData.getMessages().get(partition.getPartitionID()));
-				// Send the modified maps to all the workers.
-				this.master.sendWorkerPartitionInfo();
+				
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
