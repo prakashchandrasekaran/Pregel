@@ -491,4 +491,11 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void setInitialMessage(ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage) throws RemoteException{
 		previousIncomingMessages = initialMessage;
 	}
+
+	/**
+	 * Master checks the heart beat of the worker by calling this method
+	 */
+	@Override
+	public void heartBeat() throws RemoteException{
+	}
 }

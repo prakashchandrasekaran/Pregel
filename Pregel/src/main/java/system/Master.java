@@ -292,11 +292,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Removes the worker.
 	 *
-	 * @param serviceName the service name
-	 * @throws RemoteException the remote exception
+	 * @param 
 	 */
-	public void removeWorker(String serviceName) throws RemoteException {
-		workerProxyMap.remove(serviceName);
+	public void removeWorker(String workerID) {
+		workerProxyMap.remove(workerID);
+		workerMap.remove(workerID);
 	}
 
 	/* (non-Javadoc)
