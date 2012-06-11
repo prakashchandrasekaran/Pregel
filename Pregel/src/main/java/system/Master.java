@@ -1,9 +1,7 @@
 package system;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -288,16 +286,13 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @throws Exception the exception
 	 */
 	public static void main(String[] args) throws Exception {
-//		if (System.getSecurityManager() == null) {
-//			System.setSecurityManager(new SecurityManager());
-//		}
 		System.setSecurityManager(new RMISecurityManager());
 		Master master;
 		try {
 			master = new Master();
 			Registry registry = LocateRegistry.createRegistry(1099);
 			registry.rebind(Master.SERVICE_NAME, master);
-			System.out.println("Master Instance is bound and ready");
+			System.out.println("Master Instance is bound and ready.");
 			
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -414,15 +409,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				e.printStackTrace();
 			}
 		}
-		this.serializeActiveWorkerSet();
-		System.out.println("Press any key to continue");
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));  
-		try {
-			br.readLine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  
+		this.serializeActiveWorkerSet();		  
 	}
 	
 	private void serializeActiveWorkerSet(){

@@ -1,10 +1,6 @@
 package system;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import utility.GeneralUtils;
 import utility.Props;
 import exceptions.PropertyNotFoundException;
 
@@ -120,9 +117,7 @@ public class HealthManager implements Runnable {
 	private void recover() {
 		System.out.println("HealthManager: recover");
 		startRecovery();
-		recoverActiveWorkerSet();
-		FileInputStream fis;
-		ObjectInputStream ois;
+		recoverActiveWorkerSet();		
 		Iterator<String> iter = failedWorkers.iterator();
 		String workerID;
 		String workerStateFile;
@@ -131,20 +126,9 @@ public class HealthManager implements Runnable {
 		// assigns it to healthy nodes
 		while (iter.hasNext()) {
 			workerID = iter.next();
-			workerStateFile = checkpointDir + File.separator + workerID;
-			try {
-				fis = new FileInputStream(workerStateFile);
-				ois = new ObjectInputStream(fis);
-				workerData = (WorkerData) ois.readObject();
-				assignRecoveredPartitions(workerID, workerData);
-				ois.close();
-			} catch (FileNotFoundException f) {
-				f.printStackTrace();
-			} catch (IOException i) {
-				i.printStackTrace();
-			} catch (ClassNotFoundException c) {
-				c.printStackTrace();
-			}
+			workerStateFile = checkpointDir + File.separator + workerID;		
+			workerData = (WorkerData) GeneralUtils.deserialize(workerStateFile);
+			assignRecoveredPartitions(workerID, workerData);
 		}
 		failedWorkers.clear();
 		// Send the modified maps to all the workers.
@@ -183,25 +167,12 @@ public class HealthManager implements Runnable {
 	 */
 	private void recoverActiveWorkerSet() {
 		System.out.println("HealthManager: recoverActiveWorkerSet");
-		FileInputStream fis = null;
-		ObjectInputStream ois = null;
-		try {
-			fis = new FileInputStream(checkpointDir + File.separator
-					+ "activeworkers");
-			ois = new ObjectInputStream(fis);
-			Set<String> set = (Set<String>) ois.readObject();
-			System.out.println("Active worker set: " + set);
-			master.setActiveWorkerSet(set);
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				fis.close();
-				ois.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		String filePath = checkpointDir + File.separator
+				+ "activeworkers";
+		@SuppressWarnings("unchecked")
+		Set<String> set = (Set<String>) GeneralUtils.deserialize(filePath);
+		System.out.println("Active worker set: " + set);
+		master.setActiveWorkerSet(set);		
 	}
 
 	/**

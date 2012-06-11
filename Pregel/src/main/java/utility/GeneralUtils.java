@@ -1,9 +1,9 @@
 package utility;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -11,21 +11,29 @@ import java.util.LinkedList;
 import java.util.List;
 
 import system.Edge;
-
 import api.Vertex;
 import exceptions.InvalidVertexLineException;
 import exceptions.PropertyNotFoundException;
 import graphs.VertexID;
 
 /**
- * General Utility class
+ * General Utility class.
  */
 public class GeneralUtils {
 
+	/** The props. */
 	private static Props props = Props.getInstance();
+	
+	/** The source vertex delimiter. */
 	private static String sourceVertexDelimiter;
+	
+	/** The edges delimiter. */
 	private static String edgesDelimiter;
+	
+	/** The vertex weight delimiter. */
 	private static String vertexWeightDelimiter;
+	
+	/** The max vertices per partition. */
 	private static long maxVerticesPerPartition;
 
 	static {
@@ -45,11 +53,12 @@ public class GeneralUtils {
 	/**
 	 * generate vertex object from vertexLine <br>
 	 * vertexLine is of the form sourceVertex-Vertex1:Weight1,Vertex2:Weight2 <br>
-	 * Example : 1-2:10,3:15,4:12
-	 * 
-	 * @param vertexLine
-	 * @return
-	 * @throws InvalidVertexLineException
+	 * Example : 1-2:10,3:15,4:12.
+	 *
+	 * @param vertexLine the vertex line
+	 * @param vertexClassName the vertex class name
+	 * @return vertex
+	 * @throws InvalidVertexLineException the invalid vertex line exception
 	 */
 	public static Vertex generateVertex(String vertexLine, String vertexClassName)
 			throws InvalidVertexLineException {
@@ -99,10 +108,9 @@ public class GeneralUtils {
 
 	/**
 	 * for a given vertexId, partitionId is computed and returned, partitionId
-	 * starts from 0
-	 * 
-	 * @param vertexId
-	 *            , input vertedId for which PatitionId is computed
+	 * starts from 0.
+	 *
+	 * @param vertexId , input vertedId for which PatitionId is computed
 	 * @return respective partition Id
 	 */
 	public static int getPartitionID(long vertexId) {
@@ -110,6 +118,12 @@ public class GeneralUtils {
 		return partitionId;
 	}
 	
+	/**
+	 * Serialize the object to the file specified by the file path.
+	 *
+	 * @param filePath the file path
+	 * @param obj the object to be serialized
+	 */
 	public static void serialize(String filePath, Object obj){
 		FileOutputStream fileOutputStream = null;
 		ObjectOutputStream objectOutputStream = null;
@@ -132,7 +146,40 @@ public class GeneralUtils {
 		}
 	}
 
+	/**
+	 * Deserialize the object from the file specified by the file path.
+	 *
+	 * @param filePath the file path
+	 * @return obj the deserialized object
+	 */
+	public static Object deserialize(String filePath){
+		FileInputStream fileInputStream = null;
+		ObjectInputStream objectInputStream = null;
+		Object obj = null;
+		try{
+			fileInputStream = new FileInputStream(filePath);
+			objectInputStream = new ObjectInputStream(fileInputStream);
+			obj = objectInputStream.readObject();
+		}
+		catch(IOException | ClassNotFoundException e){
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				fileInputStream.close();			
+				objectInputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return obj;
+	}
 	
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String args[]) {
 		try {
 			System.out.println(GeneralUtils.generateVertex("1-2:10,3:15,4:12", "Vertex"));
