@@ -104,7 +104,6 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		try {
 			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINTING_DIRECTORY");
 		} catch (PropertyNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -535,10 +534,15 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void heartBeat() throws RemoteException{
 	}
 
+	/**
+	 * Method to prepare the worker
+	 */
 	@Override
 	public void startRecovery() throws PropertyNotFoundException, IOException, ClassNotFoundException {
 		this.canSendMessage = false;
 		this.startSuperStep = false;
+		this.partitionQueue.clear();
+		this.previousIncomingMessages.clear();
 		FileInputStream fis;
 		ObjectInputStream ois;
 		WorkerData workerData;
@@ -547,7 +551,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		fis = new FileInputStream(workerStateFile);
 	    ois = new ObjectInputStream(fis);
 	    workerData = (WorkerData)ois.readObject();
-	 
+	    this.currentIncomingMessages = (ConcurrentHashMap<Integer, Map<VertexID, List<Message>>>)workerData.getMessages();
+	    this.completedPartitions = (BlockingQueue<Partition>)workerData.getPartitions();
 	    ois.close();
 	}
 
@@ -559,5 +564,10 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 			System.out.println("checkpoint failure");
 			throw new RemoteException();
 		}
+	}
+
+	public void addRecoveredData(WorkerData workerData) throws RemoteException {
+		this.currentIncomingMessages.putAll(workerData.getMessages());
+		this.completedPartitions.addAll(workerData.getPartitions());
 	}
 }

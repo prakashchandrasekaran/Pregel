@@ -242,11 +242,15 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		this.worker.checkPoint();
 	}
 
-	public void startRecovery() throws RemoteException{
+	public void startRecovery() throws Exception{
 		worker.startRecovery();
 	}
 	
-	public void finishRecovery() throws RemoteException{
+	public void finishRecovery() throws Exception{
 		worker.finishRecovery();
+	}
+	
+	public void addRecoveredData(WorkerData workerData) throws RemoteException{
+		this.worker.addRecoveredData(workerData);
 	}
 }

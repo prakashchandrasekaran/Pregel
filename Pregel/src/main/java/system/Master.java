@@ -1,6 +1,10 @@
 package system;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -12,7 +16,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,7 +50,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/** The Constant SERVICE_NAME. */
 	private static final String SERVICE_NAME = "Master";
 
-	/** */ 
+	/** The CHECKPOIN t_ frequency. */ 
 	private static int CHECKPOINT_FREQUENCY = 0;
 
 	/** The total number of worker threads. */
@@ -70,9 +77,12 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/** The start time. */
 	long startTime;
 	
+	private static String CHECKPOINTING_DIRECTORY;
+	
 	static {
 		try {
 			CHECKPOINT_FREQUENCY = Props.getInstance().getIntProperty("CHECKPOINT_FREQUENCY");
+			CHECKPOINTING_DIRECTORY = Props.getInstance().getStringProperty("CHECKPOINTING_DIRECTORY");
 		} catch (PropertyNotFoundException e) {
 			/** set to default frequency value **/
 			CHECKPOINT_FREQUENCY = 5;
@@ -150,7 +160,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 *
 	 * @throws RemoteException the remote exception
 	 */
-	private void sendWorkerPartitionInfo() throws RemoteException {
+	public void sendWorkerPartitionInfo() throws RemoteException {
 		System.out.println("Master: sendWorkerPartitionInfo");
 		for (Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
@@ -269,6 +279,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			Registry registry = LocateRegistry.createRegistry(1099);
 			registry.rebind(Master.SERVICE_NAME, master);
 			System.out.println("Master Instance is bound and ready");
+			
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -312,7 +323,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Removes the worker.
 	 *
-	 * @param 
+	 * @param workerID the worker id
 	 */
 	public void removeWorker(String workerID) {
 		workerProxyMap.remove(workerID);
@@ -342,7 +353,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Start super step.
 	 *
-	 * @param superStepCounter the super step counter
 	 * @throws RemoteException the remote exception
 	 */
 	private void startSuperStep() throws RemoteException {
@@ -359,7 +369,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	}
 
 	/**
-	 * start checkpointing in master
+	 * start checkpointing in master.
 	 */
 	private void checkPoint() {
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
@@ -367,6 +377,25 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			try {
 				workerProxy.checkPoint();
 			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		// Serialize the active worker set 
+		FileOutputStream fileOutputStream = null;
+		ObjectOutputStream objectOutputStream = null;
+		try {
+			fileOutputStream = new FileOutputStream(CHECKPOINTING_DIRECTORY + File.pathSeparator + "activeworkers");
+			objectOutputStream = new ObjectOutputStream(fileOutputStream); 
+			objectOutputStream.writeObject(activeWorkerSet); 
+			objectOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				fileOutputStream.close();			
+				objectOutputStream.close();
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -379,9 +408,5 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	public String takeResult() throws RemoteException {
 		return null;
 	}
-
-	public void assignRecoveredPartitions(WorkerData workerData) {
-		
+	
 	}
-
-}

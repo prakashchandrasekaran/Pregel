@@ -3,23 +3,24 @@ package system;
 import graphs.VertexID;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class WorkerData implements Serializable {
 
-	Queue<Partition> partitions;
-	Map<Integer, Map<VertexID, List<Message>>> messages;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4779387255673737945L;
+	private Queue<Partition> partitions;
+	private Map<Integer, Map<VertexID, List<Message>>> messages;
 	
 	public WorkerData(Queue<Partition> partitions,
 			Map<Integer, Map<VertexID, List<Message>>> messages) {
@@ -27,6 +28,27 @@ public class WorkerData implements Serializable {
 		this.messages = messages;
 	}
 	
+	
+	public Queue<Partition> getPartitions() {
+		return partitions;
+	}
+
+
+	public void setPartitions(Queue<Partition> partitions) {
+		this.partitions = partitions;
+	}
+
+
+	public Map<Integer, Map<VertexID, List<Message>>> getMessages() {
+		return messages;
+	}
+
+
+	public void setMessages(Map<Integer, Map<VertexID, List<Message>>> messages) {
+		this.messages = messages;
+	}
+
+
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		
 		Map<Integer, Map<VertexID, List<Message>>> messages

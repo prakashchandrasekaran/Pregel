@@ -39,7 +39,7 @@ public class Partition implements Serializable{
 		this.vertexMap = vertexMap;
 	}
 
-	public int getPartitionID() throws RemoteException{
+	public int getPartitionID(){
 		return partitionID;
 	}
 

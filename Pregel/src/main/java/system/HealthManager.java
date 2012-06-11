@@ -8,7 +8,9 @@ import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import exceptions.PropertyNotFoundException;
 
@@ -96,7 +98,7 @@ public class HealthManager implements Runnable {
 			fis = new FileInputStream(workerStateFile);
 		    ois = new ObjectInputStream(fis);
 		    workerData = (WorkerData)ois.readObject();
-		    master.assignRecoveredPartitions(workerData);
+		    assignRecoveredPartitions(workerID, workerData);
 		    ois.close();
 		}
 		failedWorkers.clear();
@@ -112,7 +114,7 @@ public class HealthManager implements Runnable {
 			workerProxy = entry.getValue();
 			try {
 				workerProxy.startRecovery();
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				System.out.println("Remote Exception received from the Worker");
 				workerProxy.exit();
 				workerID = entry.getKey();
@@ -131,7 +133,7 @@ public class HealthManager implements Runnable {
 			workerProxy = entry.getValue();
 			try {
 				workerProxy.finishRecovery();
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				System.out.println("Remote Exception received from the Worker");
 				workerProxy.exit();
 				workerID = entry.getKey();
@@ -141,6 +143,34 @@ public class HealthManager implements Runnable {
 			}
 		}
 	}
+	
+	/**
+	 * Assign the recovered partitions from the dead Worker to another random Worker
+	 *
+	 * @param workerData the dead Worker's data
+	 */
+	public void assignRecoveredPartitions(String workerID, WorkerData workerData){
+		Set<Entry<String, WorkerProxy>> set = master.getWorkerProxyMap().entrySet();
+		Entry<String, WorkerProxy>[] entries = (Entry<String, WorkerProxy>[])set.toArray();
+		// Choose a random worker from the map and assign the partitions to it.		
+		Random rand = new Random();
+		int index = (rand.nextInt() % entries.length);
+		WorkerProxy workerProxy = entries[index].getValue();
+		
+		for(Iterator<Partition> iter = workerData.getPartitions().iterator(); iter.hasNext();){
+			Partition partition = iter.next();
+			master.partitionWorkerMap.put(partition.getPartitionID(),
+					workerProxy.getWorkerID());
+		}
+		
+		try {
+			workerProxy.addRecoveredData(workerData);
+			master.sendWorkerPartitionInfo();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	public static void main(String[] args) {
 	}
