@@ -58,6 +58,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 
 	/** Superstep Counter *. */
 	private long superstep = 1;
+	
+	/** The health manager **/
+	private HealthManager healthManager;
 
 	/** The workerID to WorkerProxy map. */
 	Map<String, WorkerProxy> workerProxyMap = new HashMap<>();
@@ -150,6 +153,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			GraphPartitioner graphPartitioner = new GraphPartitioner(graphFileName, vertexClassName);
 			assignPartitions(graphPartitioner, sourceVertexID, initData);
 			sendWorkerPartitionInfo();
+			healthManager = new HealthManager(this);
 			startSuperStep();
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
@@ -306,9 +310,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		System.out.println("Master: halt");
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()){
 		     WorkerProxy workerProxy = entry.getValue();
-		     workerProxy.halt();
-		     
+		     workerProxy.halt();     
 		}
+		healthManager.exit();
 		long endTime = System.currentTimeMillis();
 		System.out.println("Time taken: " + (endTime - startTime) + " ms");
 		// Restore the system back to its initial state

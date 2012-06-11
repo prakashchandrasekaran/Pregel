@@ -39,6 +39,7 @@ public class HealthManager implements Runnable {
 	/** The checkpoint dir. */
 	String checkpointDir;
 
+	private Thread t;
 	/**
 	 * Instantiates a new health manager.
 	 * 
@@ -53,7 +54,21 @@ public class HealthManager implements Runnable {
 		pingInterval = properties.getLongProperty("PING_INTERVAL");
 		checkpointDir = properties.getStringProperty("CHECKPOINT_DIR");
 		failedWorkers = new HashSet<>();
+		t = new Thread(this);
+		t.start();
 	}
+	
+	/**
+	 * Stop the HealthManager
+	 */
+	public void exit() {
+		try {
+			t.interrupt();
+		} catch (Exception e) {
+			System.out.println("HealthManager Stopped");
+		}
+	}
+
 
 	/**
 	 * Checks the health of all the workers.
