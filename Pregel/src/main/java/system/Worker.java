@@ -137,17 +137,24 @@ public interface Worker extends Remote{
 	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException;
 	
 	/**
+	 * Method to shutdown the worker machine
+	 * @throws RemoteException
+	 */
+	public void shutdown() throws RemoteException;
+	
+	/**
 	 * Write output.
 	 *
 	 * @param outputFilePath the output file path
 	 * @throws RemoteException the remote exception
 	 */
 	public void writeOutput(String outputFilePath) throws RemoteException;
-	
+
 	/**
 	 * Update checkpoint file after the Master knows that the checkpointing process had succeeded in all the Workers.
 	 *
 	 * @throws RemoteException the remote exception
 	 */
 	public void updateCheckpointFile() throws RemoteException;
+
 }

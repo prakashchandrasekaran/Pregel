@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -511,8 +512,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		return result;
 	}
 
-
-
 	/**
 	 * Gets the partition worker map.
 	 *
@@ -521,8 +520,6 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	public Map<Integer, String> getPartitionWorkerMap() {
 		return partitionWorkerMap;
 	}
-
-
 
 	/**
 	 * Sets the partition worker map.
@@ -533,11 +530,32 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		this.partitionWorkerMap = partitionWorkerMap;
 	}
 
-
-
 	@Override
 	public long getCheckpointedSuperstep() throws RemoteException {
 		return this.lastCheckpointedSuperstep;
+	}
+
+	/**
+	 * Defines a deployment convenience to stop each registered
+	 * {@link system.Worker Worker} and then stops itself.
+	 * 
+	 * @throws java.rmi.RemoteException
+	 *             Throws RemoteException when registered computers are stopped.
+	 */
+
+	public void shutdown() throws RemoteException {
+		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
+			WorkerProxy workerProxy = entry.getValue();
+			try {
+				workerProxy.shutdown();
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		java.util.Date date = new java.util.Date();
+		System.out.println("Master goes down now at :"
+				+ new Timestamp(date.getTime()));
+		System.exit(0);
 	}
 
 }

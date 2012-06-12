@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -593,10 +594,15 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		this.nextPartitionQueue.add(partition);		
 	}
 
-	/* (non-Javadoc)
-	 * @see system.Worker#writeOutput(java.lang.String)
-	 */
+
 	@Override
+	public void shutdown() throws RemoteException {
+			java.util.Date date = new java.util.Date();
+			System.out.println("Worker" + workerID + " goes down now at :"
+					+ new Timestamp(date.getTime()));
+			System.exit(0);
+	}
+	
 	public void writeOutput(String outputFilePath) throws RemoteException{
 		System.out.println("Printing the final state of the partitions");		
 		Iterator<Partition> iter = nextPartitionQueue.iterator();

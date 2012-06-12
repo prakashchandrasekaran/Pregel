@@ -141,8 +141,8 @@
 		</java>
 	</target>
 
-	<target name="shutdown" description="Shutdown the workers and master">
-		<java classname="client.Shutdownworkers" fork="true">
+	<target name="Shutdown" description="Shutdown the workers and master">
+		<java classname="applications.ShutdownClient" fork="true">
 			<jvmarg value="-Djava.rmi.server.codebase=${web_codebase_client}"/>
 			<jvmarg value="-Djava.security.policy=policy/grant_all.policy"/>
 			<arg value="${servername}"/>
