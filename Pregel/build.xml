@@ -40,7 +40,7 @@
 	<property name="host5" value="cartman.cs.ucsb.edu" />
 	<property name="host6" value="elroy.cs.ucsb.edu" />
 	<property name="host7" value="dagwood.cs.ucsb.edu" />
-	<property name="host8" value="calvin.cs.ucsb.edu" />
+	<property name="host8" value="speed.cs.ucsb.edu" />
 	<property name="host9" value="kenny.cs.ucsb.edu" />
 	<property name="host10" value="snoopy.cs.ucsb.edu" />
 	<property name="host11" value="beavis.cs.ucsb.edu" />
