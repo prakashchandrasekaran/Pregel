@@ -258,4 +258,12 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		this.totalPartitions += 1;
 		this.worker.addRecoveredData(partition, messages);
 	}
+
+	public void shutdown() {	
+		try {
+			worker.shutdown();
+		} catch (RemoteException e) {
+			this.exit();
+		}
+	}
 }

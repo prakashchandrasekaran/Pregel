@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -578,5 +579,13 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 			this.currentIncomingMessages.put(partition.getPartitionID(), messages);
 		}
 		this.nextPartitionQueue.add(partition);		
+	}
+
+	@Override
+	public void shutdown() throws RemoteException {
+			java.util.Date date = new java.util.Date();
+			System.out.println("Worker" + workerID + " goes down now at :"
+					+ new Timestamp(date.getTime()));
+			System.exit(0);
 	}
 }
