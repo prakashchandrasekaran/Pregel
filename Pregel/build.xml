@@ -86,7 +86,7 @@
 	<target name="runMaster" depends="dist" description="run master">
 		<java classname="system.Master" fork="true">
 			<jvmarg value="-Djava.rmi.server.codebase=${master_web_codebase}" />
-			<jvmarg value="-Djava.security.policy=policy" />
+			<jvmarg value="-Djava.security.policy=policy/grant_all.policy" />
 			<classpath>
 				<pathelement location="${dist}/${master_jar}" />
 				<pathelement location="${build}" />
@@ -97,10 +97,10 @@
 	<!-- Worker Running Target -->
 	<!-- ======================= -->
 
-	<target name="runWorker" depends="dist" description="run worker">
+	<target name="runWorker" description="run worker">
 		<java classname="system.WorkerImpl" fork="true">
 			<jvmarg value="-Djava.rmi.server.codebase=${worker_web_codebase}" />
-			<jvmarg value="-Djava.security.policy=policy" />
+			<jvmarg value="-Djava.security.policy=policy/grant_all.policy" />
 			<arg value="${servername}" />
 			<classpath>
 				<pathelement location="${dist}/${worker_jar}" />
@@ -112,10 +112,10 @@
 	<!-- Shortest Path Client Running Target -->
 	<!-- =============================================== -->
 
-	<target name="runShortestPathClient" depends="dist" description="run client">
+	<target name="runShortestPathClient" description="run Shortest Path client">
 		<java classname="applications.ShortestPathClient" fork="true">
 			<jvmarg value="-Djava.rmi.server.codebase=${client_web_codebase}" />
-			<jvmarg value="-Djava.security.policy=policy" />
+			<jvmarg value="-Djava.security.policy=policy/grant_all.policy" />
 			<arg value="${servername}" />
 			<classpath>
 				<pathelement location="${dist}/${client_jar}" />
@@ -128,10 +128,10 @@
 	<!-- PageRank Client Running Target -->
 	<!-- ======================================================= -->
 
-	<target name="runPageRankClient" depends="dist" description="run client">
+	<target name="runPageRankClient"  description="run PageRank client">
 		<java classname="applications.PageRankClient" fork="true">
 			<jvmarg value="-Djava.rmi.server.codebase=${client_web_codebase}" />
-			<jvmarg value="-Djava.security.policy=policy" />
+			<jvmarg value="-Djava.security.policy=policy/grant_all.policy" />
 			<arg value="${servername}" />
 			<classpath>
 				<pathelement location="${dist}/${client_jar}" />
@@ -144,7 +144,7 @@
 	<target name="shutdown" description="Shutdown the workers and master">
 		<java classname="client.Shutdownworkers" fork="true">
 			<jvmarg value="-Djava.rmi.server.codebase=${web_codebase_client}"/>
-			<jvmarg value="-Djava.security.policy=policy"/>
+			<jvmarg value="-Djava.security.policy=policy/grant_all.policy"/>
 			<arg value="${servername}"/>
 			<classpath>
 				<pathelement location="${dist}/${client_jar}"/>
