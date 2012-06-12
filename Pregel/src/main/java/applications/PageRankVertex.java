@@ -14,10 +14,14 @@ import api.Vertex;
 
 /**
  * Defines the Vertex implementation for the PageRank graph problem.
+ * 
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
  */
 
 public class PageRankVertex extends Vertex {
-
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 3545610632519357452L;
 
 	/**
@@ -27,13 +31,22 @@ public class PageRankVertex extends Vertex {
 	 *            the vertex id
 	 * @param outgoingEdges
 	 *            the outgoing edges
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
-	public PageRankVertex(VertexID vertexID, List<Edge> outgoingEdges) throws RemoteException {
+	public PageRankVertex(VertexID vertexID, List<Edge> outgoingEdges)
+			throws RemoteException {
 		super(vertexID, outgoingEdges);
 		this.setData(new PageRankData(new Double(0)));
 	}
 
+	/**
+	 * Represents the overrided compute method
+	 * 
+	 * @param messageIterator
+	 *            Represents the iterator for the incoming messages for this
+	 *            vertex
+	 * @return Returns the map of outgoing messages from this vertex
+	 */
 	@Override
 	public Map<VertexID, Message> compute(Iterator<Message> messageIterator) {
 		Map<VertexID, Message> vertexMessageMap = new HashMap<>();
@@ -48,7 +61,7 @@ public class PageRankVertex extends Vertex {
 				sum += data.getValue();
 			}
 			updatedRank = (0.15 / numOutgoingEdges + 0.85 * sum);
-			((PageRankData)this.getData()).setValue(updatedRank);
+			((PageRankData) this.getData()).setValue(updatedRank);
 			for (Edge edge : this.getOutgoingEdges()) {
 				vertexMessageMap.put(edge.getDestID(),
 						new Message(this.getID(), new PageRankData(

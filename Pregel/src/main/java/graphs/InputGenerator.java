@@ -1,8 +1,3 @@
-/*
- * @author Prakash Chandrasekaran
- * @author Gautham Narayanasamy
- * @author Vijayaraghavan Subbaiah
- */
 package graphs;
 
 import java.io.BufferedWriter;
@@ -17,6 +12,10 @@ import exceptions.PropertyNotFoundException;
 /**
  * Generates an adjacency list representing a graph based on the number of
  * vertices and the range of weights to be assigned to the edges.
+ * 
+ * @author Prakash Chandrasekaran
+ * @author Gautham Narayanasamy
+ * @author Vijayaraghavan Subbaiah
  */
 public class InputGenerator {
 
@@ -61,8 +60,9 @@ public class InputGenerator {
 	 */
 	private void setWriter() {
 		try {
-			File file = new File(outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator)));
-			if(! file.exists()){
+			File file = new File(outputFilePath.substring(0,
+					outputFilePath.lastIndexOf(File.separator)));
+			if (!file.exists()) {
 				file.mkdirs();
 			}
 			writer = new BufferedWriter(new FileWriter(outputFilePath));
@@ -113,10 +113,11 @@ public class InputGenerator {
 		for (int vertexId = 0; vertexId < numVertices; vertexId++) {
 			int rightVertexId = ((vertexId + 1) % squareRoot != 0) ? (vertexId + 1)
 					: 0;
-			
+
 			int topVertexId = ((vertexId + 1 + squareRoot) <= numVertices) ? (vertexId + squareRoot)
 					: 0;
-			// System.out.println("vertexId: " + vertexId + " rightvertexId: " + rightVertexId + " topVertexId: " + topVertexId);
+			// System.out.println("vertexId: " + vertexId + " rightvertexId: " +
+			// rightVertexId + " topVertexId: " + topVertexId);
 			adjacencyList.append(vertexId).append(vertexListSeparator);
 
 			// if the right vertex exists, add it to the adjacency list
@@ -146,7 +147,7 @@ public class InputGenerator {
 				adjacencyList = new StringBuilder();
 			}
 		}
-		if (adjacencyList.length() > 0) {			
+		if (adjacencyList.length() > 0) {
 			// Write the graph input to the output file path
 			writeToFile(adjacencyList.toString());
 		}
@@ -181,7 +182,7 @@ public class InputGenerator {
 		double minEdgeWeight = 1;// Double.parseDouble(args[1]);
 		double maxEdgeWeight = 1;// Double.parseDouble(args[2]);
 		String outputFilePath = "input/input.txt";
-		
+
 		InputGenerator inputGenerator = new InputGenerator(numVertices,
 				minEdgeWeight, maxEdgeWeight, outputFilePath);
 		inputGenerator.generateInput();
