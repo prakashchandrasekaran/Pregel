@@ -6,13 +6,13 @@
 package graphs;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
-import exceptions.PropertyNotFoundException;
-
 import utility.Props;
+import exceptions.PropertyNotFoundException;
 
 /**
  * Generates an adjacency list representing a graph based on the number of
@@ -61,6 +61,10 @@ public class InputGenerator {
 	 */
 	private void setWriter() {
 		try {
+			File file = new File(outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator)));
+			if(! file.exists()){
+				file.mkdirs();
+			}
 			writer = new BufferedWriter(new FileWriter(outputFilePath));
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -52,7 +52,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	private static AtomicInteger totalWorkerThreads = new AtomicInteger(0);
 
 	/** Superstep Counter *. */
-	private long superstep = 1;
+	private long superstep = 0;
 	
 	/** The health manager *. */
 	private HealthManager healthManager;
@@ -76,7 +76,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	long startTime;
 	
 	/** The last checkpointed superstep. */
-	private long lastCheckpointedSuperstep = 1;
+	private long lastCheckpointedSuperstep = 0;
 	
 	/** The CHECKPOINTIN g_ directory. */
 	private static String CHECKPOINTING_DIRECTORY;
@@ -187,9 +187,22 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Sets the checkpoint superstep.
 	 */
-	public void setCheckpointSuperstep(){
+	public void resetCheckpointSuperstep(){
 		this.superstep = this.lastCheckpointedSuperstep;
 	}
+
+	
+
+	public long getLastCheckpointedSuperstep() {
+		return lastCheckpointedSuperstep;
+	}
+
+
+
+	public void setLastCheckpointedSuperstep(long lastCheckpointedSuperstep) {
+		this.lastCheckpointedSuperstep = lastCheckpointedSuperstep;
+	}
+
 
 
 	/**
@@ -327,7 +340,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	public void halt() throws RemoteException{
 		healthManager.exit();
 		System.out.println("Master: halt");
-		System.out.println("Worker Proxy Map " + workerProxyMap);
+		//System.out.println("Worker Proxy Map " + workerProxyMap);
 		String outputDir = null;
 		try{
 			outputDir = Props.getInstance().getStringProperty("OUTPUT_DIR");
@@ -389,14 +402,14 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	@Override
 	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
-		System.out.println("Master: superStepCompleted");
-		System.out.println("Acknowledgment from Worker: " + workerID + " - activeWorkerSet " + activeWorkerSet);
+		//System.out.println("Master: superStepCompleted");
+		// System.out.println("Acknowledgment from Worker: " + workerID + " - activeWorkerSet " + activeWorkerSet);
 		this.activeWorkerSet.addAll(activeWorkerSet);
 		this.workerAcknowledgementSet.remove(workerID);
-		System.out.println("WorkerAcknowledgmentSet: " + this.workerAcknowledgementSet);
+		// System.out.println("WorkerAcknowledgmentSet: " + this.workerAcknowledgementSet);
 		// If the acknowledgment has been received from all the workers, start the next superstep
 		if(this.workerAcknowledgementSet.size() == 0) {
-			System.out.println("Acknowledgment received from all workers " + activeWorkerSet);
+			// System.out.println("Acknowledgment received from all workers " + activeWorkerSet);
 			superstep++;
 			if(activeWorkerSet.size() != 0)
 				startSuperStep();
@@ -412,13 +425,12 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	public void startSuperStep() throws RemoteException {
 		if((superstep % CHECKPOINT_FREQUENCY) == 0) {
-			if(superstep != lastCheckpointedSuperstep){
-				checkPoint();
-				lastCheckpointedSuperstep = superstep;
+			if(superstep == 0 || superstep != lastCheckpointedSuperstep){
+				checkPoint();				
 			}
 		}
 		System.out.println("Master: Starting Superstep " + superstep);
-		System.out.println("Active worker set: " + this.activeWorkerSet);
+		// System.out.println("Active worker set: " + this.activeWorkerSet);
 		this.workerAcknowledgementSet.clear();
 		this.workerAcknowledgementSet.addAll(this.activeWorkerSet);
 		
@@ -434,21 +446,45 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	private void checkPoint() {
 		System.out.println("Master: checkpointing!");
 		File f = new File(CHECKPOINTING_DIRECTORY);
-		System.out.println("File path " + f.getAbsolutePath());
 		if(! f.exists()) {
 			f.mkdirs();
 		}
-		
+		boolean isCheckpointingSuccess = true;
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
-			System.out.println("Checkpointing for Worker: " + workerProxy.getWorkerID());
+			// System.out.println("Checkpointing for Worker: " + workerProxy.getWorkerID());
 			try {
-				workerProxy.checkPoint();
+				workerProxy.checkPoint(superstep);
 			} catch (Exception e) {
+				System.out.println("Exception while checkpointing at Worker " + workerProxy.getWorkerID());
 				e.printStackTrace();
+				isCheckpointingSuccess = false;
+				continue;
 			}
 		}
-		this.serializeActiveWorkerSet();		  
+		/* If the checkpointing succeeds in all Workers, update the checkpoint file. Otherwise, the Workers that are alive will point to an previous checkpoint file.
+		 * This is done to make fault tolerance work even when a Worker is killed during checkpointing.
+		 */
+		if(isCheckpointingSuccess){
+			System.out.println("Updating checkpoint file for all Workers.");
+			for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
+				WorkerProxy workerProxy = entry.getValue();				
+				try {
+					workerProxy.updateCheckpointFile();
+				} catch (Exception e) {
+					System.out.println("Exception while updating checkpoint file at Worker " + workerProxy.getWorkerID());
+					e.printStackTrace();
+					continue;
+				}
+			}
+			this.serializeActiveWorkerSet();
+			lastCheckpointedSuperstep = superstep;
+		}
+		else{ // One of the Workers failed while checkpointing! Don't update the checkpoint file
+			System.out.println("One of the Workers failed while checkpointing!");
+		}
+		
+				  
 	}
 	
 	/**
@@ -457,7 +493,8 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	private void serializeActiveWorkerSet(){
 		// Serialize the active worker set 
 		String filePath = CHECKPOINTING_DIRECTORY + File.separator + "activeworkers";
-		GeneralUtils.serialize(filePath, activeWorkerSet);		
+		GeneralUtils.serialize(filePath, activeWorkerSet);
+		//GeneralUtils.renameFile(tmpFilePath, newFilePath);
 	}
 
 	/* (non-Javadoc)
@@ -492,6 +529,11 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		this.partitionWorkerMap = partitionWorkerMap;
 	}
 
+	@Override
+	public long getCheckpointedSuperstep() throws RemoteException {
+		return this.lastCheckpointedSuperstep;
+	}
+
 	/**
 	 * Defines a deployment convenience to stop each registered
 	 * {@link system.Worker Worker} and then stops itself.
@@ -515,4 +557,5 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				+ new Timestamp(date.getTime()));
 		System.exit(0);
 	}
+
 }

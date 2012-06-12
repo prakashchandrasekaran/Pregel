@@ -10,6 +10,9 @@
 	<property name="src" location="src" />
 	<property name="build" location="bin" />
 	<property name="dist" location="dist" />
+         <property name="input" location="input" />
+	<property name="output" location="output" />
+	<property name="checkpoint" location="checkpoint" />
 	<property name="documents" location="documents" />
 	<property name="build_client_dir" location="bin/client" />
 	<property name="build_master_dir" location="bin/master" />
@@ -27,7 +30,7 @@
 	<property name="worker_file_codebase" location="/cs/student/${username}/public_html/cs290b/pregel/worker/" />
 	<property name="worker_web_codebase" value="http://www.cs.ucsb.edu/${username}/cs290b/pregel/worker/" />
 
-	<property name="servername" value="kyle.cs.ucsb.edu" />
+	<property name="servername" value="linus" />
 	<property name="projdir" value="~/cs290b/Pregel/" />
 
 	<property name="host1" value="scooby.cs.ucsb.edu" />
@@ -51,6 +54,9 @@
 	<!-- ============== -->
 
 	<target name="compile" description="compile the source">
+                  <mkdir dir="${input}" />
+                  <mkdir dir="${output}" />
+                  <mkdir dir="${checkpoint}" />
 		<mkdir dir="${build}" />
 		<!-- Create the build directory structure used by compile -->
 		<javac srcdir="${src}" destdir="${build}">

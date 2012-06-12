@@ -1,6 +1,7 @@
 package utility;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -126,7 +127,8 @@ public class GeneralUtils {
 	 * @param filePath the file path
 	 * @param obj the object to be serialized
 	 */
-	public static void serialize(String filePath, Object obj){
+	public static boolean serialize(String filePath, Object obj){
+		boolean serialized = false;
 		FileOutputStream fileOutputStream = null;
 		ObjectOutputStream objectOutputStream = null;
 		try {			
@@ -135,8 +137,10 @@ public class GeneralUtils {
 			objectOutputStream.writeObject(obj); 
 			objectOutputStream.flush(); 
 			objectOutputStream.close();
+			serialized = true;
 		} catch (IOException e) {			
 			e.printStackTrace();
+			serialized = false;
 		}
 		finally{
 			try {
@@ -144,8 +148,10 @@ public class GeneralUtils {
 				objectOutputStream.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+				serialized = false;
 			}
 		}
+		return serialized;
 	}
 
 	/**
@@ -203,6 +209,17 @@ public class GeneralUtils {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	/**
+	 * Rename file.
+	 *
+	 * @param oldFilePath the old file path
+	 * @param newFilePath the new file path
+	 */
+	public static void renameFile(String oldFilePath, String newFilePath){
+		File f = new File(oldFilePath);
+		f.renameTo(new File(newFilePath));
 	}
 	/**
 	 * The main method.

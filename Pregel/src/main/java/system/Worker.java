@@ -135,10 +135,10 @@ public interface Worker extends Remote {
 	/**
 	 * Check point.
 	 * 
-	 * @throws Exception
-	 *             the exception
+	 * @param superstep the superstep
+	 * @throws Exception the exception
 	 */
-	public void checkPoint() throws Exception;
+	public void checkPoint(long superstep) throws Exception;
 
 	/**
 	 * Start recovery.
@@ -185,5 +185,12 @@ public interface Worker extends Remote {
 	 *             the remote exception
 	 */
 	public void writeOutput(String outputFilePath) throws RemoteException;
+
+	/**
+	 * Update checkpoint file after the Master knows that the checkpointing process had succeeded in all the Workers.
+	 *
+	 * @throws RemoteException the remote exception
+	 */
+	public void updateCheckpointFile() throws RemoteException;
 
 }

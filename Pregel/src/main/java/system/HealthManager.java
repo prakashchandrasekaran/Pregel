@@ -126,7 +126,7 @@ public class HealthManager implements Runnable {
 		// assigns it to healthy nodes
 		while (iter.hasNext()) {
 			workerID = iter.next();
-			workerStateFile = checkpointDir + File.separator + workerID;
+			workerStateFile = checkpointDir + File.separator + workerID + "_" + this.master.getLastCheckpointedSuperstep();	
 			workerData = (WorkerData) GeneralUtils.deserialize(workerStateFile);
 			assignRecoveredPartitions(workerID, workerData);
 		}
@@ -201,7 +201,7 @@ public class HealthManager implements Runnable {
 		else {
 			try {
 				System.out.println("Calling start superstep");
-				this.master.setCheckpointSuperstep();
+				this.master.resetCheckpointSuperstep();
 				this.master.startSuperStep();
 			} catch (RemoteException e) {
 				e.printStackTrace();
@@ -234,7 +234,7 @@ public class HealthManager implements Runnable {
 		if (wasDeadWorkerActive) {
 			activeWorkerSet.remove(workerID);
 		}
-		System.out.println("WorkerData Partitions " + workerData);
+		// System.out.println("WorkerData Partitions " + workerData);
 		Random rand = new Random();
 		for (Iterator<Partition> iter = workerData.getPartitions().iterator(); iter
 				.hasNext();) {
@@ -245,8 +245,7 @@ public class HealthManager implements Runnable {
 			// Choose a random worker from the map and assign the partition to
 			// it.
 			WorkerProxy workerProxy = (WorkerProxy) workerProxyCollection[index];
-			System.out.println("Assigning " + partition + " to "
-					+ workerProxy.getWorkerID());
+			System.out.println("Assigning " + partition.getPartitionID() + " to " + workerProxy.getWorkerID() );
 			partitionWorkerMap.put(partition.getPartitionID(),
 					workerProxy.getWorkerID());
 			// If the dead worker was active during checkpointing, add the

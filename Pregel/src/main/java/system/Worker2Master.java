@@ -52,5 +52,9 @@ public interface Worker2Master extends java.rmi.Remote, Serializable {
 	 * @throws java.rmi.RemoteException
 	 *             Throws RemoteException when registered workers are stopped.
 	 */
+	
+	public long getCheckpointedSuperstep() throws RemoteException;
+
 	public void shutdown() throws RemoteException;
+
 }
