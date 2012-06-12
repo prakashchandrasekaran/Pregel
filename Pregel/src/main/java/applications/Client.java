@@ -76,5 +76,7 @@ public class Client {
 		}
 		System.out.println("Vertex class: " + vertexClassName);
 		client2Master.putTask(graphFile, vertexClassName, 0, data);
+		String outputFile = client2Master.takeResult();
+		System.out.println("Output written to " + outputFile);
 	}
 }

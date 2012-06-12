@@ -14,7 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import utility.GeneralUtils;
@@ -53,30 +55,35 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/** Superstep Counter *. */
 	private long superstep = 1;
 	
-	/** The health manager **/
+	/** The health manager *. */
 	private HealthManager healthManager;
 
 	/** The workerID to WorkerProxy map. */
-	Map<String, WorkerProxy> workerProxyMap = new ConcurrentHashMap<>();
+	private Map<String, WorkerProxy> workerProxyMap = new ConcurrentHashMap<>();
 
 	/** The workerID to Worker map. **/
-	Map<String, Worker> workerMap = new HashMap<>();
+	private Map<String, Worker> workerMap = new HashMap<>();
 
 	/** The partitionID to workerID map. **/
-	Map<Integer, String> partitionWorkerMap;
+	private Map<Integer, String> partitionWorkerMap;
 
 	/** Set of Workers maintained for acknowledgment. */
-	Set<String> workerAcknowledgementSet = new HashSet<>();
+	private Set<String> workerAcknowledgementSet = new HashSet<>();
 	
 	/** Set of workers who will be active in the next superstep. */
-	Set<String> activeWorkerSet = new HashSet<>();
+	private Set<String> activeWorkerSet = new HashSet<>();
 	
 	/** The start time. */
 	long startTime;
 	
+	/** The last checkpointed superstep. */
 	private long lastCheckpointedSuperstep = 1;
 	
+	/** The CHECKPOINTIN g_ directory. */
 	private static String CHECKPOINTING_DIRECTORY;
+	
+	/** The result queue. */
+	private BlockingQueue<String> resultQueue = new LinkedBlockingDeque<>(); 
 	
 	static {
 		try {
@@ -102,10 +109,20 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 
 	
 	
+	/**
+	 * Gets the active worker set.
+	 *
+	 * @return the active worker set
+	 */
 	public Set<String> getActiveWorkerSet() {
 		return activeWorkerSet;
 	}
 
+	/**
+	 * Sets the active worker set.
+	 *
+	 * @param activeWorkerSet the new active worker set
+	 */
 	public void setActiveWorkerSet(Set<String> activeWorkerSet) {
 		this.activeWorkerSet = activeWorkerSet;
 	}
@@ -157,9 +174,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 			e.printStackTrace();
 		}
 	}
+	
 	/**
-	 * Gets the worker proxy map info
-	 * 
+	 * Gets the worker proxy map info.
+	 *
 	 * @return Returns the worker proxy map info
 	 */
 	public Map<String, WorkerProxy> getWorkerProxyMap()
@@ -167,6 +185,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		return workerProxyMap;
 	}
 
+	/**
+	 * Sets the checkpoint superstep.
+	 */
 	public void setCheckpointSuperstep(){
 		this.superstep = this.lastCheckpointedSuperstep;
 	}
@@ -316,6 +337,17 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		System.out.println("Time taken: " + (endTime - startTime) + " ms");
 		// Restore the system back to its initial state
 		restoreInitialState();
+		// Inform the client about the result.
+		try {
+			String outputFilePath = Props.getInstance().getStringProperty("OUTPUT_FILE");
+			File outputDir = new File(outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator)));
+			if(! outputDir.exists()){
+				outputDir.mkdirs();
+			}
+			resultQueue.add(outputFilePath);
+		} catch (PropertyNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -412,6 +444,9 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		this.serializeActiveWorkerSet();		  
 	}
 	
+	/**
+	 * Serialize active worker set.
+	 */
 	private void serializeActiveWorkerSet(){
 		// Serialize the active worker set 
 		String filePath = CHECKPOINTING_DIRECTORY + File.separator + "activeworkers";
@@ -423,17 +458,33 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	@Override
 	public String takeResult() throws RemoteException {
-		return null;
+		String result = null;
+		try {
+			result = resultQueue.take();
+		} catch (InterruptedException e) {			
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 
 
+	/**
+	 * Gets the partition worker map.
+	 *
+	 * @return the partition worker map
+	 */
 	public Map<Integer, String> getPartitionWorkerMap() {
 		return partitionWorkerMap;
 	}
 
 
 
+	/**
+	 * Sets the partition worker map.
+	 *
+	 * @param partitionWorkerMap the partition worker map
+	 */
 	public void setPartitionWorkerMap(Map<Integer, String> partitionWorkerMap) {
 		this.partitionWorkerMap = partitionWorkerMap;
 	}

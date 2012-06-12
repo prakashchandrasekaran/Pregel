@@ -1,7 +1,9 @@
 package utility;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -175,6 +177,32 @@ public class GeneralUtils {
 		return obj;
 	}
 	
+	/**
+	 * Write to file.
+	 *
+	 * @param outputFilePath the output file path
+	 * @param contents the contents to be written
+	 * @param append parameter indicating whether or not to write in append mode.
+	 */
+	public static void writeToFile(String outputFilePath, String contents, boolean append){
+		BufferedWriter writer = null;
+		try{
+			writer = new BufferedWriter(new FileWriter(outputFilePath, append));
+			writer.write(contents);
+			writer.flush();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				writer.close();
+			}
+			catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+	}
 	/**
 	 * The main method.
 	 *

@@ -52,10 +52,10 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 */
 	private boolean stopSendingMessage;
 	
-	/** The partition queue. */
+	/** The queue of partitions in the current superstep. */
 	private BlockingQueue<Partition> currentPartitionQueue;
 
-	/** The completed partitions. */
+	/** The queue of partitions in the next superstep. */
 	private BlockingQueue<Partition> nextPartitionQueue;
 
 	/** Hostname of the node with timestamp information. */
@@ -271,11 +271,19 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		System.out.println("Worker Machine " + workerID + " halts");
 		System.out.println("Printing the final state of the partitions");		
 		Iterator<Partition> iter = nextPartitionQueue.iterator();
-		while(iter.hasNext())
-		{
-			System.out.println(iter.next());
+		// Append the appropriate content to the output file.
+		StringBuilder contents = new StringBuilder();
+		String outputFilePath = null;
+		try {
+			outputFilePath = Props.getInstance().getStringProperty("OUTPUT_FILE");
+		} catch (PropertyNotFoundException e) {
+			e.printStackTrace();
+		}
+		while(iter.hasNext()){
+			contents.append(iter.next());			
 		}
 		this.restoreInitialState();
+		GeneralUtils.writeToFile(outputFilePath, contents.toString(), true);
 	}
 	
 	private void restoreInitialState(){
