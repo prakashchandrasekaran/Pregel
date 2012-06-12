@@ -20,9 +20,9 @@ Readme
 	change project working directory
 	change server name
 04. Add host names
-	in Build.xml add host names
-05. Edit props file
-	Change number of vertacies
+	in build.xml add host names
+05. Edit system.properties file in config directory
+	Change number of vertices
 	Change checkpoint frequency
 06. Compiling the source
 	ant dist (or just ant)
@@ -44,4 +44,5 @@ Readme
 10. Shutdown machines
 	* ant Shutdown
 
+11. The output file is created in the name of the current timestamp in the output directory.
 
