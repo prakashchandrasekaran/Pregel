@@ -136,11 +136,18 @@ public class GeneralUtils {
 
 	/**
 	 * Serialize the object to the file specified by the file path.
+<<<<<<< HEAD
 	 * 
 	 * @param filePath
 	 *            the file path
 	 * @param obj
 	 *            the object to be serialized
+=======
+	 *
+	 * @param filePath the file path
+	 * @param obj the object to be serialized
+	 * @return true, if successful
+>>>>>>> 7600b67fcc11d75a41b22c480f830549f201fa50
 	 */
 	public static boolean serialize(String filePath, Object obj) {
 		boolean serialized = false;
@@ -236,6 +243,17 @@ public class GeneralUtils {
 	public static void renameFile(String oldFilePath, String newFilePath) {
 		File f = new File(oldFilePath);
 		f.renameTo(new File(newFilePath));
+	}
+	
+	/**
+	 * Removes the file.
+	 *
+	 * @param filePath the file path
+	 */
+	public static void removeFile(String filePath){
+		System.out.println("GeneralUtils: removeFile " + filePath );
+		File f = new File(filePath);
+		f.delete();
 	}
 
 	/**

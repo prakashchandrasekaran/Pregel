@@ -130,7 +130,7 @@ public class HealthManager implements Runnable {
 			workerData = (WorkerData) GeneralUtils.deserialize(workerStateFile);
 			assignRecoveredPartitions(workerID, workerData);
 		}
-		failedWorkers.clear();
+		
 		// Send the modified maps to all the workers.
 		try {
 			this.master.sendWorkerPartitionInfo();
@@ -138,6 +138,7 @@ public class HealthManager implements Runnable {
 			e.printStackTrace();
 		}
 		finishRecovery();
+		failedWorkers.clear();
 	}
 
 	/**
@@ -182,24 +183,29 @@ public class HealthManager implements Runnable {
 		System.out.println("HealthManager: finishRecovery");
 		String workerID;
 		WorkerProxy workerProxy;
+		boolean failureDuringRecovery = false;
 		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap()
 				.entrySet()) {
 			workerProxy = entry.getValue();
 			try {
-				workerProxy.finishRecovery();
+				workerProxy.finishRecovery();				
 			} catch (Exception e) {
 				System.out.println("Remote Exception received from the Worker");
 				workerProxy.exit();
 				workerID = entry.getKey();
 				failedWorkers.add(workerID);
 				master.removeWorker(workerID);
+				failureDuringRecovery = true;
 				continue;
 			}
 		}
-		if (failedWorkers.size() != 0)
+		if (failureDuringRecovery){
 			recover();
+		}
 		else {
 			try {
+				// Update the checkpoint file for all the workers. This will set the current checkpoint file to the one which was done during this recovery.
+				this.master.updateCheckpointFile();
 				System.out.println("Calling start superstep");
 				this.master.resetCheckpointSuperstep();
 				this.master.startSuperStep();
