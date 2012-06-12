@@ -174,12 +174,12 @@
 
 	<target name="x1Worker" depends="dist" description="launch cluster with 1 Worker">
 		<parallel>
-			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
+			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
 		</parallel>
 	</target>
 
 	<target name="runRemoteMaster" depends="dist" description="launch remote Master">
-		<sshexec host="${servername}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runMaster" />
+		<sshexec host="${servername}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runMaster" />
 	</target>
 
 	<!-- Launch Cluster with 2 Workers Target -->
@@ -187,8 +187,8 @@
 
 	<target name="x2Workers" depends="dist" description="launch cluster with 2 Workers">
 		<parallel>
-			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
+			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
 		</parallel>
 	</target>
 
@@ -197,10 +197,10 @@
 
 	<target name="x4Workers" depends="dist" description="launch cluster with 4 Workers">
 		<parallel>
-			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host3}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host4}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
+			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host3}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host4}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
 		</parallel>
 	</target>
 
@@ -209,14 +209,14 @@
 
 	<target name="x8Workers" depends="dist" description="launch cluster with 8 Workers">
 		<parallel>
-			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host3}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host4}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host5}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host6}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host7}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host8}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
+			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host3}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host4}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host5}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host6}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host7}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host8}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
 		</parallel>
 	</target>
 
@@ -225,22 +225,22 @@
 
 	<target name="x16Workers" depends="dist" description="launch cluster with 16 Workers">
 		<parallel>
-			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host3}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host4}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host5}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host6}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host7}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host8}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host9}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host10}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host11}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host12}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host13}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host14}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host15}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
-			<sshexec host="${host16}" username="${username}" password="${pw}" trust="true" command="cd ${projdir}; ant runWorker" />
+			<sshexec host="${host1}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host2}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host3}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host4}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host5}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host6}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host7}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host8}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host9}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host10}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host11}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host12}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host13}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host14}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host15}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
+			<sshexec host="${host16}" username="${username}" password="${pw}" trust="true" command="sleep 1;source set_java_latest.csh;cd ${projdir}; ant runWorker" />
 		</parallel>
 	</target>
 
