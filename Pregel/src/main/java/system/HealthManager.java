@@ -130,7 +130,7 @@ public class HealthManager implements Runnable {
 			workerData = (WorkerData) GeneralUtils.deserialize(workerStateFile);
 			assignRecoveredPartitions(workerID, workerData);
 		}
-		failedWorkers.clear();
+		
 		// Send the modified maps to all the workers.
 		try {
 			this.master.sendWorkerPartitionInfo();
@@ -138,6 +138,7 @@ public class HealthManager implements Runnable {
 			e.printStackTrace();
 		}
 		finishRecovery();
+		failedWorkers.clear();
 	}
 
 	/**
@@ -182,6 +183,7 @@ public class HealthManager implements Runnable {
 		System.out.println("HealthManager: finishRecovery");
 		String workerID;
 		WorkerProxy workerProxy;
+		boolean failureDuringRecovery = false;
 		for (Map.Entry<String, WorkerProxy> entry : master.getWorkerProxyMap()
 				.entrySet()) {
 			workerProxy = entry.getValue();
@@ -193,11 +195,13 @@ public class HealthManager implements Runnable {
 				workerID = entry.getKey();
 				failedWorkers.add(workerID);
 				master.removeWorker(workerID);
+				failureDuringRecovery = true;
 				continue;
 			}
 		}
-		if (failedWorkers.size() != 0)
+		if (failureDuringRecovery){
 			recover();
+		}
 		else {
 			try {
 				System.out.println("Calling start superstep");
