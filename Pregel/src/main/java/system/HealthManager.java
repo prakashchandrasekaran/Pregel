@@ -188,7 +188,7 @@ public class HealthManager implements Runnable {
 				.entrySet()) {
 			workerProxy = entry.getValue();
 			try {
-				workerProxy.finishRecovery();
+				workerProxy.finishRecovery();				
 			} catch (Exception e) {
 				System.out.println("Remote Exception received from the Worker");
 				workerProxy.exit();
@@ -204,6 +204,8 @@ public class HealthManager implements Runnable {
 		}
 		else {
 			try {
+				// Update the checkpoint file for all the workers. This will set the current checkpoint file to the one which was done during this recovery.
+				this.master.updateCheckpointFile();
 				System.out.println("Calling start superstep");
 				this.master.resetCheckpointSuperstep();
 				this.master.startSuperStep();
