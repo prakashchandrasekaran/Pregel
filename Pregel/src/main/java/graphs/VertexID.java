@@ -11,8 +11,11 @@ import java.io.Serializable;
  * 
  */
 public class VertexID implements Serializable {
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -8636812964597333133L;
+	/** Partition identifier */
 	private int partitionID;
+	/** vertex identifier */
 	private long vertexID;
 
 	/**
@@ -74,5 +77,5 @@ public class VertexID implements Serializable {
 	public long getVertexID() {
 		return vertexID;
 	}
-	
+
 }

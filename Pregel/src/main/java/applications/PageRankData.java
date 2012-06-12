@@ -10,11 +10,13 @@ import api.Data;
  * @author Vijayaraghavan Subbaiah
  */
 public class PageRankData implements Data<Double>{
-	
+	/** Represents the value of the page rank data */
 	Double value;
-	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -3455938165928334533L;
-	
+	/** Constructs the page rank data
+	 * @param value Represents the value of the Page rank data 
+	 */
 	public PageRankData(Double value){
 		this.value = value;
 	}
@@ -48,7 +50,8 @@ public class PageRankData implements Data<Double>{
 	public void setValue(Double value) {
 		this.value = value;
 	}
-
+	
+	/** String representation of the PagerankData */
 	public String toString() {
 		return Double.toString(this.value);
 	}

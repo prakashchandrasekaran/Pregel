@@ -20,16 +20,19 @@ import system.Message;
  * 
  */
 public abstract class Vertex implements Serializable {
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 2036651815090314092L;
+	/** Represents the vertex identifier */
+	private VertexID vertexID;
+	/** Represents the list of outgoing edges for this vertex */
+	private List<Edge> outgoingEdges;
+	/** Represents the data of the vertex */
+	private Data<?> data;
+	/** Represents the current superstep */
+	private long superstep;
 
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2036651815090314092L;
-	private VertexID vertexID;
-	private List<Edge> outgoingEdges;
-	private Data<?> data;
-	private long superstep;
-	/**
+	 * Constructs the vertex
 	 * 
 	 * @param vertexID
 	 *            Represents the pair object containing partitionID and
@@ -37,7 +40,8 @@ public abstract class Vertex implements Serializable {
 	 * @param outgoingEdges
 	 *            Represents the list of outgoing edges from the source vertex
 	 */
-	protected Vertex(VertexID vertexID, List<Edge> outgoingEdges) throws RemoteException{
+	protected Vertex(VertexID vertexID, List<Edge> outgoingEdges)
+			throws RemoteException {
 		this.vertexID = vertexID;
 		this.outgoingEdges = outgoingEdges;
 	}
@@ -61,49 +65,59 @@ public abstract class Vertex implements Serializable {
 	}
 
 	/**
-	 * returns String representation of the Vertex 
+	 * returns String representation of the Vertex
 	 */
 	public String toString() {
 		return "(" + vertexID + "{" + data + "}" + "-" + outgoingEdges + ")";
 	}
-	
+
 	/**
-	 * abstract compute method, When a vertex is active, it executes it compute method
-	 * by taking all input messages and sends message to all its outgoing edges
-	 * @param iterator, iterator of messages
+	 * abstract compute method, When a vertex is active, it executes it compute
+	 * method by taking all input messages and sends message to all its outgoing
+	 * edges
+	 * 
+	 * @param iterator
+	 *            , iterator of messages
 	 * @return
 	 */
-	public abstract Map<VertexID, Message> compute(Iterator<Message> iterator) throws RemoteException;
+	public abstract Map<VertexID, Message> compute(Iterator<Message> iterator)
+			throws RemoteException;
 
 	/**
 	 * gets Data associated with the vertex
-	 * @return
+	 * 
+	 * @return Returns Data associated with the vertex
 	 */
-	public Data<?> getData(){
+	public Data<?> getData() {
 		return data;
 	}
-	
+
 	/**
 	 * sets Data associated with the Vertex
+	 * 
 	 * @param data
+	 *            Data associated with the Vertex
 	 */
-	public void setData(Data<?> data){
+	public void setData(Data<?> data) {
 		this.data = data;
 	}
-	
+
 	/**
-	 * returns SuperStep in which the Vertex is executing 
-	 * @return
+	 * Gets SuperStep in which the Vertex is executing
+	 * 
+	 * @return Returns SuperStep in which the Vertex is executing
 	 */
-	public long getSuperstep(){
+	public long getSuperstep() {
 		return superstep;
 	}
-	
+
 	/**
 	 * sets the SuperStep value for current Vertex
+	 * 
 	 * @param superstepCounter
+	 *            the SuperStep value for current Vertex
 	 */
-	public void setSuperstep(long superstepCounter){
+	public void setSuperstep(long superstepCounter) {
 		this.superstep = superstepCounter;
 	}
 }

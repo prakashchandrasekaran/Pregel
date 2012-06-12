@@ -22,14 +22,15 @@ import api.Vertex;
  * 
  */
 public class GraphPartitioner implements Iterable<Partition> {
-	/**
-	 * Constructs the graph partitions
-	 */
+	/** Number of vertices */
 	private long numVertices;
+	/** Number of partitions */
 	private int numPartitions;
+	/** Buffered Reader to buffer file */
 	private BufferedReader br;
+	/** Vertex class name of the application */
 	private String vertexClassName;
-	
+	/** Maximum number of vertices per partition */
 	public static long MAX_VERTICES_PER_PARTITION;
 
 	static {
@@ -42,6 +43,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 	}
 
 	/**
+	 * Constructs the graph partitioner
 	 * 
 	 * @param fileName
 	 *            Represents the input graph generated file
@@ -54,8 +56,8 @@ public class GraphPartitioner implements Iterable<Partition> {
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-	public GraphPartitioner(String fileName, String vertexClassName) throws NumberFormatException,
-			IOException {
+	public GraphPartitioner(String fileName, String vertexClassName)
+			throws NumberFormatException, IOException {
 		this.vertexClassName = vertexClassName;
 		br = new BufferedReader(new FileReader(fileName));
 		numVertices = Long.parseLong(br.readLine());
@@ -69,6 +71,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 	}
 
 	/**
+	 * Gets the list of vertices comprising a partition
 	 * 
 	 * @return Returns list of vertices comprising a partition
 	 */
@@ -81,12 +84,11 @@ public class GraphPartitioner implements Iterable<Partition> {
 			while ((vertexCounter < MAX_VERTICES_PER_PARTITION)
 					&& ((strLine = br.readLine()) != null)) {
 				vertexCounter += 1;
-				vertex = GeneralUtils.generateVertex(strLine, vertexClassName);				
+				vertex = GeneralUtils.generateVertex(strLine, vertexClassName);
 				vertexMap.put(vertex.getID(), vertex);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			// System.err.println("File Read Error: " + e.getMessage());
 		}
 		return vertexMap;
 	}
@@ -97,9 +99,10 @@ public class GraphPartitioner implements Iterable<Partition> {
 	@Override
 	public Iterator<Partition> iterator() {
 		Iterator<Partition> iter = new Iterator<Partition>() {
-
+			/** partition counter */
 			private int partitionCounter = 0;
 
+			/** Overrides the hasNext method */
 			@Override
 			public boolean hasNext() {
 				if (partitionCounter < numPartitions)
@@ -114,6 +117,7 @@ public class GraphPartitioner implements Iterable<Partition> {
 				}
 			}
 
+			/** Overrides the next method */
 			@Override
 			public Partition next() {
 				Partition nextPartition = null;
@@ -135,10 +139,21 @@ public class GraphPartitioner implements Iterable<Partition> {
 		return iter;
 	}
 
+	/**
+	 * Gets the number of partitions
+	 * 
+	 * @return Returns the number of partitions
+	 */
 	public int getNumPartitions() {
 		return numPartitions;
 	}
 
+	/**
+	 * Sets the number of partitions
+	 * 
+	 * @param numPartitions
+	 *            Represents the number of partitions
+	 */
 	public void setNumPartitions(int numPartitions) {
 		this.numPartitions = numPartitions;
 	}
