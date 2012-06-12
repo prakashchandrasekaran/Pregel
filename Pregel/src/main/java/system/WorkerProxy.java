@@ -258,8 +258,8 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	 *
 	 * @throws Exception the exception
 	 */
-	public void checkPoint() throws Exception {
-		this.worker.checkPoint();
+	public void checkPoint(long superstep) throws Exception {
+		this.worker.checkPoint(superstep);
 	}
 
 	/**
@@ -300,5 +300,15 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	 */
 	public void writeOutput(String outputFilePath) throws RemoteException{
 		this.worker.writeOutput(outputFilePath);
+	}
+	
+	public void updateCheckpointFile() throws RemoteException{
+		this.worker.updateCheckpointFile();
+	}
+
+	@Override
+	public long getCheckpointedSuperstep() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

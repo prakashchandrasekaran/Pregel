@@ -41,4 +41,6 @@ public interface Worker2Master extends java.rmi.Remote, Serializable {
 	 * @param workerID the worker id
 	 */
 	public void superStepCompleted(String workerID, Set<String> activeWorkerIDs) throws RemoteException;
+	
+	public long getCheckpointedSuperstep() throws RemoteException;
 }
