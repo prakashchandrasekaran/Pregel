@@ -328,26 +328,33 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	public void halt() throws RemoteException{
 		System.out.println("Master: halt");
 		System.out.println("Worker Proxy Map " + workerProxyMap);
+		String outputDir = null;
+		try{
+			outputDir = Props.getInstance().getStringProperty("OUTPUT_DIR");
+		}
+		catch(PropertyNotFoundException e){
+			e.printStackTrace();
+		}
+		// Create the output dir if it doesn't exist
+		File file = new File(outputDir);
+		if(! file.exists()){
+			file.mkdirs();
+		}
+		String outputFilePath = outputDir + File.separator + System.currentTimeMillis() + ".txt";
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()){
 		     WorkerProxy workerProxy = entry.getValue();
-		     workerProxy.halt();     
+		     workerProxy.writeOutput(outputFilePath);
+		     workerProxy.halt();
 		}
+		
 		healthManager.exit();
 		long endTime = System.currentTimeMillis();
 		System.out.println("Time taken: " + (endTime - startTime) + " ms");
 		// Restore the system back to its initial state
 		restoreInitialState();
 		// Inform the client about the result.
-		try {
-			String outputFilePath = Props.getInstance().getStringProperty("OUTPUT_FILE");
-			File outputDir = new File(outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator)));
-			if(! outputDir.exists()){
-				outputDir.mkdirs();
-			}
-			resultQueue.add(outputFilePath);
-		} catch (PropertyNotFoundException e) {
-			e.printStackTrace();
-		}
+		resultQueue.add(outputFilePath);
+		
 	}
 	
 	

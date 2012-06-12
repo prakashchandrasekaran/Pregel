@@ -98,12 +98,48 @@ public interface Worker extends Remote{
 	 */
 	public void receiveMessage(Map<VertexID, List<Message>> incomingMessages) throws RemoteException;
 
-	public void heartBeat() throws RemoteException;
+	/**
+	 * Send heartbeat to Worker to check its health.
+	 *
+	 * @throws RemoteException the remote exception
+	 */
+	public void sendHeartBeat() throws RemoteException;
+	
+	/**
+	 * Check point.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void checkPoint() throws Exception;
 
+	/**
+	 * Start recovery.
+	 *
+	 * @throws RemoteException the remote exception
+	 */
 	public void startRecovery() throws RemoteException;
 
+	/**
+	 * Finish recovery.
+	 *
+	 * @throws RemoteException the remote exception
+	 */
 	public void finishRecovery() throws RemoteException;
 	
+	/**
+	 * Adds the recovered data.
+	 *
+	 * @param partition the partition
+	 * @param messages the messages
+	 * @throws RemoteException the remote exception
+	 */
 	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException;
+	
+	/**
+	 * Write output.
+	 *
+	 * @param outputFilePath the output file path
+	 * @throws RemoteException the remote exception
+	 */
+	public void writeOutput(String outputFilePath) throws RemoteException;
 }

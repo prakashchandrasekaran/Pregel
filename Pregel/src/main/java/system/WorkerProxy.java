@@ -117,6 +117,9 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		partitionList.add(partition);
 	}
 
+	/**
+	 * Exit.
+	 */
 	public void exit() {
 		try {
 			t.interrupt();
@@ -135,7 +138,9 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	}
 
 	/**
-	 * Halts the worker and prints the final solution
+	 * Halts the worker and prints the final solution.
+	 *
+	 * @throws RemoteException the remote exception
 	 */
 	public void halt() throws RemoteException {
 		this.restoreInitialState();
@@ -165,12 +170,10 @@ public class WorkerProxy implements Runnable, Worker2Master {
 
 	/**
 	 * Sets the worker partition info.
-	 * 
-	 * @param mapPartitionIdToWorkerId
-	 *            the map partition id to worker id
-	 * @param mapWorkerIdToWorker
-	 *            the map worker id to worker
-	 * @throws RemoteException
+	 *
+	 * @param mapPartitionIdToWorkerId the map partition id to worker id
+	 * @param mapWorkerIdToWorker the map worker id to worker
+	 * @throws RemoteException the remote exception
 	 */
 	public void setWorkerPartitionInfo(
 			Map<Integer, String> mapPartitionIdToWorkerId,
@@ -214,9 +217,9 @@ public class WorkerProxy implements Runnable, Worker2Master {
 
 	/**
 	 * Start super step.
-	 * 
-	 * @param superStepCounter
-	 *            the super step counter
+	 *
+	 * @param superStepCounter the super step counter
+	 * @throws RemoteException the remote exception
 	 */
 	public void startSuperStep(long superStepCounter) throws RemoteException {
 		this.worker.startSuperStep(superStepCounter);
@@ -224,9 +227,9 @@ public class WorkerProxy implements Runnable, Worker2Master {
 
 	/**
 	 * Sets the initial message for the Worker that has the source vertex.
-	 * 
-	 * @param initialMessage
-	 *            the initial message
+	 *
+	 * @param initialMessage the initial message
+	 * @throws RemoteException the remote exception
 	 */
 	public void setInitialMessage(
 			ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage)
@@ -234,28 +237,68 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		this.worker.setInitialMessage(initialMessage);
 	}
 
+	/**
+	 * Restore initial state.
+	 */
 	private void restoreInitialState() {
 		this.totalPartitions = 0;
 	}
 
-	public void heartBeat() throws RemoteException {
-		this.worker.heartBeat();
+	/**
+	 * Heart beat.
+	 *
+	 * @throws RemoteException the remote exception
+	 */
+	public void sendHeartBeat() throws RemoteException {
+		this.worker.sendHeartBeat();
 	}
 	
+	/**
+	 * Check point.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void checkPoint() throws Exception {
 		this.worker.checkPoint();
 	}
 
+	/**
+	 * Start recovery.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void startRecovery() throws Exception{
 		worker.startRecovery();
 	}
 	
+	/**
+	 * Finish recovery.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void finishRecovery() throws Exception{
 		worker.finishRecovery();
 	}
 	
+	/**
+	 * Adds the recovered data.
+	 *
+	 * @param partition the partition
+	 * @param messages the messages
+	 * @throws RemoteException the remote exception
+	 */
 	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException {
 		this.totalPartitions += 1;
 		this.worker.addRecoveredData(partition, messages);
+	}
+	
+	/**
+	 * Write output.
+	 *
+	 * @param outputFilePath the output file path
+	 * @throws RemoteException the remote exception
+	 */
+	public void writeOutput(String outputFilePath) throws RemoteException{
+		this.worker.writeOutput(outputFilePath);
 	}
 }
