@@ -88,10 +88,10 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	/** The super step counter. */
 	private long superstep = 0;
 
-	/** The next checkpoint file. */
+	/** The checkpoint file that points to the latest checkpoint */
 	private String nextCheckpointFile;
 	
-	/** The current checkpoint file. */
+	/** The checkpoint file that points to the last successful checkpoint (among all Workers). */
 	private String currentCheckpointFile;
 	
 	/** The CHECKPOINTIN g_ directory. */
@@ -523,9 +523,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		// Serialization
 		
 		// Don't update the currentCheckpointFile until the Master confirms that the checkpointing had succeeded in all the Workers.
-		nextCheckpointFile = CHECKPOINTING_DIRECTORY + File.separator + workerID + "_" + superstep;
+		this.nextCheckpointFile = CHECKPOINTING_DIRECTORY + File.separator + workerID + "_" + superstep;
 		// String newFilePath = CHECKPOINTING_DIRECTORY + File.separator + workerID;
-		GeneralUtils.serialize(nextCheckpointFile, wd);
+		GeneralUtils.serialize(this.nextCheckpointFile, wd);
 		//nextCheckpointFile = tmpFilePath;
 		// GeneralUtils.renameFile(tmpFilePath, newFilePath);
 	}
