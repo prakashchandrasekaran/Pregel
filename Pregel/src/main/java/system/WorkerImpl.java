@@ -274,8 +274,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 						worker2WorkerProxy.sendMessage(entry.getKey(),
 								entry.getValue());
 					} catch (RemoteException e) {
-						e.printStackTrace();
-
+						System.out.println("Can't send message to Worker "
+								+ entry.getKey() + " which is down");
 					}
 				}
 
@@ -633,14 +633,14 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		this.currentPartitionQueue.clear();
 		this.previousIncomingMessages.clear();
 		this.outgoingMessages.clear();
-		
+
 		WorkerData workerData = (WorkerData) GeneralUtils
 				.deserialize(this.currentCheckpointFile);
 		this.currentIncomingMessages = (ConcurrentHashMap<Integer, Map<VertexID, List<Message>>>) workerData
 				.getMessages();
 		this.nextPartitionQueue = (BlockingQueue<Partition>) workerData
 				.getPartitions();
-		
+
 	}
 
 	/*
@@ -652,8 +652,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void finishRecovery() throws RemoteException {
 		System.out.println("WorkerImpl: finishRecovery");
 		try {
-			// Do checkpointing after assigning recovered partitions.  
-			checkPoint(this.superstep);			
+			// Do checkpointing after assigning recovered partitions.
+			checkPoint(this.superstep);
 		} catch (Exception e) {
 			System.out.println("checkpoint failure");
 			throw new RemoteException();
@@ -710,10 +710,10 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 */
 	@Override
 	public void updateCheckpointFile() throws RemoteException {
-		if(this.currentCheckpointFile != null){
+		if (this.currentCheckpointFile != null) {
 			GeneralUtils.removeFile(this.currentCheckpointFile);
 		}
-		this.currentCheckpointFile = this.nextCheckpointFile;		
+		this.currentCheckpointFile = this.nextCheckpointFile;
 		System.out.println("WorkerImpl: Updating checkpoint file: "
 				+ this.currentCheckpointFile);
 	}
