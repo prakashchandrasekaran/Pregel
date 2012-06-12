@@ -426,7 +426,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 	public void startSuperStep() throws RemoteException {
 		if((superstep % CHECKPOINT_FREQUENCY) == 0) {
-			if(superstep != lastCheckpointedSuperstep){
+			if(superstep == 0 || superstep != lastCheckpointedSuperstep){
 				checkPoint();				
 			}
 		}

@@ -61,7 +61,7 @@ public class InputGenerator {
 	 */
 	private void setWriter() {
 		try {
-			File file = new File(outputFilePath);
+			File file = new File(outputFilePath.substring(0, outputFilePath.lastIndexOf(File.separator)));
 			if(! file.exists()){
 				file.mkdirs();
 			}
