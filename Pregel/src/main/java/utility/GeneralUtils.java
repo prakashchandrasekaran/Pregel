@@ -185,6 +185,7 @@ public class GeneralUtils {
 	 * @param append parameter indicating whether or not to write in append mode.
 	 */
 	public static void writeToFile(String outputFilePath, String contents, boolean append){
+		System.out.println("GeneralUtils: writeToFile " + outputFilePath);
 		BufferedWriter writer = null;
 		try{
 			writer = new BufferedWriter(new FileWriter(outputFilePath, append));

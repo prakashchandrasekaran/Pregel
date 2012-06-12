@@ -83,7 +83,7 @@
 	<!-- Master Running Target -->
 	<!-- ==================== -->
 
-	<target name="runMaster" depends="dist" description="run master">
+	<target name="runMaster" description="run master">
 		<java classname="system.Master" fork="true">
 			<jvmarg value="-Djava.rmi.server.codebase=${master_web_codebase}" />
 			<jvmarg value="-Djava.security.policy=policy/grant_all.policy" />

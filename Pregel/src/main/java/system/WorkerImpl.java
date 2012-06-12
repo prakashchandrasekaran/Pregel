@@ -265,26 +265,14 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	}
 	
 	/**
-	 * Halts the run for this application and prints the output in a file
+	 * Halts the run for this application and prints the output in a file.
+	 *
+	 * @throws RemoteException the remote exception
 	 */
 	public void halt() throws RemoteException
 	{
 		System.out.println("Worker Machine " + workerID + " halts");
-		System.out.println("Printing the final state of the partitions");		
-		Iterator<Partition> iter = nextPartitionQueue.iterator();
-		// Append the appropriate content to the output file.
-		StringBuilder contents = new StringBuilder();
-		String outputFilePath = null;
-		try {
-			outputFilePath = Props.getInstance().getStringProperty("OUTPUT_FILE");
-		} catch (PropertyNotFoundException e) {
-			e.printStackTrace();
-		}
-		while(iter.hasNext()){
-			contents.append(iter.next());			
-		}
-		this.restoreInitialState();
-		GeneralUtils.writeToFile(outputFilePath, contents.toString(), true);
+		this.restoreInitialState();		
 	}
 	
 	private void restoreInitialState(){
@@ -482,7 +470,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 * @param superStepCounter the super step counter
 	 */
 	public void startSuperStep(long superStepCounter){
-		System.out.println("WorkerImpl: startSuperStep - superStepCounter: " + superStepCounter);
+		// System.out.println("WorkerImpl: startSuperStep - superStepCounter: " + superStepCounter);
 		this.superstep = superStepCounter;
 		// Put all elements in current incoming queue to previous incoming queue and clear the current incoming queue.
 		this.previousIncomingMessages.clear();
@@ -521,7 +509,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 				this.currentIncomingMessages
 				);
 		// Serialization
-		System.out.println("Checkpointing WorkerData " + wd + " for " + workerID);
+		// System.out.println("Checkpointing WorkerData " + wd + " for " + workerID);
 		String filePath = CHECKPOINTING_DIRECTORY + File.separator + workerID;
 		GeneralUtils.serialize(filePath, wd);		
 	}
@@ -530,7 +518,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 * Master checks the heart beat of the worker by calling this method
 	 */
 	@Override
-	public void heartBeat() throws RemoteException{
+	public void sendHeartBeat() throws RemoteException{
 	}
 
 	/**
@@ -573,19 +561,33 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 
 	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException {
 		System.out.println("WorkerImpl: addRecoveredData");
-		System.out.println("Partition " + partition.getPartitionID());
-		System.out.println("Messages: " + messages);
+//		System.out.println("Partition " + partition.getPartitionID());
+//		System.out.println("Messages: " + messages);
 		if(messages != null){
 			this.currentIncomingMessages.put(partition.getPartitionID(), messages);
 		}
 		this.nextPartitionQueue.add(partition);		
 	}
 
+	/**
+	 * Shutdown the worker machine
+	 */
 	@Override
 	public void shutdown() throws RemoteException {
 			java.util.Date date = new java.util.Date();
 			System.out.println("Worker" + workerID + " goes down now at :"
 					+ new Timestamp(date.getTime()));
 			System.exit(0);
+	}
+	
+	public void writeOutput(String outputFilePath) throws RemoteException{
+		System.out.println("Printing the final state of the partitions");		
+		Iterator<Partition> iter = nextPartitionQueue.iterator();
+		// Append the appropriate content to the output file.
+		StringBuilder contents = new StringBuilder();
+		while(iter.hasNext()){
+			contents.append(iter.next());			
+		}
+		GeneralUtils.writeToFile(outputFilePath, contents.toString(), true);
 	}
 }

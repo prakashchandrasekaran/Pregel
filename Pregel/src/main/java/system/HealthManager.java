@@ -79,7 +79,7 @@ public class HealthManager implements Runnable {
 				.entrySet()) {
 			workerProxy = entry.getValue();
 			try {
-				workerProxy.heartBeat();
+				workerProxy.sendHeartBeat();
 			} catch (RemoteException e) {
 				System.out.println("Remote Exception received from the Worker");
 				workerProxy.exit();

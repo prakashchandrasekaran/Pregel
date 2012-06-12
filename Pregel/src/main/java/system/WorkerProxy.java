@@ -91,16 +91,19 @@ public class WorkerProxy implements Runnable, Worker2Master {
 				System.out.println("Partition taken");
 				worker.addPartition(partition);
 			} catch (RemoteException e) {
-				System.out.println("Remote Exception received from the Worker " + workerID);
+				System.out.println("Remote Exception received from the Worker "
+						+ workerID);
 				// System.out.println("Giving back the partition to the Master ");
-				System.out.println("RemoteException: Removing Worker from Master");
+				System.out
+						.println("RemoteException: Removing Worker from Master");
 				master.removeWorker(workerID);
 				// return;
 			} catch (InterruptedException e) {
 				System.out.println("Thread interrupted");
-				System.out.println("InterruptedException: Removing Worker from Master");
+				System.out
+						.println("InterruptedException: Removing Worker from Master");
 				master.removeWorker(workerID);
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 	}
@@ -117,6 +120,9 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		partitionList.add(partition);
 	}
 
+	/**
+	 * Exit.
+	 */
 	public void exit() {
 		try {
 			t.interrupt();
@@ -135,7 +141,10 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	}
 
 	/**
-	 * Halts the worker and prints the final solution
+	 * Halts the worker and prints the final solution.
+	 * 
+	 * @throws RemoteException
+	 *             the remote exception
 	 */
 	public void halt() throws RemoteException {
 		this.restoreInitialState();
@@ -171,6 +180,7 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	 * @param mapWorkerIdToWorker
 	 *            the map worker id to worker
 	 * @throws RemoteException
+	 *             the remote exception
 	 */
 	public void setWorkerPartitionInfo(
 			Map<Integer, String> mapPartitionIdToWorkerId,
@@ -217,6 +227,8 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	 * 
 	 * @param superStepCounter
 	 *            the super step counter
+	 * @throws RemoteException
+	 *             the remote exception
 	 */
 	public void startSuperStep(long superStepCounter) throws RemoteException {
 		this.worker.startSuperStep(superStepCounter);
@@ -227,6 +239,8 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	 * 
 	 * @param initialMessage
 	 *            the initial message
+	 * @throws RemoteException
+	 *             the remote exception
 	 */
 	public void setInitialMessage(
 			ConcurrentHashMap<Integer, Map<VertexID, List<Message>>> initialMessage)
@@ -234,36 +248,89 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		this.worker.setInitialMessage(initialMessage);
 	}
 
+	/**
+	 * Restore initial state.
+	 */
 	private void restoreInitialState() {
 		this.totalPartitions = 0;
 	}
 
-	public void heartBeat() throws RemoteException {
-		this.worker.heartBeat();
+	/**
+	 * Heart beat.
+	 * 
+	 * @throws RemoteException
+	 *             the remote exception
+	 */
+	public void sendHeartBeat() throws RemoteException {
+		this.worker.sendHeartBeat();
 	}
-	
+
+	/**
+	 * Check point.
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
 	public void checkPoint() throws Exception {
 		this.worker.checkPoint();
 	}
 
-	public void startRecovery() throws Exception{
+	/**
+	 * Start recovery.
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
+	public void startRecovery() throws Exception {
 		worker.startRecovery();
 	}
-	
-	public void finishRecovery() throws Exception{
+
+	/**
+	 * Finish recovery.
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
+	public void finishRecovery() throws Exception {
 		worker.finishRecovery();
 	}
-	
-	public void addRecoveredData(Partition partition, Map<VertexID, List<Message>> messages) throws RemoteException {
+
+	/**
+	 * Adds the recovered data.
+	 * 
+	 * @param partition
+	 *            the partition
+	 * @param messages
+	 *            the messages
+	 * @throws RemoteException
+	 *             the remote exception
+	 */
+	public void addRecoveredData(Partition partition,
+			Map<VertexID, List<Message>> messages) throws RemoteException {
 		this.totalPartitions += 1;
 		this.worker.addRecoveredData(partition, messages);
 	}
-
-	public void shutdown() {	
+	
+	/**
+	 * Shutdowns the worker and exits
+	 */
+	public void shutdown() {
 		try {
 			worker.shutdown();
 		} catch (RemoteException e) {
 			this.exit();
 		}
+	}
+
+	/**
+	 * Write output.
+	 * 
+	 * @param outputFilePath
+	 *            the output file path
+	 * @throws RemoteException
+	 *             the remote exception
+	 */
+	public void writeOutput(String outputFilePath) throws RemoteException {
+		this.worker.writeOutput(outputFilePath);
 	}
 }
