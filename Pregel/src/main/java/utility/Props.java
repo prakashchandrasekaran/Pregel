@@ -27,7 +27,7 @@ public class Props {
 
 	public static synchronized Props getInstance() {
 		if (props == null) {
-			props = new Props("../config/system.properties");
+			props = new Props("config/system.properties");
 		}
 		return props;
 	}
