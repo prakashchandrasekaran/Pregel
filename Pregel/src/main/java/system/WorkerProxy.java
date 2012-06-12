@@ -338,8 +338,4 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		this.worker.updateCheckpointFile();
 	}
 
-	@Override
-	public long getCheckpointedSuperstep() throws RemoteException {
-		return this.master.getCheckpointedSuperstep();
-	}
 }

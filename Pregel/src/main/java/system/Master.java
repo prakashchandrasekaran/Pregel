@@ -401,7 +401,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @see system.Worker2Master#superStepCompleted(java.lang.String, java.util.Set)
 	 */
 	@Override
-	public void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
+	public synchronized void superStepCompleted(String workerID, Set<String> activeWorkerSet) throws RemoteException {
 		//System.out.println("Master: superStepCompleted");
 		// System.out.println("Acknowledgment from Worker: " + workerID + " - activeWorkerSet " + activeWorkerSet);
 		this.activeWorkerSet.addAll(activeWorkerSet);
@@ -529,11 +529,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 		this.partitionWorkerMap = partitionWorkerMap;
 	}
 
-	@Override
-	public long getCheckpointedSuperstep() throws RemoteException {
-		return this.lastCheckpointedSuperstep;
-	}
-
+	
 	/**
 	 * Defines a deployment convenience to stop each registered
 	 * {@link system.Worker Worker} and then stops itself.

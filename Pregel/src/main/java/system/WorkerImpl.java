@@ -652,8 +652,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void finishRecovery() throws RemoteException {
 		System.out.println("WorkerImpl: finishRecovery");
 		try {
-			System.out.println("this.masterProxy.getCheckpointedSuperstep() " + this.masterProxy.getCheckpointedSuperstep());
-			checkPoint(this.masterProxy.getCheckpointedSuperstep());			
+			// Do checkpointing after assigning recovered partitions.  
+			checkPoint(this.superstep);			
 		} catch (Exception e) {
 			System.out.println("checkpoint failure");
 			throw new RemoteException();
@@ -714,7 +714,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 			GeneralUtils.removeFile(this.currentCheckpointFile);
 		}
 		this.currentCheckpointFile = this.nextCheckpointFile;		
-		System.out.println("WorkerImpl: current checkpoint file: "
+		System.out.println("WorkerImpl: Updating checkpoint file: "
 				+ this.currentCheckpointFile);
 	}
 }
