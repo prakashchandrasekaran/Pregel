@@ -710,7 +710,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 */
 	@Override
 	public void updateCheckpointFile() throws RemoteException {
-		GeneralUtils.removeFile(this.currentCheckpointFile);
+		if(this.currentCheckpointFile != null){
+			GeneralUtils.removeFile(this.currentCheckpointFile);
+		}
 		this.currentCheckpointFile = this.nextCheckpointFile;		
 		System.out.println("WorkerImpl: current checkpoint file: "
 				+ this.currentCheckpointFile);

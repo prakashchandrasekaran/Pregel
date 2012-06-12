@@ -230,6 +230,7 @@ public class GeneralUtils {
 	 * @param filePath the file path
 	 */
 	public static void removeFile(String filePath){
+		System.out.println("GeneralUtils: removeFile " + filePath );
 		File f = new File(filePath);
 		f.delete();
 	}
