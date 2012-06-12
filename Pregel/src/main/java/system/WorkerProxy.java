@@ -31,7 +31,7 @@ public class WorkerProxy implements Runnable, Worker2Master {
 	/** The master. */
 	private Master master;
 
-	/** The t. */
+	/** The thread */
 	private Thread t;
 
 	/** The num worker threads. */
@@ -310,7 +310,7 @@ public class WorkerProxy implements Runnable, Worker2Master {
 		this.totalPartitions += 1;
 		this.worker.addRecoveredData(partition, messages);
 	}
-	
+
 	/**
 	 * Shutdowns the worker and exits
 	 */

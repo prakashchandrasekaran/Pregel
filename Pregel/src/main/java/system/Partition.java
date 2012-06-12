@@ -19,42 +19,70 @@ import api.Vertex;
  * 
  */
 
-public class Partition implements Serializable{
-	/**
-	 * 
-	 */
+public class Partition implements Serializable {
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -7212204736364464061L;
 	private Map<VertexID, Vertex> vertexMap;
-	int partitionID;
+	private int partitionID;
 
-	public Partition() throws RemoteException{
-		
+	public Partition() throws RemoteException {
+
 	}
+
 	/**
-	 * @param vertexList
-	 *            Represents the list of vertices in a partition
+	 * Constructs a partition
+	 * 
+	 * @param partitionID
+	 *            Represents the unique id of the partition
+	 * @param vertexMap
+	 *            Represents mapping between id and its respective vertices
+	 * @throws RemoteException
 	 */
-	public Partition(int partitionID, Map<VertexID, Vertex> vertexMap) throws RemoteException{
+	public Partition(int partitionID, Map<VertexID, Vertex> vertexMap)
+			throws RemoteException {
 		this.partitionID = partitionID;
 		this.vertexMap = vertexMap;
 	}
 
-	public int getPartitionID(){
+	/**
+	 * Gets the id of the partition
+	 * 
+	 * @return returns the id of the partition
+	 */
+	public int getPartitionID() {
 		return partitionID;
 	}
 
-	public void setPartitionID(int partitionID) throws RemoteException{
+	/**
+	 * Sets the id of the partition
+	 * 
+	 * @param partitionID
+	 *            Represents the unique id of the partition
+	 * @throws RemoteException
+	 */
+	public void setPartitionID(int partitionID) throws RemoteException {
 		this.partitionID = partitionID;
 	}
 
-	public Vertex getVertex(VertexID vertexID) throws RemoteException{
+	/**
+	 * Gets the vertex
+	 * 
+	 * @param vertexID
+	 *            Represents the unique id of the vertex
+	 * @return Returns the vertex
+	 * @throws RemoteException
+	 */
+	public Vertex getVertex(VertexID vertexID) throws RemoteException {
 		return vertexMap.get(vertexID);
 	}
 
+	/**
+	 * String Representation of the object
+	 */
 	public String toString() {
-		String result = "Partition ID :" + this.partitionID +"\n";
-		for (Entry<VertexID, Vertex> entry : vertexMap.entrySet()) 
-				result += entry.getValue().toString() + "\n";
+		String result = "Partition ID :" + this.partitionID + "\n";
+		for (Entry<VertexID, Vertex> entry : vertexMap.entrySet())
+			result += entry.getValue().toString() + "\n";
 		return result;
 	}
 }

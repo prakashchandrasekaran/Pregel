@@ -19,7 +19,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import utility.GeneralUtils;
 import utility.Props;
 import api.Client2Master;
@@ -27,7 +26,6 @@ import api.Data;
 import exceptions.PropertyNotFoundException;
 import graphs.GraphPartitioner;
 import graphs.VertexID;
-
 
 /**
  * The Class Master.
@@ -327,6 +325,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 * @throws RemoteException the remote exception
 	 */
 	public void halt() throws RemoteException{
+		healthManager.exit();
 		System.out.println("Master: halt");
 		System.out.println("Worker Proxy Map " + workerProxyMap);
 		String outputDir = null;
@@ -502,6 +501,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	 */
 
 	public void shutdown() throws RemoteException {
+		healthManager.exit();
 		for(Map.Entry<String, WorkerProxy> entry : workerProxyMap.entrySet()) {
 			WorkerProxy workerProxy = entry.getValue();
 			try {

@@ -14,14 +14,15 @@ import java.io.Serializable;
  * 
  */
 
-public class Edge implements Serializable{
+public class Edge implements Serializable {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 349936200862773459L;
+	/** source vertex ID **/
 	private VertexID sourceID;
+	/** Destination vertex ID **/
 	private VertexID destID;
+	/** Edge Weight **/
 	private double weight;
 
 	/**
@@ -38,6 +39,9 @@ public class Edge implements Serializable{
 		this.weight = weight;
 	}
 
+	/**
+	 * Overrides the default java toString method
+	 */
 	@Override
 	public String toString() {
 		return "(" + sourceID + "," + destID + "-" + weight + ")";
@@ -60,9 +64,11 @@ public class Edge implements Serializable{
 	public VertexID getDestID() {
 		return destID;
 	}
-	
+
 	/**
+	 * Gets the edge weight
 	 * 
+	 * @return Returns the edge weight
 	 */
 	public double getEdgeWeight() {
 		return this.weight;
