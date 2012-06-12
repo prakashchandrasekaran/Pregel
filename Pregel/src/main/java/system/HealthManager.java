@@ -206,8 +206,11 @@ public class HealthManager implements Runnable {
 			try {
 				// Update the checkpoint file for all the workers. This will set the current checkpoint file to the one which was done during this recovery.
 				this.master.updateCheckpointFile();
-				System.out.println("Calling start superstep");
+				// Serialize the active worker set.
+				this.master.serializeActiveWorkerSet();
+				// Reset the superstep to the most recent superstep at which checkpointing was done.
 				this.master.resetCheckpointSuperstep();
+				System.out.println("Calling start superstep");
 				this.master.startSuperStep();
 			} catch (RemoteException e) {
 				e.printStackTrace();

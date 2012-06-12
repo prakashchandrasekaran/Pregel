@@ -505,11 +505,10 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 	/**
 	 * Serialize active worker set.
 	 */
-	private void serializeActiveWorkerSet(){
+	public void serializeActiveWorkerSet(){
 		// Serialize the active worker set 
 		String filePath = CHECKPOINTING_DIRECTORY + File.separator + "activeworkers";
-		GeneralUtils.serialize(filePath, activeWorkerSet);
-		//GeneralUtils.renameFile(tmpFilePath, newFilePath);
+		GeneralUtils.serialize(filePath, activeWorkerSet);		
 	}
 
 	/* (non-Javadoc)
