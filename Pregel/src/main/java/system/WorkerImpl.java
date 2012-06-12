@@ -653,8 +653,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		System.out.println("WorkerImpl: finishRecovery");
 		try {
 			System.out.println("this.masterProxy.getCheckpointedSuperstep() " + this.masterProxy.getCheckpointedSuperstep());
-			checkPoint(this.masterProxy.getCheckpointedSuperstep());
-			System.exit(0);
+			checkPoint(this.masterProxy.getCheckpointedSuperstep());			
 		} catch (Exception e) {
 			System.out.println("checkpoint failure");
 			throw new RemoteException();
@@ -683,7 +682,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void shutdown() throws RemoteException {
 		java.util.Date date = new java.util.Date();
 		System.out.println("Worker" + workerID + " goes down now at :"
-				+ new Timestamp(date.getTime()));		
+				+ new Timestamp(date.getTime()));
+		System.exit(0);
 	}
 
 	/**
