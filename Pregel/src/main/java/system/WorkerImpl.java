@@ -633,35 +633,14 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 		this.currentPartitionQueue.clear();
 		this.previousIncomingMessages.clear();
 		this.outgoingMessages.clear();
-
-		WorkerData workerData;
-		String checkpointDir;
-		try {
-			checkpointDir = Props.getInstance().getStringProperty(
-					"CHECKPOINT_DIR");
-			String workerStateFile = checkpointDir + File.separator + workerID;
-			workerData = (WorkerData) GeneralUtils.deserialize(workerStateFile);
-			this.currentIncomingMessages = (ConcurrentHashMap<Integer, Map<VertexID, List<Message>>>) workerData
-					.getMessages();
-			this.nextPartitionQueue = (BlockingQueue<Partition>) workerData
-					.getPartitions();
-			System.out.println("Restoring checkpointed data "
-					+ this.nextPartitionQueue);
-		} catch (PropertyNotFoundException p) {
-			p.printStackTrace();
-		}
-		// String checkpointDir;
-		// checkpointDir =
-		// Props.getInstance().getStringProperty("CHECKPOINT_DIR");
-		// String workerStateFile = checkpointDir + File.separator + workerID;
-		workerData = (WorkerData) GeneralUtils
+		
+		WorkerData workerData = (WorkerData) GeneralUtils
 				.deserialize(this.currentCheckpointFile);
 		this.currentIncomingMessages = (ConcurrentHashMap<Integer, Map<VertexID, List<Message>>>) workerData
 				.getMessages();
 		this.nextPartitionQueue = (BlockingQueue<Partition>) workerData
 				.getPartitions();
-		// System.out.println("Restoring checkpointed data " +
-		// this.nextPartitionQueue);
+		
 	}
 
 	/*
@@ -673,7 +652,9 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void finishRecovery() throws RemoteException {
 		System.out.println("WorkerImpl: finishRecovery");
 		try {
+			System.out.println("this.masterProxy.getCheckpointedSuperstep() " + this.masterProxy.getCheckpointedSuperstep());
 			checkPoint(this.masterProxy.getCheckpointedSuperstep());
+			System.exit(0);
 		} catch (Exception e) {
 			System.out.println("checkpoint failure");
 			throw new RemoteException();
@@ -702,8 +683,7 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	public void shutdown() throws RemoteException {
 		java.util.Date date = new java.util.Date();
 		System.out.println("Worker" + workerID + " goes down now at :"
-				+ new Timestamp(date.getTime()));
-		System.exit(0);
+				+ new Timestamp(date.getTime()));		
 	}
 
 	/**
@@ -730,7 +710,8 @@ public class WorkerImpl extends UnicastRemoteObject implements Worker {
 	 */
 	@Override
 	public void updateCheckpointFile() throws RemoteException {
-		this.currentCheckpointFile = this.nextCheckpointFile;
+		GeneralUtils.removeFile(this.currentCheckpointFile);
+		this.currentCheckpointFile = this.nextCheckpointFile;		
 		System.out.println("WorkerImpl: current checkpoint file: "
 				+ this.currentCheckpointFile);
 	}

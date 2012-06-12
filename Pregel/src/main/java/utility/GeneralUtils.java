@@ -126,6 +126,7 @@ public class GeneralUtils {
 	 *
 	 * @param filePath the file path
 	 * @param obj the object to be serialized
+	 * @return true, if successful
 	 */
 	public static boolean serialize(String filePath, Object obj){
 		boolean serialized = false;
@@ -220,6 +221,17 @@ public class GeneralUtils {
 	public static void renameFile(String oldFilePath, String newFilePath){
 		File f = new File(oldFilePath);
 		f.renameTo(new File(newFilePath));
+	}
+	
+	
+	/**
+	 * Removes the file.
+	 *
+	 * @param filePath the file path
+	 */
+	public static void removeFile(String filePath){
+		File f = new File(filePath);
+		f.delete();
 	}
 	/**
 	 * The main method.

@@ -478,7 +478,7 @@ public class Master extends UnicastRemoteObject implements Worker2Master, Client
 				}
 			}
 			this.serializeActiveWorkerSet();
-			lastCheckpointedSuperstep = superstep;
+			this.lastCheckpointedSuperstep = superstep;
 		}
 		else{ // One of the Workers failed while checkpointing! Don't update the checkpoint file
 			System.out.println("One of the Workers failed while checkpointing!");
